@@ -1,54 +1,93 @@
-import { getIdToken, signInWithEmailAndPassword } from 'firebase/auth';
+import { getIdToken, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth,  } from '../../utils/firebase/firebase';
 import { useEffect, useState } from 'react';
-
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../utils/redux/authSlice/authSlice';
+import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import { BASE_URL } from '../../constants/api';
+import useUserDetails from './useUserDetails';
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [confirmation, setConfirmation] = useState(null);
-  
+  const nevigate = useNavigate();
+  const { getUserDetails } = useUserDetails();
+
+  // const [uid, setUid] = useState(null); // Track user ID
+  // const [token, setToken] = useState(null);  // Store the token
+
+  const dispatch = useDispatch();
+  // useEffect(() => {
+  //   const checkUserRole = async () => {
+  //     // Get the current user
+  //     const user = auth.currentUser;
+  //     if (user) {
+  //       // Get the user's ID token
+  //       const token = await getIdToken(user);
+
+  //       // Parse the token to get custom claims (including the role)
+        // const decodedToken = JSON.parse(atob(token.split('.')[1]));
+        // console.log(decodedToken?.type);
+  //     }
+  //   };
+ 
+  //   checkUserRole();
+  // }, []);
   useEffect(() => {
-    const checkUserRole = async () => {
-      // Get the current user
-      const user = auth.currentUser;
+    onAuthStateChanged(auth, (user) => {
       if (user) {
-        // Get the user's ID token
-        const token = await getIdToken(user);
-
-        // Parse the token to get custom claims (including the role)
-        const decodedToken = JSON.parse(atob(token.split('.')[1]));
-        console.log(decodedToken?.role);
+        // setUid(user.uid);
+        getIdToken(user)
+          .then((token) => {
+            // setToken(token);
+            dispatch(setUser({
+              token:token,
+            }));
+            setConfirmation('Login successful!');
+          })
+          .catch((error) => {
+            setError(error.message);
+          });
       }
-    };
-
-    checkUserRole();
+    });
   }, []);
+
   const handleSignIn = async () => {
     try {
-    //   setLoading(true);
-
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log(userCredential);
-      const {uid, displayName, email: userEmail} = userCredential.user;
-      const token  = await getIdToken(userCredential.user);
-      console.log(token);
+      // setUid(userCredential.user.uid);
+
+      // Get token after successful sign-in
+      const newToken = await getIdToken(userCredential.user);
+      // const decodedToken = JSON.parse(atob(newToken.split('.')[1]));
+      // setToken(newToken);
       
+      dispatch(setUser({
+        token:newToken,
+        // type:decodedToken.type || null  
+      }));
+      getUserDetails()
       setConfirmation('Login successful!');
+      nevigate("/")
+      
     } catch (error) {
       setError(error.message);
-    } finally {
-    //   setLoading(false);
     }
   };
-
+ 
+ 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
        
       <div className="bg-white p-8 shadow-md rounded-md w-96">
         <h2 className="text-2xl font-semibold mb-4">Sign In</h2>
         {confirmation ? (
+          <>
           <p className="text-green-500 mb-4">{confirmation}</p>
+
+          </>
         ) : (
           <div>
             <div className="mb-4">

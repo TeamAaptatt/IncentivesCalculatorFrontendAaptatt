@@ -1,11 +1,16 @@
-import logo from './logo.svg';
 import SignIn from './components/Auth/SignIn';
+import { Provider } from 'react-redux';
+import  store from './utils/redux/store';
+import { RouterProvider } from 'react-router-dom';
+import router from './routes/routes';
 
 function App() {
   return (
-    <div className="">
+    <Provider store={store}>
+      <RouterProvider router={router}>
       <SignIn/>
-    </div>
+      </RouterProvider>
+    </Provider>
   );
 }
 
