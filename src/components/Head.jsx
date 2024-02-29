@@ -3,12 +3,14 @@ import { useDispatch } from 'react-redux';
 import { logout } from '../utils/redux/authSlice/authSlice';
 import { signOut } from 'firebase/auth';
 import { auth } from '../utils/firebase/firebase';
+import { clearUserData } from '../utils/redux/userSlice';
 
 const Head = () => {
     const dispatch  = useDispatch()
     const handleLogout = async () => {
         try {
           await signOut(auth);
+          dispatch(clearUserData())
           dispatch(logout())
         } catch (error) {
             console.log(error);

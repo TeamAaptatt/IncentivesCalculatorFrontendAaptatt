@@ -8,7 +8,7 @@ const loadUserFromStorage = () => {
 const authSlice = createSlice({
   name: "authSlice",
   initialState: {
-    token: loadUserFromStorage(),
+    token: loadUserFromStorage()||'',
     isAuthenticated: !!loadUserFromStorage(),
   },
   reducers: {
@@ -18,9 +18,9 @@ const authSlice = createSlice({
       localStorage.setItem("token", JSON.stringify(action.payload));
     },
     logout: (state) => {
-      state.user = null;
+      state.token = '';
       state.isAuthenticated = false;
-      localStorage.removeItem("user");
+      localStorage.removeItem("token");
     },
   },
 });

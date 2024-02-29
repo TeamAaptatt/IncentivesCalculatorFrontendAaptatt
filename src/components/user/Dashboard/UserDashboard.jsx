@@ -8,7 +8,7 @@ const UserDashboard = () => {
    const userData = useSelector(state=>state.user.userData.userData)
   return (
     <div className=' text-center'>
-    <h1>Hello {userData.name} </h1>  
+    <h1>Hello {userData?.name} </h1>  
     <PlacementTable/>
     </div>
   )

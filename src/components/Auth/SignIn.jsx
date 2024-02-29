@@ -46,6 +46,7 @@ const SignIn = () => {
               token:token,
             }));
             setConfirmation('Login successful!');
+            nevigate("/")
           })
           .catch((error) => {
             setError(error.message);
@@ -68,9 +69,11 @@ const SignIn = () => {
         token:newToken,
         // type:decodedToken.type || null  
       }));
-      getUserDetails()
-      setConfirmation('Login successful!');
       nevigate("/")
+
+      setConfirmation('Login successful!');
+      getUserDetails()
+
       
     } catch (error) {
       setError(error.message);

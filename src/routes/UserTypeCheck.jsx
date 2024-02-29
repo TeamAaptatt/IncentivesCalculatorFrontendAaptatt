@@ -5,7 +5,7 @@ import { auth } from '../utils/firebase/firebase';
 
 const UserTypeCheck = ({ admin, user }) => {
     const [userType, setUserType] = useState(null);
-    const token = useSelector((store)=>store.auth.token.token) || '';
+    const token = useSelector((store)=>store.auth.token?.token) || '';
     useEffect(() => {
       const checkUserType = () => {
           try {
@@ -19,7 +19,7 @@ const UserTypeCheck = ({ admin, user }) => {
       };
   
       checkUserType();
-    }, []); // Empty dependency array to run the effect once when the component mounts
+    }, [token]); // Empty dependency array to run the effect once when the component mounts
   
     console.log(userType);
   

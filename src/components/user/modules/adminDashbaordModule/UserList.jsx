@@ -20,7 +20,7 @@ const UserList = () => {
   return (
     <div className="flex flex-wrap">
       {users.map((user) => (
-        <Link to={`/userPage/${user._id}`} key={user._id}>
+        <Link to={`/userPage/${user.cid}`} key={user._id}>
           <UserCard user={user} />
         </Link>
       ))}

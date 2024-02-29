@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import CreateUserForm from '../modules/adminDashbaordModule/CreateUserForm';
 import PlacementTable from '../modules/userDashboardModule/PlacementTable';
 import UserList from '../modules/adminDashbaordModule/UserList';
+import AdminPlacementTable from '../modules/adminDashbaordModule/AdminPlacementTable';
 
 const AdminDashboard = () => {
   const [toggle, setToggle] = useState(false);
@@ -12,6 +13,7 @@ const AdminDashboard = () => {
         </div>
         {toggle && <CreateUserForm/>}
         {/* <PlacementTable/> */}
+        <AdminPlacementTable/>
         <UserList/>
     </div>
   )

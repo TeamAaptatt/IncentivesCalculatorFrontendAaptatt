@@ -5,7 +5,7 @@ import { BASE_URL } from "../../constants/api";
 import { setUserData } from "../../utils/redux/userSlice";
 
 const useUserDetails = () => {
-  const token = useSelector((state) => state.auth.token.token)||null;
+  const token = useSelector((state) => state.auth.token.token)||'';
   console.log(token);
   const dispatch = useDispatch();
 
