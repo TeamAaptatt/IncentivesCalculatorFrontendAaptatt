@@ -28,11 +28,10 @@ const PlacementTable = () => {
  const token = useSelector((store)=>store.auth.token?.token) || '';
  useEffect(() => {
   placementDataofUser();
-}, );
+}, [userId]);
 
 const placementDataofUser = async () => {
   try {
-    if(token!==''){
     const response = await axios.get(BASE_URL + `placements/${userId}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -41,7 +40,6 @@ const placementDataofUser = async () => {
     const resData = response.data;  // Extract data from the response
     console.log(resData);
     setPlacementData(resData.placements);
-  }
   } catch (err) {
     console.log("Error in getting the user's placement data", err);
   }

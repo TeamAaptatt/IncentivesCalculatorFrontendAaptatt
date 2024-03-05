@@ -54,6 +54,38 @@ const SignIn = () => {
       }
     });
   }, []);
+  useEffect(() => {
+    const checkAuthState = async () => {
+      const user = auth.currentUser;
+
+      if (user) {
+        try {
+          // Get the initial ID token
+          const token = await getIdToken(user);
+          dispatch(setUser({
+            token: token,
+          }));
+
+          // Set up a token refresh interval every 55 minutes
+          const tokenRefreshInterval = setInterval(async () => {
+            const refreshedToken = await getIdToken(user);
+            dispatch(setUser({
+              token: refreshedToken,
+            }));
+          }, 55 * 60 * 1000);
+
+          // Set up a cleanup function to clear the interval when the component unmounts
+          return () => clearInterval(tokenRefreshInterval);
+        } catch (error) {
+          console.error('Error getting ID token:', error);
+        }
+      }
+    };
+
+    // Check authentication state when the component mounts
+    checkAuthState();
+  }, [dispatch]);
+
 
   const handleSignIn = async () => {
     try {
@@ -62,17 +94,25 @@ const SignIn = () => {
 
       // Get token after successful sign-in
       const newToken = await getIdToken(userCredential.user);
-      // const decodedToken = JSON.parse(atob(newToken.split('.')[1]));
-      // setToken(newToken);
-      
       dispatch(setUser({
-        token:newToken,
-        // type:decodedToken.type || null  
+        token: newToken,
       }));
+
+      // Set up a token refresh interval every 55 minutes
+      const tokenRefreshInterval = setInterval(async () => {
+        const refreshedToken = await getIdToken(userCredential.user);
+        dispatch(setUser({
+          token: refreshedToken,
+        }));
+      }, 55 * 60 * 1000);
       nevigate("/")
 
       setConfirmation('Login successful!');
       getUserDetails()
+      // Set up a cleanup function to clear the interval when the component unmounts
+      return () => clearInterval(tokenRefreshInterval);
+
+      
 
       
     } catch (error) {

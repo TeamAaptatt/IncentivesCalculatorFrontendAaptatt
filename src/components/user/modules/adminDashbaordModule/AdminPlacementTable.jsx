@@ -4,12 +4,9 @@ import { BASE_URL } from "../../../../constants/api";
 import { useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCancel,
   faCheck,
-  faCross,
   faEdit,
   faMultiply,
-  faSave,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -130,22 +127,22 @@ useEffect(()=>{
   }
 
   return (
-    <div className="overflow-hidden border border-collapse border-gray-800 overflow-x-scroll w-[80%] m-4">
+    <div className="overflow-hidden border rounded border-collapse border-gray-800 overflow-x-scroll w-[80%] m-4">
       <table className="min-w-full  ">
-        <thead>
-          <tr>
+        <thead className=" text-indigo-600 uppercase text-center">
+          <tr >
             {dataFields.map((data) => (
-              <th className="py-2 px-4 border-b">{data}</th>
+              <th className=" px-4 border border-black">{data}</th>
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className=" text-center text-s ">
           {placements.map((placement) => (
             <>
               {placement._id === updateFieldId ? (
                 <tr key={placement._id} className="hover:bg-gray-100">
                   {fields.map((field, index) => (
-                    <td key={index} className="px-6 py-4 whitespace-nowrap">
+                    <td key={index} className="px-6  whitespace-nowrap">
                       <input
                          
                         onChange={(e)=>handleInputChange(e, field)} 
@@ -165,7 +162,7 @@ useEffect(()=>{
                       />
                     </td>
                   ))}
-                  <td className="py-2 px-4 border-b">
+                  <td className=" px-4 border-b">
                     <button
                       onClick={() => {
                         saveChangesHandler();
@@ -183,19 +180,19 @@ useEffect(()=>{
                   </td>
                 </tr>
               ) : (
-                <tr key={placement._id} className="hover:bg-gray-100">
+                <tr key={placement._id} className="hover:bg-gray-100 ">
                   {fields.map((field, index) => (
-                    <td key={index} className="px-6 py-4 whitespace-nowrap">
+                    <td key={index} className="px-6 py-4 whitespace-nowrap border  border-r-gray-800">
                       {field === "accountManager"
-                        ? `${placement[field].name}`
+                        ? `${placement[field].name} (${placement[field].cid})`
                         : field === "cnadidateOwner"
-                        ? `${placement[field].name}`
+                        ? `${placement[field].name} (${placement[field].cid})`
                         : field === "pandLhead"
-                        ? `${placement[field].name}`
+                        ? `${placement[field].name} (${placement[field].cid})`
                         : field === "dateOfJoining"
                         ? new Date(placement[field]).toLocaleDateString()
                         : field === "accountHead"
-                        ? `${placement[field].name}`
+                        ? `${placement[field].name} (${placement[field].cid})`
                         : placement[field]}
                     </td>
                   ))}
