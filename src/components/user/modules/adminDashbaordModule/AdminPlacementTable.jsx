@@ -15,7 +15,7 @@ const AdminPlacementTable = () => {
   const [placements, setPlacements] = useState([]);
   const [updateFieldId, setupdateFieldId] = useState(null);
   const [updatedData, setUpdatedData] = useState(null);
-  const [deleteFieldId, setDeleteFieldId] = useState(null)
+  const [deleteFieldId, setDeleteFieldId] = useState(null);
   const dataFields = [
     "Status",
     "Candidate",
@@ -57,6 +57,7 @@ const AdminPlacementTable = () => {
   useEffect(() => {
     getAllPlacements();
   }, [updateFieldId, deleteFieldId]);
+
   const getAllPlacements = async () => {
     const response = await axios.get(BASE_URL + "get-all-placements", {
       headers: {
@@ -67,13 +68,19 @@ const AdminPlacementTable = () => {
     setPlacements(data);
     console.log(data);
   };
+
   const handleInputChange = (event, field) => {
     let updatedValue = event.target.value;
 
     // Handle special cases based on the field name
     if (field === "dateOfJoining") {
       updatedValue = new Date(updatedValue);
-    } else if (field === "accountManager" || field === "cnadidateOwner" || field === "accountHead"|| field === "pandLhead") {
+    } else if (
+      field === "accountManager" ||
+      field === "cnadidateOwner" ||
+      field === "accountHead" ||
+      field === "pandLhead"
+    ) {
       updatedValue = { name: updatedValue };
     }
 
@@ -89,63 +96,74 @@ const AdminPlacementTable = () => {
     });
     setPlacements(updatedPlacements);
   };
+
   const saveChangesHandler = async () => {
-    const updatedPlacement =  placements.find((placement) => placement._id === updateFieldId);
+    const updatedPlacement = placements.find(
+      (placement) => placement._id === updateFieldId
+    );
     console.log(updatedPlacement);
-    const response = await axios.put(BASE_URL+`/updatePlacement/${updateFieldId}`, updatedPlacement, {
-      headers:{
-        'Authorization' : `Bearer ${token}` ,
+    const response = await axios.put(
+      BASE_URL + `/updatePlacement/${updateFieldId}`,
+      updatedPlacement,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
-    })
+    );
     setupdateFieldId(null);
-    if(response.status==='200'){
+    if (response.status === "200") {
       setupdateFieldId(null);
     }
-  }
+  };
 
-
-useEffect(()=>{
-  if(deleteFieldId!==null){
-  deleteRowHandler();
-
-  }
-}, [deleteFieldId])
-    const deleteRowHandler = async () => {
-    const response = await axios.delete(BASE_URL + `/deletePlacement/${deleteFieldId}`,{
-      headers:{
-        'Authorization': `Bearer ${token}`
-      }
-    })
-  
-    if(response.status==='200'){
-    setDeleteFieldId(null)
-    setupdateFieldId(null)
-    getAllPlacements();
-
+  useEffect(() => {
+    if (deleteFieldId !== null) {
+      deleteRowHandler();
     }
+  }, [deleteFieldId]);
 
-  }
+  const deleteRowHandler = async () => {
+    const response = await axios.delete(
+      BASE_URL + `/deletePlacement/${deleteFieldId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.status === "200") {
+      setDeleteFieldId(null);
+      setupdateFieldId(null);
+      getAllPlacements();
+    }
+  };
 
   return (
     <div className="overflow-hidden border rounded border-collapse border-gray-800 overflow-x-scroll w-[80%] m-4">
-      <table className="min-w-full  ">
-        <thead className=" text-indigo-600 uppercase text-center">
-          <tr >
-            {dataFields.map((data) => (
-              <th className=" px-4 border border-black">{data}</th>
+      <table className="min-w-full border border-gray-800">
+        <thead className="text-indigo-600 uppercase text-center">
+          <tr>
+            {dataFields.map((data, index) => (
+              <th key={index} className="px-4 py-2 border border-black">
+                {data}
+              </th>
             ))}
           </tr>
         </thead>
-        <tbody className=" text-center text-s ">
+        <tbody className="text-center text-sm">
           {placements.map((placement) => (
             <>
               {placement._id === updateFieldId ? (
                 <tr key={placement._id} className="hover:bg-gray-100">
-                  {fields.map((field, index) => (
-                    <td key={index} className="px-6  whitespace-nowrap">
+                  {fields.map((field, fieldIndex) => (
+                    <td
+                      key={fieldIndex}
+                      className="px-6 py-4 whitespace-nowrap border border-gray-800"
+                    >
                       <input
-                         
-                        onChange={(e)=>handleInputChange(e, field)} 
+                        onChange={(e) => handleInputChange(e, field)}
                         value={
                           field === "accountManager"
                             ? `${placement[field].name}`
@@ -162,7 +180,7 @@ useEffect(()=>{
                       />
                     </td>
                   ))}
-                  <td className=" px-4 border-b">
+                  <td className="px-4 py-4 border-b">
                     <button
                       onClick={() => {
                         saveChangesHandler();
@@ -172,7 +190,7 @@ useEffect(()=>{
                     </button>
                     <button
                       onClick={() => {
-                        setupdateFieldId(null)
+                        setupdateFieldId(null);
                       }}
                     >
                       <FontAwesomeIcon icon={faMultiply} className="mr-2" />
@@ -180,9 +198,12 @@ useEffect(()=>{
                   </td>
                 </tr>
               ) : (
-                <tr key={placement._id} className="hover:bg-gray-100 ">
-                  {fields.map((field, index) => (
-                    <td key={index} className="px-6 py-4 whitespace-nowrap border  border-r-gray-800">
+                <tr key={placement._id} className="hover:bg-gray-100">
+                  {fields.map((field, fieldIndex) => (
+                    <td
+                      key={fieldIndex}
+                      className="px-6 py-4 whitespace-nowrap border border-black w-32" // Set fixed width here
+                    >
                       {field === "accountManager"
                         ? `${placement[field].name} (${placement[field].cid})`
                         : field === "cnadidateOwner"
@@ -196,7 +217,7 @@ useEffect(()=>{
                         : placement[field]}
                     </td>
                   ))}
-                  <td className="py-2 px-4 border-b">
+                  <td className="py-4 px-4 border-b">
                     <button
                       onClick={() => {
                         setupdateFieldId(placement._id);
@@ -206,10 +227,10 @@ useEffect(()=>{
                       <FontAwesomeIcon icon={faEdit} className="mr-2" />
                     </button>
                     <button
-                          onClick={() => {
-                            setDeleteFieldId(placement._id);
-                            // deleteRowHandler();
-                          }}
+                      onClick={() => {
+                        setDeleteFieldId(placement._id);
+                        // deleteRowHandler();
+                      }}
                     >
                       <FontAwesomeIcon icon={faTrash} className="mr-2" />
                     </button>
