@@ -22,6 +22,29 @@ const dataFields = [
     "paymentStaus",
   ];
  
+
+  const userId = useSelector(state => state.user?.userData?.userData?._id);
+  console.log(userId, "userId");
+
+  const token = useSelector(store => store.auth.token?.token) || '';
+  useEffect(() => {
+    placementDataofUser();
+  }, [userId]);
+
+  const placementDataofUser = async () => {
+    try {
+      const response = await axios.get(BASE_URL + `placements/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+      const resData = response.data;  // Extract data from the response
+      setPlacementData(resData.placements);
+    } catch (err) {
+      console.log("Error in getting the user's placement data", err);
+    }
+  }
+
   return (
     <div className="relative my-5">
       <div className="overflow-x-auto max-w-screen-xl mx-auto">
@@ -31,7 +54,7 @@ const dataFields = [
               {dataFields.map((field, index) => (
                 <th
                   key={index}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-black"
                 >
                   {field}
                 </th>
@@ -40,15 +63,15 @@ const dataFields = [
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {placementData?.map((placement, index) => (
-              <tr key={index}>
+              <tr key={index} className="border border-black" style={{ border: placement.sendOff ? '1.5px solid #E02424' : '', backgroundColor: placement.sendOff ? '#F8B4B4' : '' }}>
                 {dataFields.map((field, index) => (
-                  <td key={index} className="px-6 py-4 whitespace-nowrap">
+                  <td key={index} className="px-6 py-4 whitespace-nowrap border border-black">
                     {field === "accountManager" ? `${placement[field].name}` :
                       field === "cnadidateOwner" ? `${placement[field].name}` :
-                      field === "pandLhead" ? `${placement[field].name}` :
-                      field === "dateOfJoining" ? new Date(placement[field]).toLocaleDateString() :
-                      field === "accountHead" ? `${placement[field].name}` :
-                      placement[field]}
+                        field === "pandLhead" ? `${placement[field].name}` :
+                          field === "dateOfJoining" ? new Date(placement[field]).toLocaleDateString() :
+                            field === "accountHead" ? `${placement[field].name}` :
+                              placement[field]}
                   </td>
                 ))}
               </tr>
@@ -61,6 +84,8 @@ const dataFields = [
 };
 
 export default PlacementTable;
+
+
 
 
 
