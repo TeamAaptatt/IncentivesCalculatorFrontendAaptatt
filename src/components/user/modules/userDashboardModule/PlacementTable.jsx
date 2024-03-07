@@ -3,9 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { BASE_URL } from "../../../../constants/api";
 
-const PlacementTable = () => {
-  const [placementData, setPlacementData] = useState([]);
-  const dataFields = [
+const PlacementTable = ({placementData}) => {
+const dataFields = [
     "status",
     "candidate",
     "client",
@@ -22,29 +21,7 @@ const PlacementTable = () => {
     "securityPeriod",
     "paymentStaus",
   ];
- const userId = useSelector(state=> state.user?.userData?.userData?._id);
- console.log(userId,"userId");
  
- const token = useSelector((store)=>store.auth.token?.token) || '';
- useEffect(() => {
-  placementDataofUser();
-}, [userId]);
-
-const placementDataofUser = async () => {
-  try {
-    const response = await axios.get(BASE_URL + `placements/${userId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      }
-    });
-    const resData = response.data;  // Extract data from the response
-    console.log(resData);
-    setPlacementData(resData.placements);
-  } catch (err) {
-    console.log("Error in getting the user's placement data", err);
-  }
-}
-
   return (
     <div className="relative my-5">
       <div className="overflow-x-auto max-w-screen-xl mx-auto">
