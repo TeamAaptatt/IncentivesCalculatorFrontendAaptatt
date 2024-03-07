@@ -3,9 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { BASE_URL } from "../../../../constants/api";
 
-const PlacementTable = () => {
-  const [placementData, setPlacementData] = useState([]);
-  const dataFields = [
+const PlacementTable = ({placementData}) => {
+const dataFields = [
     "status",
     "candidate",
     "client",
@@ -22,6 +21,7 @@ const PlacementTable = () => {
     "securityPeriod",
     "paymentStaus",
   ];
+ 
 
   const userId = useSelector(state => state.user?.userData?.userData?._id);
   console.log(userId, "userId");
