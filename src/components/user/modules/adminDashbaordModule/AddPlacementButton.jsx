@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { BASE_URL } from '../../../../constants/api';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 const AddPlacementButton = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,6 +23,7 @@ const AddPlacementButton = () => {
     securityPeriod: '',
     paymentStatus: '',
   });
+  const token = useSelector((state) => state.auth.token.token);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -30,13 +34,13 @@ const AddPlacementButton = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('/api/addPlacement', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await axios.post(BASE_URL +'add-placement', formData,
+        {
+          headers:{
+            Authorization:`Bearer ${token}`
+          }
+        }
+      );
 
       if (response.ok) {
         // Handle successful placement creation

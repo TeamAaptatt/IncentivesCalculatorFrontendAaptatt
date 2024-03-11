@@ -24,7 +24,7 @@ const OwnerShipTable = () => {
   const [reportings, setReportings] = useState(null);
   const [createReportingToggle, setCreateReprtingToggle] = useState(false);
   const [transferReportingToggle, setTransferReprtingToggle] = useState(false);
-
+  const [salaryValue, setSalaryValue] = useState(null);
   const [userId, setUserId] = useState(null);
 
   const tableHeadNames = [
@@ -89,6 +89,7 @@ const OwnerShipTable = () => {
 
       const data = response.data;
       setReportings(data);
+      
       console.log(data);
     } catch (err) {
       console.log(err);
@@ -135,13 +136,33 @@ const OwnerShipTable = () => {
     }
   };
   //UPDATE SALARY
-  const updateSalryOfUser = async () => {};
+
+  const updateSalryOfUser = async () => {
+    const reportingToUpdate = reportings.find(
+      (reporting) => reporting.user._id === updateUserId
+    );
+    const cid = reportingToUpdate.user.cid
+    console.log(reportingToUpdate);
+    try{
+      const response = await axios.put(BASE_URL + `/update-salary/${cid}`,       { amount: salaryValue }, 
+      {
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      }
+       ) 
+
+      console.log(response.data);
+    }catch (err){
+      console.log(err);
+    }
+  };
   //UPDATE USER
   const updateUser = async () => {
     const reportingToUpdate = reportings.find(
       (reporting) => reporting.user._id === updateUserId
     );
-
+  await updateSalryOfUser();
     try {
       const response = await axios.put(`${BASE_URL}update-user/${updateUserId} `,
       reportingToUpdate.user, 
@@ -162,8 +183,10 @@ const OwnerShipTable = () => {
   };
   const handleUpdateUser = (e, field) => {
     let updateValue = e.target.value;
-    console.log(updateValue, "Update");
-  
+  if(field === "salary"){
+
+    updateValue = {amount: updateValue}
+  }
    if (field === "level"||field === "designation" || field === "assignedRole"|| field ==="skip") {
       updateValue =  updateValue;
     }
@@ -238,9 +261,15 @@ const OwnerShipTable = () => {
                       ) : field === "reportingTo" ? (
                         reporting?.reportingTo?.name
                       ) : field === "skip" ? (
-                        reporting.user[field]?.name
+                        reporting.user?.skip?.name
                       ) : field === "salary" ? (
-                        reporting.user[field]?.name
+                        <input value={salaryValue} onChange={(e)=> {
+                          setSalaryValue(e.target.value)
+
+                        }
+                        } className=" w-20">
+                          
+                        </input>
                       ) : (
                         <input
                           className=" w-20"
@@ -295,12 +324,12 @@ const OwnerShipTable = () => {
                         new Date(reporting[field]).toLocaleDateString()
                       ) : field === "endDate" && reporting[field] ? (
                         new Date(reporting[field]).toLocaleDateString()
-                      ) : field === "skip" ? `${reporting[field]?.name} (${reporting[field]?.cid})`
+                      ) : field === "skip" ? `${reporting.user.skip?.name} (${reporting.user.skip?.cid})`
                         
                        : "" ? (
                         reporting.user[field]?.name
                       ) : field === "salary" ? (
-                        reporting.user[field]?.name
+                        reporting.user?.salary?.amount
                       ) :field ==="name"?                        `${reporting.user[field]} (${reporting.user.cid})`:
                       (
                         reporting.user[field]
