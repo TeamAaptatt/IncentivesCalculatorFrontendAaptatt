@@ -24,7 +24,7 @@ const OwnerShipTable = () => {
   const [reportings, setReportings] = useState(null);
   const [createReportingToggle, setCreateReprtingToggle] = useState(false);
   const [transferReportingToggle, setTransferReprtingToggle] = useState(false);
-  const [salaryValue, setSalaryValue] = useState(null);
+ const [salaryValue, setSalaryValue] = useState(null);
   const [userId, setUserId] = useState(null);
 
   const tableHeadNames = [
@@ -90,6 +90,7 @@ const OwnerShipTable = () => {
       const data = response.data;
       setReportings(data);
       
+
       console.log(data);
     } catch (err) {
       console.log(err);
@@ -261,7 +262,7 @@ const OwnerShipTable = () => {
                       ) : field === "reportingTo" ? (
                         reporting?.reportingTo?.name
                       ) : field === "skip" ? (
-                        reporting.user?.skip?.name
+]                        reporting.user?.skip?.name
                       ) : field === "salary" ? (
                         <input value={salaryValue} onChange={(e)=> {
                           setSalaryValue(e.target.value)
