@@ -9,6 +9,7 @@ import {
   faMultiply,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
+import useUserManagement from "../../../../utils/hooks/useUserMangement";
 
 const AdminPlacementTable = () => {
   const token = useSelector((state) => state.auth.token.token);
@@ -53,7 +54,53 @@ const AdminPlacementTable = () => {
     "securityPeriod",
     "paymentStaus",
   ];
+  const securityPeriodOptions = ["On-Going", "Completed", "Send-Off"]; // Replace with your actual options
+  const paymentStatusOptions = ["Pending", "Received", "Adjusted", "Returning", "Compromised"]; // Replace with your actual options
+  
+   const {users, filteredUsers} = useUserManagement();
 
+
+   const getFieldOptions = (field) => {
+    switch (field) {
+      case "cnadidateOwner":
+      case "accountManager":
+      case "accountHead":
+      case "pandLhead":
+        const usersToDisplay = field === "cnadidateOwner"?
+        users?.map((user) => ({
+          label: `${user.name} (${user.cid})`,
+          value: user._id,
+        })): filteredUsers?.map((user) => ({
+          label: `${user.name} (${user.cid})`,
+          value: user._id,
+        }))
+        return usersToDisplay;
+        
+      case "securityPeriod":
+        return securityPeriodOptions.map((option) => ({
+          label: option,
+          value: option,
+        }));
+      case "paymentStatus":
+        return paymentStatusOptions.map((option) => ({
+          label: option,
+          value: option,
+        }));
+      default:
+        return [];
+    }
+  };
+  
+   const candidateOwnerOptions = getFieldOptions("cnadidateOwner");
+   
+  const accountManagerOptions = getFieldOptions("accountManager");
+  const accountHeadOptions = getFieldOptions("accountHead");
+  const pandLHeadOptions = getFieldOptions("pandLhead");
+  const securityPeriodOption = getFieldOptions("securityPeriod");
+  const paymentStatusOption = getFieldOptions('paymentStatus')
+  
+ 
+  
   useEffect(() => {
     getAllPlacements();
   }, [updateFieldId, deleteFieldId]);
@@ -81,8 +128,12 @@ const AdminPlacementTable = () => {
       field === "accountHead" ||
       field === "pandLhead"
     ) {
-      updatedValue = { name: updatedValue };
-    }
+      const user = users.find((user) => user.name === updatedValue);
+
+      if (user) {
+        updatedValue = { name: user.name, id: user.id };
+      }
+      }
 
     // Use the field name to update the corresponding state in a new array
     const updatedPlacements = placements.map((placement) => {
@@ -153,7 +204,7 @@ const AdminPlacementTable = () => {
           </tr>
         </thead>
         <tbody className="text-center text-sm">
-          {placements.map((placement) => (
+          {placements?.map((placement) => (
             <>
               {placement._id === updateFieldId ? (
                 <tr key={placement._id} className="hover:bg-gray-100">
@@ -162,22 +213,90 @@ const AdminPlacementTable = () => {
                       key={fieldIndex}
                       className="px-6 py-4 whitespace-nowrap border border-gray-800"
                     >
-                      <input
-                        onChange={(e) => handleInputChange(e, field)}
-                        value={
-                          field === "accountManager"
-                            ? `${placement[field].name}`
-                            : field === "cnadidateOwner"
-                            ? `${placement[field].name}`
-                            : field === "pandLhead"
-                            ? `${placement[field].name}`
-                            : field === "dateOfJoining"
-                            ? new Date(placement[field]).toLocaleDateString()
-                            : field === "accountHead"
-                            ? `${placement[field].name}`
-                            : placement[field]
-                        }
-                      />
+                {fieldIndex === 14 || fieldIndex === 15 ? ( // Check if the field index is 14 or 15
+  <select
+    onChange={(e) => handleInputChange(e, field)}
+    value={placement[field]}
+  >
+    {fieldIndex === 14
+      ? securityPeriodOptions.map((option, index) => (
+          <option key={index} value={option}>
+            {option}
+          </option>
+        ))
+      : paymentStatusOptions.map((option, index) => (
+          <option key={index} value={option}>
+            {option}
+          </option>
+        ))}
+  </select>
+) : (
+  <input
+    onChange={(e) => handleInputChange(e, field)}
+    className={`${fieldIndex === 5 || fieldIndex === 6 || fieldIndex === 7 || fieldIndex===8 ? 'hidden' : 'visible'}`}
+
+    value={
+      field === "accountManager" ||
+      field === "cnadidateOwner" ||
+      field === "pandLhead" ||
+      field === "accountHead"
+        ? placement[field]?.name
+        : field === "dateOfJoining"
+        ? new Date(placement[field]).toLocaleDateString()
+        : placement[field]
+    }
+  />
+)}
+{field === "cnadidateOwner" && (
+  <select
+    onChange={(e) => handleInputChange(e, field)}
+    value={placement[field]?.name}
+  >
+    {candidateOwnerOptions?.map((option, index) => (
+      <option key={index} value={option.value}>
+        {option.label}
+      </option>
+    ))}
+  </select>
+)}
+{field === "accountManager" && (
+  <select
+    onChange={(e) => handleInputChange(e, field)}
+    value={placement[field]?.name}
+  >
+    {accountManagerOptions.map((option, index) => (
+      <option key={index} value={option.value}>
+        {option.label}
+      </option>
+    ))}
+  </select>
+)}
+{field === "pandLhead" && (
+  <select
+    onChange={(e) => handleInputChange(e, field)}
+    value={placement[field]?.name}
+  >
+    {pandLHeadOptions.map((option, index) => (
+      <option key={index} value={option.value}>
+        {option.label}
+      </option>
+    ))}
+  </select>
+)}
+{field === "accountHead" && (
+  <select
+    onChange={(e) => handleInputChange(e, field)}
+    value={placement[field]?.name}
+  >
+    {accountHeadOptions.map((option, index) => (
+      <option key={index} value={option.value}>
+        {option.label}
+      </option>
+    ))}
+  </select>
+)}
+
+                      
                     </td>
                   ))}
                   <td className="px-4 py-4 border-b">
@@ -199,13 +318,13 @@ const AdminPlacementTable = () => {
                 </tr>
               ) : (
                 <tr key={placement._id} className="hover:bg-gray-100">
-                  {fields.map((field, fieldIndex) => (
+                  {fields?.map((field, fieldIndex) => (
                     <td
                       key={fieldIndex}
                       className="px-6 py-4 whitespace-nowrap border border-black w-32" // Set fixed width here
                     >
                       {field === "accountManager"
-                        ? `${placement[field].name} (${placement[field].cid})`
+                        ? `${placement[field]?.name} (${placement[field].cid})`
                         : field === "cnadidateOwner"
                         ? `${placement[field].name} (${placement[field].cid})`
                         : field === "pandLhead"

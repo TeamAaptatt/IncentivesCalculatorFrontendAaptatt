@@ -27,23 +27,23 @@ const dataFields = [
   console.log(userId, "userId");
 
   const token = useSelector(store => store.auth.token?.token) || '';
-  useEffect(() => {
-    placementDataofUser();
-  }, [userId]);
+  // useEffect(() => {
+  //   placementDataofUser();
+  // }, [userId]);
 
-  const placementDataofUser = async () => {
-    try {
-      const response = await axios.get(BASE_URL + `placements/${userId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        }
-      });
-      const resData = response.data;  // Extract data from the response
-      setPlacementData(resData.placements);
-    } catch (err) {
-      console.log("Error in getting the user's placement data", err);
-    }
-  }
+  // const placementDataofUser = async () => {
+  //   try {
+  //     const response = await axios.get(BASE_URL + `placements/${userId}`, {
+  //       headers: {
+  //         'Authorization': `Bearer ${token}`,
+  //       }
+  //     });
+  //     const resData = response.data;  // Extract data from the response
+  //     setPlacementData(resData.placements);
+  //   } catch (err) {
+  //     console.log("Error in getting the user's placement data", err);
+  //   }
+  // }
 
   return (
     <div className="relative my-5">
