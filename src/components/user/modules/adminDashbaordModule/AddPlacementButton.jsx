@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { BASE_URL } from '../../../../constants/api';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faClose } from '@fortawesome/free-solid-svg-icons';
+import useUserManagement from '../../../../utils/hooks/useUserMangement';
 
 const AddPlacementButton = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -11,7 +14,7 @@ const AddPlacementButton = () => {
     client: '',
     offeredPosition: '',
     dateOfJoining: '',
-    candidateOwner: '',
+    cnadidateOwner: '',
     accountManager: '',
     accountHead: '',
     pandLhead: '',
@@ -21,9 +24,10 @@ const AddPlacementButton = () => {
     fee: '',
     sendOff: '',
     securityPeriod: '',
-    paymentStatus: '',
+    paymentStaus: '',
   });
   const token = useSelector((state) => state.auth.token.token);
+  const { users } = useUserManagement();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -34,18 +38,18 @@ const AddPlacementButton = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(BASE_URL +'add-placement', formData,
+      const response = await axios.post(
+        BASE_URL + 'add-placement',
+        formData,
         {
-          headers:{
-            Authorization:`Bearer ${token}`
-          }
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
       if (response.ok) {
-        // Handle successful placement creation
         console.log('Placement created successfully');
-        // Optionally, close the modal or reset the form
         setIsModalOpen(false);
         setFormData({
           status: '',
@@ -66,7 +70,6 @@ const AddPlacementButton = () => {
           paymentStatus: '',
         });
       } else {
-        // Handle error in placement creation
         console.error('Failed to create placement');
       }
     } catch (error) {
@@ -84,11 +87,22 @@ const AddPlacementButton = () => {
       </button>
 
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
-          <div className="bg-white w-full md:max-w-md p-4 md:p-8 rounded-md shadow-lg overflow-y-auto max-h-full">
-            <h2 className="text-xl md:text-2xl font-bold mb-4 text-blue-500">Add Placement</h2>
+        <div className="fixed inset-0 m-8 flex items-center justify-center">
+          <div className="bg-white w-full md:max-w-[60rem] p-4 md:p-8 rounded-md shadow-lg overflow-y-auto max-h-full">
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="mt-4 fixed translate-x-[54rem] text-red-600 border-2 border-black p-1 hover:text-gray-800 focus:outline-none"
+            >
+              <FontAwesomeIcon icon={faClose} />
+            </button>
+            <h2 className="text-xl md:text-2xl font-bold mb-4 text-blue-500">
+              Add Placement
+            </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-wrap gap-6 uppercase"
+            >
               {Object.entries(formData).map(([key, value]) => (
                 <div key={key}>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -102,7 +116,7 @@ const AddPlacementButton = () => {
                       onChange={handleInputChange}
                       className="p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-500"
                     />
-                  ) : key === 'securityPeriod' || key === 'paymentStatus' ? (
+                  ) : key === 'securityPeriod' || key === 'paymentStaus' ? (
                     <select
                       name={key}
                       value={value}
@@ -123,6 +137,20 @@ const AddPlacementButton = () => {
                         ))
                       )}
                     </select>
+                  ) : key === 'cnadidateOwner' || key === 'accountManager' || key === 'accountHead' || key === 'pandLhead' ? (
+                    <select
+                      name={key}
+                      value={value}
+                      onChange={handleInputChange}
+                      className="p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-500"
+                    >
+                      <option value="">Select {key}</option>
+                      {users.map((user) => (
+                        <option key={user._id} value={user._id}>
+                          {user.name}
+                        </option>
+                      ))}
+                    </select>
                   ) : (
                     <input
                       type="text"
@@ -135,7 +163,7 @@ const AddPlacementButton = () => {
                 </div>
               ))}
 
-              <div className="flex justify-end">
+              <div className="m-8 flex justify-center items-center w-full">
                 <button
                   type="submit"
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
@@ -144,13 +172,6 @@ const AddPlacementButton = () => {
                 </button>
               </div>
             </form>
-
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="mt-4 text-gray-600 hover:text-gray-800 focus:outline-none"
-            >
-              Close
-            </button>
           </div>
         </div>
       )}
