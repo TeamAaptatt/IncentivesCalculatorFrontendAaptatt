@@ -262,7 +262,7 @@ const OwnerShipTable = () => {
                       ) : field === "reportingTo" ? (
                         reporting?.reportingTo?.name
                       ) : field === "skip" ? (
-]                        reporting.user?.skip?.name
+                      reporting.user?.skip?.name
                       ) : field === "salary" ? (
                         <input value={salaryValue} onChange={(e)=> {
                           setSalaryValue(e.target.value)
