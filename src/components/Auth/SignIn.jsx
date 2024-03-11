@@ -14,7 +14,7 @@ const SignIn = () => {
   const [confirmation, setConfirmation] = useState(null);
   const nevigate = useNavigate();
   const { getUserDetails } = useUserDetails();
-=  const [authuser, setAuthUser] = useState(null);
+ const [authuser, setAuthUser] = useState(null);
   // const [uid, setUid] = useState(null); // Track user ID
   // const [token, setToken] = useState(null);  // Store the token
 
