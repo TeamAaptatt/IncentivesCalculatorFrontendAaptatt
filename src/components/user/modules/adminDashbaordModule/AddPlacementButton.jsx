@@ -48,8 +48,7 @@ const AddPlacementButton = () => {
         }
       );
 
-      if (response.ok) {
-        console.log('Placement created successfully');
+        alert('Placement created successfully');
         setIsModalOpen(false);
         setFormData({
           status: '',
@@ -69,9 +68,8 @@ const AddPlacementButton = () => {
           securityPeriod: '',
           paymentStatus: '',
         });
-      } else {
-        console.error('Failed to create placement');
-      }
+           console.error('Failed to create placement');
+      
     } catch (error) {
       console.error('Error:', error.message);
     }
