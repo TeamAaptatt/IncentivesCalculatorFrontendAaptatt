@@ -1,111 +1,81 @@
-import { getIdToken, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { auth,  } from '../../utils/firebase/firebase';
+import { getIdToken, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../utils/firebase/firebase';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../utils/redux/authSlice/authSlice';
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
-import { BASE_URL } from '../../constants/api';
 import useUserDetails from './useUserDetails';
+
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [confirmation, setConfirmation] = useState(null);
-  const nevigate = useNavigate();
+  const navigate = useNavigate();
   const { getUserDetails } = useUserDetails();
- const [authuser, setAuthUser] = useState(null);
-  // const [uid, setUid] = useState(null); // Track user ID
-  // const [token, setToken] = useState(null);  // Store the token
+  const [authUser, setAuthUser] = useState(null);
 
   const dispatch = useDispatch();
-  // useEffect(() => {
-  //   const checkUserRole = async () => {
-  //     // Get the current user
-  //     const user = auth.currentUser;
-  //     if (user) {
-  //       // Get the user's ID token
-  //       const token = await getIdToken(user);
 
-  //       // Parse the token to get custom claims (including the role)
-        // const decodedToken = JSON.parse(atob(token.split('.')[1]));
-        // console.log(decodedToken?.type);
-  //     }
-  //   };
- 
-  //   checkUserRole();
-  // }, []);
   useEffect(() => {
-       onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // setUid(user.uid);
-        setAuthUser(user)
-        getIdToken(user)
-          .then((token) => {
-            // setToken(token);
-            dispatch(setUser({
-              token:token,
-            }));
-            setupTokenRefresh()
-            setConfirmation('Login successful!');
-            nevigate("/")
-          })
-          .catch((error) => {
-            setError(error.message);
-          });
+        setAuthUser(user);
+
+        try {
+          const token = await getIdToken(user);
+          dispatch(setUser({ token }));
+          setupTokenRefresh();
+
+          setConfirmation('Login successful!');
+          navigate('/');
+        } catch (error) {
+          setError(error.message);
+        }
       }
     });
-  }, []);
-  const setupTokenRefresh = () => {
-    const intervalId = setInterval(() => {
-      authuser.getIdToken(true)
-        .then((token) => {
-          console.log('Token refreshed:', token);
 
-        })
-        .catch((error) => {
-          console.error('Error refreshing token:', error.message);
-        });
-    }, 3600000); // Refresh token every hour
+    return () => unsubscribe();
+  }, [dispatch, navigate]);
+
+  const setupTokenRefresh = () => {
+    if (!authUser) {
+      console.error('Error refreshing token: authUser is null');
+      return;
+    }
+  
+    const intervalId = setInterval(async () => {
+      try {
+        const token = await authUser.getIdToken();
+        console.log('Token refreshed:', token);
+      } catch (error) {
+        console.error('Error refreshing token:', error.message);
+      }
+    }, 200); // Refresh token every hour
 
     return () => clearInterval(intervalId);
-  };
-
+  };
 
   const handleSignIn = async () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      // setUid(userCredential.user.uid);
-
-      // Get token after successful sign-in
       const newToken = await getIdToken(userCredential.user);
-      dispatch(setUser({
-        token: newToken,
-      }));
+      dispatch(setUser({ token: newToken }));
 
-      // Set up a token refresh interval every 55 minutes
       const tokenRefreshInterval = setInterval(async () => {
         const refreshedToken = await getIdToken(userCredential.user);
-        dispatch(setUser({
-          token: refreshedToken,
-        }));
+        dispatch(setUser({ token: refreshedToken }));
       }, 55 * 60 * 1000);
-      nevigate("/")
 
+      navigate('/');
       setConfirmation('Login successful!');
-      getUserDetails()
-      // Set up a cleanup function to clear the interval when the component unmounts
+      getUserDetails();
+
       return () => clearInterval(tokenRefreshInterval);
-
-      
-
-      
     } catch (error) {
       setError(error.message);
     }
-  };
- 
- 
+  }; 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
        
