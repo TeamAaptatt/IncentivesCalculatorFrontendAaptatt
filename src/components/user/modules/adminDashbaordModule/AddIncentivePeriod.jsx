@@ -25,7 +25,6 @@ const AddIncentivePeriod = () => {
           [name]: name === 'startDate' || name === 'endDate' ? value : prevFormData.incentivePeriod[name],
         },
       };
-      console.log(updatedFormData);  // Log the updated state
       return updatedFormData;
     });
   };
@@ -48,7 +47,7 @@ const AddIncentivePeriod = () => {
 
   return (
     <div className="container mx-auto mt-8">
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+      <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-gray-100 p-6 rounded-lg shadow-md">
         <label className="block mb-4">
           User:
           <input
@@ -56,7 +55,7 @@ const AddIncentivePeriod = () => {
             name="cid"
             value={formData.cid}
             onChange={handleChange}
-            className="form-input mt-1 block w-full"
+            className="form-input mt-1 block w-full border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
           />
         </label>
 
@@ -67,7 +66,7 @@ const AddIncentivePeriod = () => {
             name="startDate"
             value={formData.incentivePeriod.startDate}
             onChange={handleChange}
-            className="form-input mt-1 block w-full"
+            className="form-input mt-1 block w-full border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
           />
         </label>
 
@@ -78,13 +77,13 @@ const AddIncentivePeriod = () => {
             name="endDate"
             value={formData.incentivePeriod.endDate}
             onChange={handleChange}
-            className="form-input mt-1 block w-full"
+            className="form-input mt-1 block w-full border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
           />
         </label>
 
         <button
           type="submit"
-          className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+          className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 mt-4 w-full"
         >
           Add Incentive Period
         </button>

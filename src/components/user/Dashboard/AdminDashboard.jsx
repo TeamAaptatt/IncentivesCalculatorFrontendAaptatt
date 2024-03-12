@@ -21,7 +21,8 @@ const AdminDashboard = () => {
         <AdminPlacementTable/>
         <AddPlacementButton/>
         <OwnerShipTable/>
-        <IncentiveCalculator/>
+        <IncentiveCalculator/>    
+        <div>
         <button className="bg-black m-4 hover:bg-blue-400 text-white px-4 py-2 rounded-md w-44" onClick={()=>setCreateIncentive((state)=>!state)}>{creatIncentive===true?'Close':'Create Incentive'}</button>
         {creatIncentive && <AddIncentivePeriod/>}
 
@@ -29,6 +30,7 @@ const AdminDashboard = () => {
         {usertoggle && <UserList/>}
         <button className="bg-black hover:bg-blue-400 text-white px-4 py-2 rounded-md w-44" onClick={()=>setToggle((state)=>!state)}>{toggle===true?'Close':'Create User'}</button>
         {toggle && <CreateUserForm/>}
+        </div>
 
     </div>
   )
