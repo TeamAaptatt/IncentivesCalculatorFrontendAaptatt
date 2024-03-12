@@ -40,6 +40,15 @@ const AddIncentivePeriod = () => {
       });
       console.log(response.data);
       // Handle success, e.g., show a success message to the user
+      alert("Incentive Period Created");
+      setFormData({
+        cid: '',
+        incentivePeriod: {
+          startDate: '',
+          endDate: '',
+        },
+      })
+    
     } catch (error) {
       console.error(error.response.data.error);
       // Handle error, e.g., show an error message to the user
