@@ -1,4 +1,3 @@
-// Import necessary dependencies and styles
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../../../../constants/api';
@@ -7,7 +6,7 @@ import { useSelector } from 'react-redux';
 const IncentiveCalculator = () => {
   // State variables
   const [cid, setCid] = useState('');
-  const [incentiveData, setIncentiveData] = useState({});
+  const [incentiveData, setIncentiveData] = useState(null);
   const [loading, setLoading] = useState(false);
   const token = useSelector((state) => state.auth.token.token);
 
@@ -46,12 +45,7 @@ const IncentiveCalculator = () => {
     }
   };
 
-  // Use effect to fetch incentive data when component mounts or cid changes
-  useEffect(() => {
-    if (cid) {
-      fetchIncentiveData();
-    }
-  }, [cid]);
+  const tablestyle = "border-collapse border border-gray-800 p-2"
 
   return (
     <div className="flex items-center justify-center m-4">
@@ -72,19 +66,32 @@ const IncentiveCalculator = () => {
           />
         </div>
 
-        <button className="px-4 py-2 text-white bg-red-500 rounded-md w-full" onClick={fetchIncentiveData}>
+        <button disabled={!cid.length} className="px-4 py-2 text-white bg-red-500 rounded-md w-full" onClick={fetchIncentiveData}>
           Calculate
         </button>
-
-        {loading ? (
-          <p className="mt-4 text-gray-600 text-center">Loading...</p>
-        ) : (
-          <div className="mt-4">
-            <p className="text-sm text-gray-600 font-bold">Achieved Target: {incentiveData.achievedTarget}</p>
-            <p className="text-sm font-bold text-gray-600">Target: {incentiveData.target}</p>
-            <p className="text-sm font-bold text-gray-600">Incentive Amount: {incentiveData.incentiveAmount}</p>
-          </div>
-        )}
+        {incentiveData || loading ? <>
+          {loading ? (
+            <p className="mt-4 text-gray-600 text-center">Loading...</p>
+          ) : (
+            <table className="mt-4 text-gray-600 text-center">
+              <thead>
+                <tr>
+                  <th className={tablestyle}>Achieved Target</th>
+                  <th className={tablestyle}>Target</th>
+                  <th className={tablestyle}>Incentive Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className={tablestyle}> {incentiveData.achievedTarget}</td>
+                  <td className={tablestyle}> {incentiveData.target}</td>
+                  <td className={tablestyle}>{incentiveData.incentiveAmount}</td>
+                </tr>
+              </tbody>
+            </table>
+          )}
+        </> : null
+        }
       </div>
     </div>
   );
