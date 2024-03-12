@@ -209,9 +209,9 @@ const OwnerShipTable = () => {
   
   console.log(reportings);
   return (
-    <div className=" w-[90vw] flex flex-col items-center overflow-x-hidden">
+    <div className=" w-full flex flex-col items-center overflow-x-hidden">
       <h1 className=" text-center font-bold text-4xl"> Ownership Table</h1>
-      <table className=" w-[90vw] my-4 border rounded  border-collapse p-2 border-gray-800">
+      <table className=" w-full my-4 border rounded  border-collapse p-2 border-gray-800">
         <thead>
           <tr className="">
             {tableHeadNames.map((head) => {
