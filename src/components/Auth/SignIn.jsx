@@ -24,8 +24,8 @@ const SignIn = () => {
         try {
           const token = await getIdToken(user);
           setAuthUser(user)
-          dispatch(setUser({ token }));
-          setupTokenRefresh();
+          // dispatch(setUser({ token }));
+          // setupTokenRefresh();
 
           setConfirmation('Login successful!');
           navigate('/');
@@ -39,21 +39,18 @@ const SignIn = () => {
   }, [dispatch, navigate]);
 
   const setupTokenRefresh = () => {
-    if (!authUser) {
-      console.error('Error refreshing token: authUser is null');
-      return;
-    }
+    
 
     const intervalId = setInterval(async () => {
       try {
-        const token = await authUser.getIdToken(true); // Force refresh
+        const token = await getIdToken(authUser); // Force refresh
         console.log('Token refreshed:', token);
         dispatch(setUser({ token }));
       } catch (error) {
         console.error('Error refreshing token:', error.message);
         // Handle token refresh errors here, e.g., clearInterval and prompt re-login
       }
-    }, 50000000); // Refresh every 5 minutes
+    }, 500000000000); // Refresh every 5 minutes
 
     return () => clearInterval(intervalId);
   };
@@ -65,16 +62,10 @@ const SignIn = () => {
       dispatch(setUser({ token: newToken }));
       setAuthUser(userCredential.user);
 
-      const tokenRefreshInterval = setInterval(async () => {
-        const refreshedToken = await authUser.getIdToken(true); // Force refresh
-        dispatch(setUser({ token: refreshedToken }));
-      }, 500000000); // Refresh every 5 minutes
-
       navigate('/');
+      // setupTokenRefresh();
       setConfirmation('Login successful!');
       getUserDetails();
-
-      return () => clearInterval(tokenRefreshInterval);
     } catch (error) {
       setError(error.message);
     }
