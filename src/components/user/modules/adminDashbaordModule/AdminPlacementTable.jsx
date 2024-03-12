@@ -192,7 +192,7 @@ const AdminPlacementTable = () => {
   };
 
   return (
-    <div className="overflow-hidden border rounded border-collapse border-gray-800 overflow-x-scroll w-[80%] m-4">
+    <div className="overflow-hidden border rounded border-collapse border-gray-800 overflow-x-scroll w-full m-4">
       <table className="min-w-full border border-gray-800">
         <thead className="text-indigo-600 uppercase text-center">
           <tr>

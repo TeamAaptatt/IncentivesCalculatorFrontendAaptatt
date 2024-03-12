@@ -20,10 +20,10 @@ const SignIn = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setAuthUser(user);
 
         try {
           const token = await getIdToken(user);
+          setAuthUser(user)
           dispatch(setUser({ token }));
           setupTokenRefresh();
 
@@ -43,15 +43,17 @@ const SignIn = () => {
       console.error('Error refreshing token: authUser is null');
       return;
     }
-  
+
     const intervalId = setInterval(async () => {
       try {
-        const token = await authUser.getIdToken();
+        const token = await authUser.getIdToken(true); // Force refresh
         console.log('Token refreshed:', token);
+        dispatch(setUser({ token }));
       } catch (error) {
         console.error('Error refreshing token:', error.message);
+        // Handle token refresh errors here, e.g., clearInterval and prompt re-login
       }
-    }, 200); // Refresh token every hour
+    }, 50000000); // Refresh every 5 minutes
 
     return () => clearInterval(intervalId);
   };
@@ -61,11 +63,12 @@ const SignIn = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const newToken = await getIdToken(userCredential.user);
       dispatch(setUser({ token: newToken }));
+      setAuthUser(userCredential.user);
 
       const tokenRefreshInterval = setInterval(async () => {
-        const refreshedToken = await getIdToken(userCredential.user);
+        const refreshedToken = await authUser.getIdToken(true); // Force refresh
         dispatch(setUser({ token: refreshedToken }));
-      }, 55 * 60 * 1000);
+      }, 500000000); // Refresh every 5 minutes
 
       navigate('/');
       setConfirmation('Login successful!');
@@ -75,7 +78,7 @@ const SignIn = () => {
     } catch (error) {
       setError(error.message);
     }
-  }; 
+  };
   return (
     <div className="flex flex-col items-center justify-center h-screen">
        

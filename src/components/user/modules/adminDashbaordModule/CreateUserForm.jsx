@@ -115,6 +115,24 @@ const CreateUserForm = () => {
 
         alert('User and Salary created successfully!');
         // You can perform further actions, such as redirecting the user or showing a success message
+        setFormData({
+          cid: '',
+    name: '',
+    email: '',
+    level: '',
+    salary: '',
+    assignedRole: '',
+    status: '',
+    // reporting: '',
+    skip: '',
+    designation: '',
+    // type: '',
+    // ownedTeam: '',
+    // incentivePeriod: '',
+    // imageUrl: '',
+    password: '',
+
+        })
       } else {
         console.error('Error creating salary:', salaryData.error);
         // Handle error, show error message to the user, etc.
@@ -133,14 +151,14 @@ const CreateUserForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className=" w-full flex items-center justify-center">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded shadow-md max-w-md w-full"
+        className="bg-white p-8 rounded shadow-md max-w-md w-full flex gap-4 flex-wrap "
       >
         <h2 className="text-2xl font-bold mb-4">Create User</h2>
 
-        <div className="mb-4">
+        <div className=" mt-5 ">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cid">
             CID:
           </label>
@@ -153,7 +171,7 @@ const CreateUserForm = () => {
           />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-2">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
             Name:
           </label>

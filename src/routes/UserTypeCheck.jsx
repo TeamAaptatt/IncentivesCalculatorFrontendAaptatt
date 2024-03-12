@@ -19,8 +19,7 @@ const UserTypeCheck = ({ admin, user }) => {
       };
   
       checkUserType();
-    }, [token]); // Empty dependency array to run the effect once when the component mounts
-  
+    }, []);   
     console.log(userType);
   
     return (
