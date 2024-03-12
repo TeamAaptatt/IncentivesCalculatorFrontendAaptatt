@@ -12,7 +12,8 @@ const UserTypeCheck = ({ admin, user }) => {
       const checkUserType = () => {
           try {
             const decodedToken = JSON.parse(atob(token?.split('.')[1]));
-            const type = decodedToken?.type || null;
+            console.log('d',decodedToken);
+            const type = decodedToken?.type || 'user';
             setUserType(type);
           } catch (error) {
             console.error('Error fetching user type:', error);
