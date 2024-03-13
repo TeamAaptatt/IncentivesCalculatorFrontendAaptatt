@@ -52,7 +52,7 @@ const UserTypeCheck = ({ admin, user }) => {
       };
   
 
-    }, []); // Empty dependency array to run the effect once when the component mounts
+    }, [token, dispatch]); // Empty dependency array to run the effect once when the component mounts
   
     console.log(userType);
   
