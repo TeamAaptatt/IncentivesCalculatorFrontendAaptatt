@@ -39,7 +39,16 @@ const AddIncentivePeriod = ({ handleClose }) => {
       });
       console.log(response.data);
       // Handle success, e.g., show a success message to the user
-      handleClose(); // Close the modal after successful submission
+      // Close the modal after successful submission
+      alert("Incentive Period Created");
+      setFormData({
+        cid: '',
+        incentivePeriod: {
+          startDate: '',
+          endDate: '',
+        },
+      })
+      handleClose();  
     } catch (error) {
       console.error(error.response.data.error);
       // Handle error, e.g., show an error message to the user
