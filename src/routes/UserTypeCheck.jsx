@@ -32,29 +32,40 @@ const UserTypeCheck = ({ admin, user }) => {
         }
       });
   
+      
       // Refresh token every 50 minutes
       const intervalId = setInterval(async () => {
         try {
           const user = auth.currentUser;
           if (user) {
-            const token= await getIdToken(user);
+            const token= await getIdToken(user,  true);
                       dispatch(setUser({token }));
           }
         } catch (error) {
           console.error('Error refreshing token:', error);
         }
-      }, 3000000 ); // 50 minutes in milliseconds
-  
-      // Clean up interval and unsubscribe on component unmount
+      }, 2500000 );  
+    
       return () => {
         clearInterval(intervalId);
         unsubscribe();
       };
   
 
-    }, [token, dispatch]); // Empty dependency array to run the effect once when the component mounts
+    }, [token, dispatch]); 
   
     console.log(userType);
+    useEffect(()=>{
+      const user = localStorage.getItem('User')
+        getToken(user)
+  }, [])
+
+  const getToken = async (user) =>{
+    if (user) {
+      const token= await getIdToken(user,  true);
+                dispatch(setUser({token }));
+    }
+  }
   
     return (
       <>

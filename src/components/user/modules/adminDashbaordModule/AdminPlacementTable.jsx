@@ -121,7 +121,7 @@ const AdminPlacementTable = () => {
 
     // Handle special cases based on the field name
     if (field === "dateOfJoining") {
-      updatedValue = new Date(updatedValue);
+      updatedValue = updatedValue;
     } else if (
       field === "accountManager" ||
       field === "cnadidateOwner" ||
@@ -230,7 +230,13 @@ const AdminPlacementTable = () => {
           </option>
         ))}
   </select>
-) : (
+) :fieldIndex ===4 ?(<>
+<input type="date" value={placement[field]}
+          onChange={(e) => handleInputChange(e, field)}
+
+      />
+
+</>): (
   <input
     onChange={(e) => handleInputChange(e, field)}
     className={`${fieldIndex === 5 || fieldIndex === 6 || fieldIndex === 7 || fieldIndex===8 ? 'hidden' : 'visible'}`}
@@ -241,8 +247,6 @@ const AdminPlacementTable = () => {
       field === "pandLhead" ||
       field === "accountHead"
         ? placement[field]?.name
-        : field === "dateOfJoining"
-        ? new Date(placement[field]).toLocaleDateString()
         : placement[field]
     }
   />
