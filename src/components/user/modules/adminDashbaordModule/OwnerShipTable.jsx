@@ -355,12 +355,17 @@ const OwnerShipTable = () => {
       {transferReportingToggle && (
         <TransferReporting user={userId} onSubmission={getAllReportings} />
       )}
-      <button onClick={() => setCreateReprtingToggle((prev) => !prev)}>
-        <FontAwesomeIcon icon={faPlusCircle} />
+       <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onClick={() => setCreateReprtingToggle((prev) => !prev)}
+      >
+        Add Ownership
       </button>
+
       {createReportingToggle && (
-        <NewReporting onSubmission={getAllReportings} />
+        <NewReporting onSubmission={getAllReportings} 
+        onClose={() => setCreateReprtingToggle(false)} />
       )}
+
     </div>
   );
 };
