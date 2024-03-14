@@ -61,7 +61,7 @@ const SignIn = () => {
       const newToken = await getIdToken(userCredential.user);
       dispatch(setUser({ token: newToken }));
       setAuthUser(userCredential.user);
-      localStorage.setItem('User', userCredential.user);
+      localStorage.setItem('User', JSON.stringify(userCredential.user));
 
       navigate('/');
       // setupTokenRefresh();
