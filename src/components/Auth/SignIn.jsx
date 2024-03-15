@@ -5,6 +5,9 @@ import { useDispatch } from 'react-redux';
 import { setUser } from '../../utils/redux/authSlice/authSlice';
 import { useNavigate } from 'react-router-dom';
 import useUserDetails from './useUserDetails';
+import axios from 'axios'
+import { setUserData } from '../../utils/redux/userSlice';
+import { BASE_URL } from '../../constants/api';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -60,6 +63,9 @@ const SignIn = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const newToken = await getIdToken(userCredential.user);
       dispatch(setUser({ token: newToken }));
+      const user = await axios.get(BASE_URL + `/user-me-firebase/${userCredential.user.uid}`)
+      dispatch(setUserData(user.data[0]))
+
       setAuthUser(userCredential.user);
       localStorage.setItem('User', JSON.stringify(userCredential.user));
 

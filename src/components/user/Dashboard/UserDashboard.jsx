@@ -10,7 +10,10 @@ const UserDashboard = () => {
    const [placementData, setPlacementData] = useState([]);
 
    const userData = useSelector(state=>state.user.userData.userData)
-   const userId = useSelector(state=> state.user?.userData?.userData?._id);
+   console.log("testtest", userData)
+   const userData1 = useSelector(state=>state.user.userData)
+   console.log("testtest", userData1)
+   const userId = useSelector(state=> state.user?.userData?._id);
    const ownedTeams = useSelector(state=>state.user.userData?.userData?.ownedTeam);
    console.log('ownedTeam',ownedTeams);
  console.log(userId,"userId");
@@ -22,7 +25,7 @@ const UserDashboard = () => {
 
 const placementDataofUser = async () => {
   try {
-    const response = await axios.get(BASE_URL + `placements/${userId}`, {
+    const response = await axios.get(BASE_URL + `placements-test/${userId}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       }
