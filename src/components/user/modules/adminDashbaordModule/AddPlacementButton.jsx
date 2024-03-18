@@ -48,28 +48,28 @@ const AddPlacementButton = () => {
         }
       );
 
-        alert('Placement created successfully');
-        setIsModalOpen(false);
-        setFormData({
-          status: '',
-          candidate: '',
-          client: '',
-          offeredPosition: '',
-          dateOfJoining: '',
-          candidateOwner: '',
-          accountManager: '',
-          accountHead: '',
-          pandLhead: '',
-          resumeSource: '',
-          billableSalary: '',
-          commercial: '',
-          fee: '',
-          sendOff: '',
-          securityPeriod: '',
-          paymentStatus: '',
-        });
-           console.error('Failed to create placement');
-      
+      alert('Placement created successfully');
+      setIsModalOpen(false);
+      setFormData({
+        status: '',
+        candidate: '',
+        client: '',
+        offeredPosition: '',
+        dateOfJoining: '',
+        candidateOwner: '',
+        accountManager: '',
+        accountHead: '',
+        pandLhead: '',
+        resumeSource: '',
+        billableSalary: '',
+        commercial: '',
+        fee: '',
+        sendOff: '',
+        securityPeriod: '',
+        paymentStatus: '',
+      });
+      console.error('Failed to create placement');
+
     } catch (error) {
       console.error('Error:', error.message);
     }
