@@ -220,7 +220,7 @@ const OwnerShipTable = () => {
             <tr className="">
               {tableHeadNames.map((head, index) => (
                 <th key={index} className={`px-2 w-20 border border-gray-800 border-collapse ${index === tableHeadNames.length - 1 ? 'sticky right-0 bg-white' : ''
-              }`}
+                  }`}
                 >
                   {head}
                 </th>
