@@ -24,7 +24,7 @@ const OwnerShipTable = () => {
   const [reportings, setReportings] = useState(null);
   const [createReportingToggle, setCreateReprtingToggle] = useState(false);
   const [transferReportingToggle, setTransferReprtingToggle] = useState(false);
- const [salaryValue, setSalaryValue] = useState(null);
+  const [salaryValue, setSalaryValue] = useState(null);
   const [userId, setUserId] = useState(null);
 
   const tableHeadNames = [
@@ -89,7 +89,7 @@ const OwnerShipTable = () => {
 
       const data = response.data;
       setReportings(data);
-      
+
 
       console.log(data);
     } catch (err) {
@@ -144,17 +144,17 @@ const OwnerShipTable = () => {
     );
     const cid = reportingToUpdate.user.cid
     console.log(reportingToUpdate);
-    try{
-      const response = await axios.put(BASE_URL + `/update-salary/${cid}`,       { amount: salaryValue }, 
-      {
-        headers:{
-          Authorization:`Bearer ${token}`
+    try {
+      const response = await axios.put(BASE_URL + `/update-salary/${cid}`, { amount: salaryValue },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      }
-       ) 
+      )
 
       console.log(response.data);
-    }catch (err){
+    } catch (err) {
       console.log(err);
     }
   };
@@ -163,20 +163,20 @@ const OwnerShipTable = () => {
     const reportingToUpdate = reportings.find(
       (reporting) => reporting.user._id === updateUserId
     );
-  await updateSalryOfUser();
+    await updateSalryOfUser();
     try {
       const response = await axios.put(`${BASE_URL}update-user/${updateUserId} `,
-      reportingToUpdate.user, 
+        reportingToUpdate.user,
 
-       {
-        headers:{
+        {
+          headers: {
             Authorization: `Bearer ${token}`
+          }
         }
-       }
       );
       const data = await response.data;
       console.log(response.data);
-       setUpdateUserId(null)
+      setUpdateUserId(null)
       getAllReportings();
     } catch (err) {
       console.log(err);
@@ -184,17 +184,17 @@ const OwnerShipTable = () => {
   };
   const handleUpdateUser = (e, field) => {
     let updateValue = e.target.value;
-  if(field === "salary"){
+    if (field === "salary") {
 
-    updateValue = {amount: updateValue}
-  }
-   if (field === "level"||field === "designation" || field === "assignedRole"|| field ==="skip") {
-      updateValue =  updateValue;
+      updateValue = { amount: updateValue }
     }
-  
+    if (field === "level" || field === "designation" || field === "assignedRole" || field === "skip") {
+      updateValue = updateValue;
+    }
+
     const updatedUserCopy = { ...updatedUser, [field]: updateValue };
     setUpdatedUser(updatedUserCopy);
-  
+
     const updatedReportings = reportings.map((reporting) => {
       if (reporting.user._id === updateUserId) {
         return {
@@ -206,7 +206,7 @@ const OwnerShipTable = () => {
     });
     setReportings(updatedReportings);
   };
-  
+
   console.log(reportings);
   return (
     <div className=" w-full flex flex-col items-center overflow-x-hidden">
@@ -254,7 +254,7 @@ const OwnerShipTable = () => {
                           className=" w-40"
                           value={reporting.user[field]?.name}
                           onChange={(e) => handleUpdateUser(e, field)}
-                          >
+                        >
                           {assignedRoles?.map((role) => (
                             <option key={role._id} value={role._id}>{role.name}</option>
                           ))}
@@ -262,14 +262,14 @@ const OwnerShipTable = () => {
                       ) : field === "reportingTo" ? (
                         reporting?.reportingTo?.name
                       ) : field === "skip" ? (
-                      reporting.user?.skip?.name
+                        reporting.user?.skip?.name
                       ) : field === "salary" ? (
-                        <input value={salaryValue} onChange={(e)=> {
+                        <input value={salaryValue} onChange={(e) => {
                           setSalaryValue(e.target.value)
 
                         }
                         } className=" w-20">
-                          
+
                         </input>
                       ) : (
                         <input
@@ -282,8 +282,8 @@ const OwnerShipTable = () => {
                     </td>
                   ))}
                   <td className="border border-gray-800 p-2 flex gap-2">
-                    <button onClick={()=>{
-                                              updateUser();
+                    <button onClick={() => {
+                      updateUser();
 
                     }}>
                       <FontAwesomeIcon icon={faCheck} />
@@ -326,15 +326,15 @@ const OwnerShipTable = () => {
                       ) : field === "endDate" && reporting[field] ? (
                         new Date(reporting[field]).toLocaleDateString()
                       ) : field === "skip" ? `${reporting.user.skip?.name} (${reporting.user.skip?.cid})`
-                        
-                       : "" ? (
-                        reporting.user[field]?.name
-                      ) : field === "salary" ? (
-                        reporting.user?.salary?.amount
-                      ) :field ==="name"?                        `${reporting.user[field]} (${reporting.user.cid})`:
-                      (
-                        reporting.user[field]
-                      )}
+
+                        : "" ? (
+                          reporting.user[field]?.name
+                        ) : field === "salary" ? (
+                          reporting.user?.salary?.amount
+                        ) : field === "name" ? `${reporting.user[field]} (${reporting.user.cid})` :
+                          (
+                            reporting.user[field]
+                          )}
                     </td>
                   ))}
                   <td className="border border-gray-800 p-2 flex gap-2">
@@ -355,15 +355,15 @@ const OwnerShipTable = () => {
       {transferReportingToggle && (
         <TransferReporting user={userId} onSubmission={getAllReportings} />
       )}
-       <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         onClick={() => setCreateReprtingToggle((prev) => !prev)}
       >
         Add Ownership
       </button>
 
       {createReportingToggle && (
-        <NewReporting onSubmission={getAllReportings} 
-        onClose={() => setCreateReprtingToggle(false)} />
+        <NewReporting onSubmission={getAllReportings}
+          onClose={() => setCreateReprtingToggle(false)} />
       )}
 
     </div>
