@@ -199,7 +199,7 @@ const AdminPlacementTable = () => {
             {dataFields.map((data, index) => (
               <th
                 key={index}
-                className={`px-4 py-2 border border-black ${index === dataFields.length - 1 ? 'sticky right-0 bg-white' : ''
+                className={`px-4 py-2 border border-b border-black ${index === dataFields.length - 1 ? 'sticky right-0 bg-white' : ''
                   }`}
               >
                 {data}
@@ -215,7 +215,7 @@ const AdminPlacementTable = () => {
                   {fields.map((field, fieldIndex) => (
                     <td
                       key={fieldIndex}
-                      className="px-6 py-4 whitespace-nowrap border border-gray-800"
+                      className="px-6 py-2 whitespace-nowrap border border-gray-800"
                     >
                       {fieldIndex === 14 || fieldIndex === 15 ? ( // Check if the field index is 14 or 15
                         <select
@@ -307,7 +307,7 @@ const AdminPlacementTable = () => {
 
                     </td>
                   ))}
-                  <td className="px-4 py-4 border-b sticky right-0 bg-white border-gray-800">
+                  <td className="px-4 py-2 border-b sticky right-0 bg-white border-gray-800">
                     <button
                       onClick={() => {
                         saveChangesHandler();
@@ -329,7 +329,7 @@ const AdminPlacementTable = () => {
                   {fields?.map((field, fieldIndex) => (
                     <td
                       key={fieldIndex}
-                      className="px-6 py-4 whitespace-nowrap border border-black w-32" // Set fixed width here
+                      className="px-6 py-2 whitespace-nowrap border border-black w-32" // Set fixed width here
                     >
                       {field === "accountManager"
                         ? `${placement[field]?.name} (${placement[field].cid})`
@@ -344,7 +344,7 @@ const AdminPlacementTable = () => {
                                 : placement[field]}
                     </td>
                   ))}
-                  <td className="py-4 px-4 border-b sticky right-0 bg-white border border-gray-800">
+                  <td className="py-2 px-4 border-b sticky right-0 bg-white border border-gray-800">
                     <button
                       onClick={() => {
                         setupdateFieldId(placement._id);
