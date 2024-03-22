@@ -24,7 +24,7 @@ const OwnerShipTable = () => {
   const [reportings, setReportings] = useState(null);
   const [createReportingToggle, setCreateReprtingToggle] = useState(false);
   const [transferReportingToggle, setTransferReprtingToggle] = useState(false);
- const [salaryValue, setSalaryValue] = useState(null);
+  const [salaryValue, setSalaryValue] = useState(null);
   const [userId, setUserId] = useState(null);
 
   const tableHeadNames = [
@@ -89,7 +89,7 @@ const OwnerShipTable = () => {
 
       const data = response.data;
       setReportings(data);
-      
+
 
       console.log(data);
     } catch (err) {
@@ -144,17 +144,17 @@ const OwnerShipTable = () => {
     );
     const cid = reportingToUpdate.user.cid
     console.log(reportingToUpdate);
-    try{
-      const response = await axios.put(BASE_URL + `/update-salary/${cid}`,       { amount: salaryValue }, 
-      {
-        headers:{
-          Authorization:`Bearer ${token}`
+    try {
+      const response = await axios.put(BASE_URL + `/update-salary/${cid}`, { amount: salaryValue },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      }
-       ) 
+      )
 
       console.log(response.data);
-    }catch (err){
+    } catch (err) {
       console.log(err);
     }
   };
@@ -163,20 +163,20 @@ const OwnerShipTable = () => {
     const reportingToUpdate = reportings.find(
       (reporting) => reporting.user._id === updateUserId
     );
-  await updateSalryOfUser();
+    await updateSalryOfUser();
     try {
       const response = await axios.put(`${BASE_URL}update-user/${updateUserId} `,
-      reportingToUpdate.user, 
+        reportingToUpdate.user,
 
-       {
-        headers:{
+        {
+          headers: {
             Authorization: `Bearer ${token}`
+          }
         }
-       }
       );
       const data = await response.data;
       console.log(response.data);
-       setUpdateUserId(null)
+      setUpdateUserId(null)
       getAllReportings();
     } catch (err) {
       console.log(err);
@@ -184,17 +184,17 @@ const OwnerShipTable = () => {
   };
   const handleUpdateUser = (e, field) => {
     let updateValue = e.target.value;
-  if(field === "salary"){
+    if (field === "salary") {
 
-    updateValue = {amount: updateValue}
-  }
-   if (field === "level"||field === "designation" || field === "assignedRole"|| field ==="skip") {
-      updateValue =  updateValue;
+      updateValue = { amount: updateValue }
     }
-  
+    if (field === "level" || field === "designation" || field === "assignedRole" || field === "skip") {
+      updateValue = updateValue;
+    }
+
     const updatedUserCopy = { ...updatedUser, [field]: updateValue };
     setUpdatedUser(updatedUserCopy);
-  
+
     const updatedReportings = reportings.map((reporting) => {
       if (reporting.user._id === updateUserId) {
         return {
@@ -206,166 +206,164 @@ const OwnerShipTable = () => {
     });
     setReportings(updatedReportings);
   };
-  
+
   console.log(reportings);
+
   return (
-    <div className=" w-full flex flex-col items-center overflow-x-hidden">
-      <h1 className=" text-center font-bold text-4xl"> Ownership Table</h1>
-      <table className=" w-full my-4 border rounded  border-collapse p-2 border-gray-800">
-        <thead>
-          <tr className="">
-            {tableHeadNames.map((head) => {
-              return (
-                <th className="border border-gray-800 p-2 w-20">{head}</th>
-              );
-            })}
-          </tr>
-        </thead>
-        <tbody>
-          {reportings?.map((reporting) => (
-            <>
-              {updateUserId === reporting.user._id ? (
-                <tr key={reporting._id}>
-                  {tableFields.map((field, index) => (
-                    <td key={index} className=" border border-gray-800 p-2">
-                      {field === "level" ? (
-                        <select
-                          value={reporting.user[field]?.level}
-                          onChange={(e) => handleUpdateUser(e, field)}
-                          className=" w-20"
-                        >
-                          {levels?.map((lev) => (
-                            <option key={lev._id} value={lev._id}>{lev.level}</option>
-                          ))}
-                        </select>
-                      ) : field === "designation" ? (
-                        <select
-                          className="  w-40"
-                          value={reporting.user[field]?.name}
-                          onChange={(e) => handleUpdateUser(e, field)}
-
-                        >
-                          {designations?.map((designation) => (
-                            <option key={designation._id} value={designation._id}>{designation.name}</option>
-                          ))}
-                        </select>
-                      ) : field === "assignedRole" ? (
-                        <select
-                          className=" w-40"
-                          value={reporting.user[field]?.name}
-                          onChange={(e) => handleUpdateUser(e, field)}
+    <div className="w-full flex flex-col items-center overflow-x-hidden">
+      <div className="w-full flex flex-col items-center">
+        <h1 className="text-center my-4 font-bold uppercase text-4xl"> Ownership Table</h1>
+      </div>
+      <div className="w-full overflow-x-auto">
+        <table className="w-full my-2 border rounded border-collapse p-2 border-gray-800">
+          <thead className="text-indigo-600 uppercase text-center">
+            <tr className="">
+              {tableHeadNames.map((head, index) => (
+                <th key={index} className={`px-2 w-20 border border-gray-800 border-collapse ${index === tableHeadNames.length - 1 ? 'sticky right-0 bg-white' : ''
+                  }`}
+                >
+                  {head}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {reportings?.map((reporting) => (
+              <>
+                {updateUserId === reporting.user._id ? (
+                  <tr key={reporting._id}>
+                    {tableFields.map((field, index) => (
+                      <td key={index} className="border border-gray-800 p-2 ">
+                        {field === "level" ? (
+                          <select
+                            value={reporting.user[field]?.level}
+                            onChange={(e) => handleUpdateUser(e, field)}
+                            className="w-20"
                           >
-                          {assignedRoles?.map((role) => (
-                            <option key={role._id} value={role._id}>{role.name}</option>
-                          ))}
-                        </select>
-                      ) : field === "reportingTo" ? (
-                        reporting?.reportingTo?.name
-                      ) : field === "skip" ? (
-                      reporting.user?.skip?.name
-                      ) : field === "salary" ? (
-                        <input value={salaryValue} onChange={(e)=> {
-                          setSalaryValue(e.target.value)
-
-                        }
-                        } className=" w-20">
-                          
-                        </input>
-                      ) : (
-                        <input
-                          className=" w-20"
-                          value={reporting.user[field]}
-                          onChange={(e) => handleUpdateUser(e, field)}
-
-                        />
-                      )}
-                    </td>
-                  ))}
-                  <td className="border border-gray-800 p-2 flex gap-2">
-                    <button onClick={()=>{
-                                              updateUser();
-
-                    }}>
-                      <FontAwesomeIcon icon={faCheck} />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setUpdateUserId(null);
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faMultiply} />
-                    </button>
-                  </td>
-                </tr>
-              ) : (
-                <tr key={reporting._id}>
-                  {tableFields.map((field, index) => (
-                    <td key={index} className="border border-gray-800 p-2">
-                      {field === "level" ? (
-                        reporting.user[field]?.level
-                      ) : field === "designation" ? (
-                        reporting.user[field]?.name
-                      ) : field === "assignedRole" ? (
-                        reporting.user[field]?.name
-                      ) : field === "reportingTo" ? (
-                        <div className="flex gap-2">
-                          {`${reporting?.reportingTo?.name} (${reporting?.reportingTo?.cid})`}
-
-                          <button
-                            onClick={() => {
-                              setUserId(reporting.user._id);
-
-                              setTransferReprtingToggle((prev) => !prev);
-                            }}
+                            {levels?.map((lev) => (
+                              <option key={lev._id} value={lev._id}>{lev.level}</option>
+                            ))}
+                          </select>
+                        ) : field === "designation" ? (
+                          <select
+                            className="w-40"
+                            value={reporting.user[field]?.name}
+                            onChange={(e) => handleUpdateUser(e, field)}
                           >
-                            <FontAwesomeIcon icon={faExchange} />
-                          </button>
-                        </div>
-                      ) : field === "startDate" ? (
-                        new Date(reporting[field]).toLocaleDateString()
-                      ) : field === "endDate" && reporting[field] ? (
-                        new Date(reporting[field]).toLocaleDateString()
-                      ) : field === "skip" ? `${reporting.user.skip?.name} (${reporting.user.skip?.cid})`
-                        
-                       : "" ? (
-                        reporting.user[field]?.name
-                      ) : field === "salary" ? (
-                        reporting.user?.salary?.amount
-                      ) :field ==="name"?                        `${reporting.user[field]} (${reporting.user.cid})`:
-                      (
-                        reporting.user[field]
-                      )}
+                            {designations?.map((designation) => (
+                              <option key={designation._id} value={designation._id}>{designation.name}</option>
+                            ))}
+                          </select>
+                        ) : field === "assignedRole" ? (
+                          <select
+                            className="w-40"
+                            value={reporting.user[field]?.name}
+                            onChange={(e) => handleUpdateUser(e, field)}
+                          >
+                            {assignedRoles?.map((role) => (
+                              <option key={role._id} value={role._id}>{role.name}</option>
+                            ))}
+                          </select>
+                        ) : field === "reportingTo" ? (
+                          <>
+                            <div className="flex justify-between">
+                              {`${reporting?.reportingTo?.name} (${reporting?.reportingTo?.cid})`}
+                              <button
+                                onClick={() => {
+                                  setUserId(reporting.user._id);
+                                  setTransferReprtingToggle((prev) => !prev);
+                                }}
+                              >
+                                <FontAwesomeIcon icon={faExchange} />
+                              </button>
+                            </div>
+                          </>
+                        ) : field === "skip" ? (
+                          reporting.user?.skip?.name
+                        ) : field === "salary" ? (
+                          <input value={salaryValue} onChange={(e) => setSalaryValue(e.target.value)} className="w-20" />
+                        ) : (
+                          <input
+                            className="w-20"
+                            value={reporting.user[field]}
+                            onChange={(e) => handleUpdateUser(e, field)}
+                          />
+                        )}
+                      </td>
+                    ))}
+                    <td className="border border-gray-800 p-2 flex gap-2 justify-center sticky right-0 bg-white">
+                      <button onClick={() => { updateUser(); }}>
+                        <FontAwesomeIcon icon={faCheck} />
+                      </button>
+                      <button onClick={() => { setUpdateUserId(null); }}>
+                        <FontAwesomeIcon icon={faMultiply} />
+                      </button>
                     </td>
-                  ))}
-                  <td className="border border-gray-800 p-2 flex gap-2">
-                    <button
-                      onClick={() => {
-                        setUpdateUserId(reporting.user._id);
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faEdit} />
-                    </button>
-                  </td>
-                </tr>
-              )}
-            </>
-          ))}
-        </tbody>
-      </table>
+                  </tr>
+                ) : (
+                  <tr key={reporting._id}>
+                    {tableFields.map((field, index) => (
+                      <td key={index} className="border border-gray-800 px-4 p-2 whitespace-nowrap">
+                        {field === "level" ? (
+                          reporting.user[field]?.level
+                        ) : field === "designation" ? (
+                          reporting.user[field]?.name
+                        ) : field === "assignedRole" ? (
+                          reporting.user[field]?.name
+                        ) : field === "reportingTo" ? (
+                          <>
+                            <div className="flex justify-between">
+                              {`${reporting?.reportingTo?.name} (${reporting?.reportingTo?.cid})`}
+                              <button
+                                onClick={() => {
+                                  setUserId(reporting.user._id);
+                                  setTransferReprtingToggle((prev) => !prev);
+                                }}
+                              >
+                                <FontAwesomeIcon icon={faExchange} />
+                              </button>
+                            </div>
+                          </>
+                        ) : field === "startDate" ? (
+                          // new Date(reporting[field]).toLocaleDateString()
+                          new Date(reporting[field]).toLocaleDateString("en-US", { day: 'numeric', month: 'long', year: 'numeric' })
+                        ) : field === "endDate" && reporting[field] ? (
+                          // new Date(reporting[field]).toLocaleDateString()
+                          new Date(reporting[field]).toLocaleDateString("en-US", { day: 'numeric', month: 'long', year: 'numeric' })
+                        ) : field === "skip" ? (
+                          `${reporting.user.skip?.name} (${reporting.user.skip?.cid})`
+                        ) : field === "salary" ? (
+                          reporting.user?.salary?.amount
+                        ) : field === "name" ? (
+                          `${reporting.user[field]} (${reporting.user.cid})`
+                        ) : (
+                          reporting.user[field]
+                        )}
+                      </td>
+                    ))}
+                    <td className="border  p-2 flex gap-2 justify-center sticky right-0 bg-white">
+                      <button onClick={() => { setUpdateUserId(reporting.user._id); }}>
+                        <FontAwesomeIcon icon={faEdit} />
+                      </button>
+                    </td>
+                  </tr>
+                )}
+              </>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="w-full flex justify-center">
+        <button className="bg-blue-500 hover:bg-blue-700 my-4 text-white font-bold py-2 px-4 rounded" onClick={() => setCreateReprtingToggle((prev) => !prev)}>
+          Add Ownership
+        </button>
+      </div>
       {transferReportingToggle && (
         <TransferReporting user={userId} onSubmission={getAllReportings} />
       )}
-       <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        onClick={() => setCreateReprtingToggle((prev) => !prev)}
-      >
-        Add Ownership
-      </button>
-
       {createReportingToggle && (
-        <NewReporting onSubmission={getAllReportings} 
-        onClose={() => setCreateReprtingToggle(false)} />
+        <NewReporting onSubmission={getAllReportings} onClose={() => setCreateReprtingToggle(false)} />
       )}
-
     </div>
   );
 };
