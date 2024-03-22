@@ -338,7 +338,8 @@ const AdminPlacementTable = () => {
                           : field === "pandLhead"
                             ? `${placement[field].name} (${placement[field].cid})`
                             : field === "dateOfJoining"
-                              ? new Date(placement[field]).toLocaleDateString()
+                              // ? new Date(placement[field]).toLocaleDateString() 
+                              ? new Date(placement[field]).toLocaleDateString("en-US", { day: 'numeric', month: 'long', year: 'numeric' })
                               : field === "accountHead"
                                 ? `${placement[field].name} (${placement[field].cid})`
                                 : placement[field]}

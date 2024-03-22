@@ -325,9 +325,11 @@ const OwnerShipTable = () => {
                             </div>
                           </>
                         ) : field === "startDate" ? (
-                          new Date(reporting[field]).toLocaleDateString()
+                          // new Date(reporting[field]).toLocaleDateString()
+                          new Date(reporting[field]).toLocaleDateString("en-US", { day: 'numeric', month: 'long', year: 'numeric' })
                         ) : field === "endDate" && reporting[field] ? (
-                          new Date(reporting[field]).toLocaleDateString()
+                          // new Date(reporting[field]).toLocaleDateString()
+                          new Date(reporting[field]).toLocaleDateString("en-US", { day: 'numeric', month: 'long', year: 'numeric' })
                         ) : field === "skip" ? (
                           `${reporting.user.skip?.name} (${reporting.user.skip?.cid})`
                         ) : field === "salary" ? (
