@@ -55,10 +55,10 @@ const UserTypeCheck = ({ admin, user }) => {
     }, [token, dispatch]); 
   
     console.log(userType);
-    useEffect(()=>{
-      const user = localStorage.getItem('User')
-        getToken(user)
-  }, [])
+  //   useEffect(()=>{
+  //     const user = localStorage.getItem('User')
+  //       getToken(user)
+  // }, [])
 
   const getToken = async (user) =>{
     if (user) {
