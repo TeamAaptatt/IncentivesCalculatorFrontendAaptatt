@@ -56,26 +56,26 @@ const AdminPlacementTable = () => {
   ];
   const securityPeriodOptions = ["On-Going", "Completed", "Send-Off"]; // Replace with your actual options
   const paymentStatusOptions = ["Pending", "Received", "Adjusted", "Returning", "Compromised"]; // Replace with your actual options
-  
-   const {users, filteredUsers} = useUserManagement();
+
+  const { users, filteredUsers } = useUserManagement();
 
 
-   const getFieldOptions = (field) => {
+  const getFieldOptions = (field) => {
     switch (field) {
       case "cnadidateOwner":
       case "accountManager":
       case "accountHead":
       case "pandLhead":
-        const usersToDisplay = field === "cnadidateOwner"?
-        users?.map((user) => ({
-          label: `${user.name} (${user.cid})`,
-          value: user._id,
-        })): filteredUsers?.map((user) => ({
-          label: `${user.name} (${user.cid})`,
-          value: user._id,
-        }))
+        const usersToDisplay = field === "cnadidateOwner" ?
+          users?.map((user) => ({
+            label: `${user.name} (${user.cid})`,
+            value: user._id,
+          })) : filteredUsers?.map((user) => ({
+            label: `${user.name} (${user.cid})`,
+            value: user._id,
+          }))
         return usersToDisplay;
-        
+
       case "securityPeriod":
         return securityPeriodOptions.map((option) => ({
           label: option,
@@ -90,17 +90,17 @@ const AdminPlacementTable = () => {
         return [];
     }
   };
-  
-   const candidateOwnerOptions = getFieldOptions("cnadidateOwner");
-   
+
+  const candidateOwnerOptions = getFieldOptions("cnadidateOwner");
+
   const accountManagerOptions = getFieldOptions("accountManager");
   const accountHeadOptions = getFieldOptions("accountHead");
   const pandLHeadOptions = getFieldOptions("pandLhead");
   const securityPeriodOption = getFieldOptions("securityPeriod");
   const paymentStatusOption = getFieldOptions('paymentStatus')
-  
- 
-  
+
+
+
   useEffect(() => {
     getAllPlacements();
   }, [updateFieldId, deleteFieldId]);
@@ -133,7 +133,7 @@ const AdminPlacementTable = () => {
       if (user) {
         updatedValue = { name: user.name, id: user.id };
       }
-      }
+    }
 
     // Use the field name to update the corresponding state in a new array
     const updatedPlacements = placements.map((placement) => {
@@ -197,7 +197,11 @@ const AdminPlacementTable = () => {
         <thead className="text-indigo-600 uppercase text-center">
           <tr>
             {dataFields.map((data, index) => (
-              <th key={index} className="px-4 py-2 border border-black">
+              <th
+                key={index}
+                className={`px-4 py-2 border border-b border-black ${index === dataFields.length - 1 ? 'sticky right-0 bg-white' : ''
+                  }`}
+              >
                 {data}
               </th>
             ))}
@@ -211,99 +215,99 @@ const AdminPlacementTable = () => {
                   {fields.map((field, fieldIndex) => (
                     <td
                       key={fieldIndex}
-                      className="px-6 py-4 whitespace-nowrap border border-gray-800"
+                      className="px-6 py-2 whitespace-nowrap border border-gray-800"
                     >
-                {fieldIndex === 14 || fieldIndex === 15 ? ( // Check if the field index is 14 or 15
-  <select
-    onChange={(e) => handleInputChange(e, field)}
-    value={placement[field]}
-  >
-    {fieldIndex === 14
-      ? securityPeriodOptions.map((option, index) => (
-          <option key={index} value={option}>
-            {option}
-          </option>
-        ))
-      : paymentStatusOptions.map((option, index) => (
-          <option key={index} value={option}>
-            {option}
-          </option>
-        ))}
-  </select>
-) :fieldIndex ===4 ?(<>
-<input type="date" value={placement[field]}
-          onChange={(e) => handleInputChange(e, field)}
+                      {fieldIndex === 14 || fieldIndex === 15 ? ( // Check if the field index is 14 or 15
+                        <select
+                          onChange={(e) => handleInputChange(e, field)}
+                          value={placement[field]}
+                        >
+                          {fieldIndex === 14
+                            ? securityPeriodOptions.map((option, index) => (
+                              <option key={index} value={option}>
+                                {option}
+                              </option>
+                            ))
+                            : paymentStatusOptions.map((option, index) => (
+                              <option key={index} value={option}>
+                                {option}
+                              </option>
+                            ))}
+                        </select>
+                      ) : fieldIndex === 4 ? (<>
+                        <input type="date" value={placement[field]}
+                          onChange={(e) => handleInputChange(e, field)}
 
-      />
+                        />
 
-</>): (
-  <input
-    onChange={(e) => handleInputChange(e, field)}
-    className={`${fieldIndex === 5 || fieldIndex === 6 || fieldIndex === 7 || fieldIndex===8 ? 'hidden' : 'visible'}`}
+                      </>) : (
+                        <input
+                          onChange={(e) => handleInputChange(e, field)}
+                          className={`${fieldIndex === 5 || fieldIndex === 6 || fieldIndex === 7 || fieldIndex === 8 ? 'hidden' : 'visible'}`}
 
-    value={
-      field === "accountManager" ||
-      field === "cnadidateOwner" ||
-      field === "pandLhead" ||
-      field === "accountHead"
-        ? placement[field]?.name
-        : placement[field]
-    }
-  />
-)}
-{field === "cnadidateOwner" && (
-  <select
-    onChange={(e) => handleInputChange(e, field)}
-    value={placement[field]?.name}
-  >
-    {candidateOwnerOptions?.map((option, index) => (
-      <option key={index} value={option.value}>
-        {option.label}
-      </option>
-    ))}
-  </select>
-)}
-{field === "accountManager" && (
-  <select
-    onChange={(e) => handleInputChange(e, field)}
-    value={placement[field]?.name}
-  >
-    {accountManagerOptions.map((option, index) => (
-      <option key={index} value={option.value}>
-        {option.label}
-      </option>
-    ))}
-  </select>
-)}
-{field === "pandLhead" && (
-  <select
-    onChange={(e) => handleInputChange(e, field)}
-    value={placement[field]?.name}
-  >
-    {pandLHeadOptions.map((option, index) => (
-      <option key={index} value={option.value}>
-        {option.label}
-      </option>
-    ))}
-  </select>
-)}
-{field === "accountHead" && (
-  <select
-    onChange={(e) => handleInputChange(e, field)}
-    value={placement[field]?.name}
-  >
-    {accountHeadOptions.map((option, index) => (
-      <option key={index} value={option.value}>
-        {option.label}
-      </option>
-    ))}
-  </select>
-)}
+                          value={
+                            field === "accountManager" ||
+                              field === "cnadidateOwner" ||
+                              field === "pandLhead" ||
+                              field === "accountHead"
+                              ? placement[field]?.name
+                              : placement[field]
+                          }
+                        />
+                      )}
+                      {field === "cnadidateOwner" && (
+                        <select
+                          onChange={(e) => handleInputChange(e, field)}
+                          value={placement[field]?.name}
+                        >
+                          {candidateOwnerOptions?.map((option, index) => (
+                            <option key={index} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      {field === "accountManager" && (
+                        <select
+                          onChange={(e) => handleInputChange(e, field)}
+                          value={placement[field]?.name}
+                        >
+                          {accountManagerOptions.map((option, index) => (
+                            <option key={index} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      {field === "pandLhead" && (
+                        <select
+                          onChange={(e) => handleInputChange(e, field)}
+                          value={placement[field]?.name}
+                        >
+                          {pandLHeadOptions.map((option, index) => (
+                            <option key={index} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      {field === "accountHead" && (
+                        <select
+                          onChange={(e) => handleInputChange(e, field)}
+                          value={placement[field]?.name}
+                        >
+                          {accountHeadOptions.map((option, index) => (
+                            <option key={index} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      )}
 
-                      
+
                     </td>
                   ))}
-                  <td className="px-4 py-4 border-b">
+                  <td className="px-4 py-2 border-b sticky right-0 bg-white border-gray-800">
                     <button
                       onClick={() => {
                         saveChangesHandler();
@@ -325,22 +329,23 @@ const AdminPlacementTable = () => {
                   {fields?.map((field, fieldIndex) => (
                     <td
                       key={fieldIndex}
-                      className="px-6 py-4 whitespace-nowrap border border-black w-32" // Set fixed width here
+                      className="px-6 py-2 whitespace-nowrap border border-black w-32" // Set fixed width here
                     >
                       {field === "accountManager"
                         ? `${placement[field]?.name} (${placement[field].cid})`
                         : field === "cnadidateOwner"
-                        ? `${placement[field].name} (${placement[field].cid})`
-                        : field === "pandLhead"
-                        ? `${placement[field].name} (${placement[field].cid})`
-                        : field === "dateOfJoining"
-                        ? new Date(placement[field]).toLocaleDateString()
-                        : field === "accountHead"
-                        ? `${placement[field].name} (${placement[field].cid})`
-                        : placement[field]}
+                          ? `${placement[field].name} (${placement[field].cid})`
+                          : field === "pandLhead"
+                            ? `${placement[field].name} (${placement[field].cid})`
+                            : field === "dateOfJoining"
+                              // ? new Date(placement[field]).toLocaleDateString() 
+                              ? new Date(placement[field]).toLocaleDateString("en-US", { day: 'numeric', month: 'long', year: 'numeric' })
+                              : field === "accountHead"
+                                ? `${placement[field].name} (${placement[field].cid})`
+                                : placement[field]}
                     </td>
                   ))}
-                  <td className="py-4 px-4 border-b">
+                  <td className="py-2 px-4 border-b sticky right-0 bg-white border border-gray-800">
                     <button
                       onClick={() => {
                         setupdateFieldId(placement._id);
@@ -366,6 +371,7 @@ const AdminPlacementTable = () => {
       </table>
     </div>
   );
+
 };
 
 export default AdminPlacementTable;

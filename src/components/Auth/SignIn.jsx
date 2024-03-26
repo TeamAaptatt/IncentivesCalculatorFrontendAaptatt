@@ -24,8 +24,8 @@ const SignIn = () => {
         try {
           const token = await getIdToken(user);
           setAuthUser(user)
-          // dispatch(setUser({ token }));
-          // setupTokenRefresh();
+           dispatch(setUser({ token }));
+           setupTokenRefresh();
 
           setConfirmation('Login successful!');
           navigate('/');
