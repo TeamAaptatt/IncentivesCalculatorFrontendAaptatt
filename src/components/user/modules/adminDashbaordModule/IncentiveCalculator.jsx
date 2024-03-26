@@ -28,7 +28,7 @@ const IncentiveCalculator = () => {
   };
 
   const fetchIncentiveData = async () => {
-    await calculateOwnership();
+    // await calculateOwnership();
     try {
       setLoading(true);
       const response = await axios.get(BASE_URL + `/calculate-incentive/${cid}`, {

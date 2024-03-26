@@ -44,7 +44,7 @@ const UserTypeCheck = ({ admin, user }) => {
         } catch (error) {
           console.error('Error refreshing token:', error);
         }
-      }, 2500000 );  
+      }, 2000000 );  
     
       return () => {
         clearInterval(intervalId);
@@ -56,7 +56,7 @@ const UserTypeCheck = ({ admin, user }) => {
   
     console.log(userType);
   //   useEffect(()=>{
-  //     const user = localStorage.getItem('User')
+  //     const user = JSON.parse(localStorage.getItem('User'))
   //       getToken(user)
   // }, [])
 

@@ -24,8 +24,8 @@ const SignIn = () => {
         try {
           const token = await getIdToken(user);
           setAuthUser(user)
-          // dispatch(setUser({ token }));
-          // setupTokenRefresh();
+           dispatch(setUser({ token }));
+           setupTokenRefresh();
 
           setConfirmation('Login successful!');
           navigate('/');
@@ -61,7 +61,7 @@ const SignIn = () => {
       const newToken = await getIdToken(userCredential.user);
       dispatch(setUser({ token: newToken }));
       setAuthUser(userCredential.user);
-      localStorage.setItem('User', userCredential.user);
+      localStorage.setItem('User', JSON.stringify(userCredential.user));
 
       navigate('/');
       // setupTokenRefresh();

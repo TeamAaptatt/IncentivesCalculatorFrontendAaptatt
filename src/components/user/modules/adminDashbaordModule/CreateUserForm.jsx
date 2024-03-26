@@ -160,7 +160,10 @@ const CreateUserForm = ({ handleClose }) => {
   return (
     <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50 z-50" onClick={handleOutsideClick}>
       <div className="bg-white p-8 rounded shadow-md max-w-xl w-full">
-        <h2 className="text-2xl font-bold mb-2 text-center">Create User</h2>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded shadow-md max-w-md w-full flex gap-4 flex-wrap "
+      >        <h2 className="text-2xl font-bold mb-2 text-center">Create User</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <div className="mb-4">
@@ -329,10 +332,12 @@ const CreateUserForm = ({ handleClose }) => {
           <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">
             Create User
           </button>
+          
           <button type="button" className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700 ml-4" onClick={handleClose}>
             Close
           </button>
         </div>
+        </form>
       </div>
     </div>
   );
