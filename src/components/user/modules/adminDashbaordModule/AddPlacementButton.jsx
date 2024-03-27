@@ -71,6 +71,7 @@ const AddPlacementButton = () => {
       console.error('Failed to create placement');
 
     } catch (error) {
+      console.log(error);
       console.error('Error:', error.message);
     }
   };

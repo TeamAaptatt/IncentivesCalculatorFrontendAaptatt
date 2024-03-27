@@ -48,11 +48,12 @@ const IncentiveCalculator = () => {
   const tablestyle = "border-collapse border border-gray-800 p-2"
 
   return (
-    <div className="flex items-center justify-center m-4">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md border border-gray-300">
-        <h1 className="text-3xl font-bold mb-8 text-center">Incentive Calculator</h1>
+    <div className="flex  m-4">
 
-        <div className="mb-4">
+      <div className="w-full flex max-w-md p-6 bg-white ">
+
+        <div className="mb-4 mx-8 w-full flex flex-col">
+          <div className='flex flex-col w-auto mx-4'>
           <label htmlFor="cid" className="block text-sm font-bold text-gray-800">
             User CID:
           </label>
@@ -62,30 +63,47 @@ const IncentiveCalculator = () => {
             name="cid"
             value={cid}
             onChange={(e) => setCid(e.target.value)}
-            className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+            className="mt-1 p-2  border border-gray-300 rounded-md w-96"
           />
-        </div>
-
-        <button disabled={!cid.length} className="px-4 py-2 text-white bg-red-500 rounded-md w-full" onClick={fetchIncentiveData}>
+          </div>
+          
+           <button disabled={!cid.length} className="px-4 w-32 my-4 mx-4 py-2 text-white bg-red-500 rounded-md " onClick={fetchIncentiveData}>
           Calculate
         </button>
+        </div>
+
+       
         {incentiveData || loading ? <>
           {loading ? (
             <p className="mt-4 text-gray-600 text-center">Loading...</p>
           ) : (
-            <table className="mt-4 text-gray-600 text-center">
+            // <div>
+            //   <ul>
+            //     <li>
+            //     Achieved Target
+            //     </li>
+            //     <li>
+            //       Target
+            //     </li>
+            //     <li>
+            //       Incentive A
+            //     </li>
+            //   </ul>
+            // </div>
+            <table className="mt-4 text-gray-600 text-center flex ">
               <thead>
-                <tr>
-                  <th className={tablestyle}>Achieved Target</th>
-                  <th className={tablestyle}>Target</th>
-                  <th className={tablestyle}>Incentive Amount</th>
+                <tr className='flex flex-col items-start'>
+                  
+                  <th className='mx-4  translate-x-16  my-[0.26rem]  text-nowrap'>Achieved Target</th>
+                  <th className='mx-4  translate-x-16  my-[0.26rem]  text-nowrap'>Target</th>
+                  <th className='mx-4  translate-x-16  my-[0.26rem]  text-nowrap'>Incentive Amount</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td className={tablestyle}> {incentiveData.achievedTarget}</td>
-                  <td className={tablestyle}> {incentiveData.target}</td>
-                  <td className={tablestyle}>{incentiveData.incentiveAmount}</td>
+                <tr className='   translate-x-12  flex flex-col items-start  '>
+                  <td className=' text-nowrap mx-14 my-[0.26rem]'> {incentiveData.achievedTarget}</td>
+                  <td className=' text-nowrap mx-14 my-[0.26rem]'> {incentiveData.target}</td>
+                  <td className='  text-nowrap mx-14 my-[0.26rem'>{incentiveData.incentiveAmount}</td>
                 </tr>
               </tbody>
             </table>
