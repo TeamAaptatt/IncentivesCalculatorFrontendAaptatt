@@ -7,27 +7,29 @@ import OwnerShipTable from '../modules/adminDashbaordModule/OwnerShipTable';
 import AddPlacementButton from '../modules/adminDashbaordModule/AddPlacementButton';
 import IncentiveCalculator from '../modules/adminDashbaordModule/IncentiveCalculator';
 import AddIncentivePeriod from '../modules/adminDashbaordModule/AddIncentivePeriod';
+import AdminDashboardTabs from '../modules/adminDashbaordModule/AdminDashboardTabs';
 
 const AdminDashboard = () => {
   const [toggle, setToggle] = useState(false);
   const [usertoggle, setUSerToggle] = useState(false);
   const [creatIncentive, setCreateIncentive] = useState(false);
+  const [placementToggle, setPlacementToggle] = useState(false);
 
   const toggleCreateIncentive = () => {
     setCreateIncentive((prevState) => !prevState);
   };
 
-  const toggleForm = () => {
-    setToggle((prevState) => !prevState);
-  };
-
+ 
   return (
     <div className='m-4 p-2 flex flex-col items-center'>
-      <h2 className='text-4xl m-2 uppercase font-bold'>Placement Table</h2>
-      <AdminPlacementTable />
+      {/* <button className="bg-black m-4 hover:bg-blue-400 text-white px-4 py-2 rounded-md w-44" onClick={() => setPlacementToggle((prev)=>!prev)}>
+        {placementToggle===true?"Placement Table":"Placement Table"}
+      </button> */}
+      <AdminDashboardTabs  />
+      {/* <AdminPlacementTable />0
       <AddPlacementButton />
       <OwnerShipTable />
-      <IncentiveCalculator />
+      <IncentiveCalculator /> */}
 
       <div>
         <button className="bg-black m-4 hover:bg-blue-400 text-white px-4 py-2 rounded-md w-44"
@@ -36,13 +38,10 @@ const AdminDashboard = () => {
         </button>
         {creatIncentive && <AddIncentivePeriod handleClose={toggleCreateIncentive} />}
 
-        <button className="bg-black m-4 hover:bg-blue-400 text-white px-4 py-2 rounded-md w-44" onClick={() => setUSerToggle((state) => !state)}>{usertoggle === true ? 'Close' : 'All Users'}</button>
-        {usertoggle && <UserList />}
+      
         {/* <button className="bg-black hover:bg-blue-400 text-white px-4 py-2 rounded-md w-44" onClick={() => setToggle((state) => !state)}>{toggle === true ? 'Close' : 'Create User'}</button>
         {toggle && <CreateUserForm />} */}
-        <button className="bg-black hover:bg-blue-400 text-white px-4 py-2 rounded-md w-44" onClick={() => setToggle((state) => !state)}>{toggle === true ? 'Close' : 'Create User'}
-        </button>
-        {toggle && <CreateUserForm handleClose={toggleForm} />}
+      
       </div>
 
     </div>

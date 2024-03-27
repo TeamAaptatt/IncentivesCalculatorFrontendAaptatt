@@ -9,6 +9,8 @@ import {
   faExchange,
   faMultiply,
   faPlusCircle,
+  faTrash,
+  faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import CreateReporting from "./TransferReporting";
 import TransferReporting from "./TransferReporting";
@@ -123,7 +125,6 @@ const OwnerShipTable = () => {
       console.log(err);
     }
   };
-  //GET ALL ASSIGNED ROLE
   const getAllAssignedRoles = async () => {
     try {
       const response = await axios.get(BASE_URL + "get-assigned-role", {
@@ -207,12 +208,24 @@ const OwnerShipTable = () => {
     setReportings(updatedReportings);
   };
 
-  console.log(reportings);
+  const handleDeleteReporting  = async (reporting) => {
+      const reportingid=reporting  
+    try {
+      const deleteReporting  = await axios.delete(`${BASE_URL}delete-reporting/${reportingid}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+       alert("Deleted Successfully!")
+      getAllReportings()
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
 
   return (
     <div className="w-full flex flex-col items-center overflow-x-hidden">
       <div className="w-full flex flex-col items-center">
-        <h1 className="text-center my-4 font-bold uppercase text-4xl"> Ownership Table</h1>
+        {/* <h1 className="text-center my-4 font-bold uppercase text-4xl"> Ownership Table</h1> */}
       </div>
       <div className="w-full overflow-x-auto">
         <table className="w-full my-2 border rounded border-collapse p-2 border-gray-800">
@@ -344,6 +357,12 @@ const OwnerShipTable = () => {
                     <td className="border  p-2 flex gap-2 justify-center sticky right-0 bg-white">
                       <button onClick={() => { setUpdateUserId(reporting.user._id); }}>
                         <FontAwesomeIcon icon={faEdit} />
+                      </button>
+                      <button>
+                      <FontAwesomeIcon 
+                        icon={faTrash} 
+                    onClick={() => handleDeleteReporting(reporting._id)}
+                       />
                       </button>
                     </td>
                   </tr>
