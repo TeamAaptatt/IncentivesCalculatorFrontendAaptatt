@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClose } from '@fortawesome/free-solid-svg-icons';
+import Select from 'react-select'; // Import react-select
 import useUserManagement from '../../../../utils/hooks/useUserMangement';
 
 const AddPlacementButton = () => {
@@ -29,18 +30,34 @@ const AddPlacementButton = () => {
   const token = useSelector((state) => state.auth.token.token);
   const { users } = useUserManagement();
 
+  
+  const [candidateOwner, setCandidateOwner] = useState(null);
+  const [accountManager, setAccountManager] = useState(null);
+  const [accountHead, setAccountHead] = useState(null);
+  const [pandLhead, setPandLHead] = useState(null);
+
   const handleInputChange = (e) => {
+    console.log(e.target.value);
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+     const updatedFormData = {
+      ...formData,
+      cnadidateOwner: candidateOwner,
+      accountManager: accountManager,
+      accountHead: accountHead,
+      pandLhead: pandLhead,
+    };
+  
+    console.log(updatedFormData);
 
     try {
       const response = await axios.post(
         BASE_URL + 'add-placement',
-        formData,
+        updatedFormData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -56,7 +73,7 @@ const AddPlacementButton = () => {
         client: '',
         offeredPosition: '',
         dateOfJoining: '',
-        candidateOwner: '',
+        cnadidateOwner: '',
         accountManager: '',
         accountHead: '',
         pandLhead: '',
@@ -66,12 +83,9 @@ const AddPlacementButton = () => {
         fee: '',
         sendOff: '',
         securityPeriod: '',
-        paymentStatus: '',
+        paymentStaus: '',
       });
-      console.error('Failed to create placement');
-
     } catch (error) {
-      console.log(error);
       console.error('Error:', error.message);
     }
   };
@@ -136,21 +150,40 @@ const AddPlacementButton = () => {
                         ))
                       )}
                     </select>
-                  ) : key === 'cnadidateOwner' || key === 'accountManager' || key === 'accountHead' || key === 'pandLhead' ? (
-                    <select
-                      name={key}
-                      value={value}
-                      onChange={handleInputChange}
-                      className="p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-500"
-                    >
-                      <option value="">Select {key}</option>
-                      {users.map((user) => (
-                        <option key={user._id} value={user._id}>
-                          {user.name}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
+                  ) : key === 'cnadidateOwner' ? (
+                    <Select
+                      options={users.map((user) => ({ value: user._id, label: user.name }))}
+                      onChange={(selectedOption) => setCandidateOwner(selectedOption.value)}
+                      value={candidateOwner ? { value: candidateOwner, label: users.find(user => user._id === candidateOwner).name } : null}
+                      className="w-full"
+                      placeholder="Search and select Candidate Owner"
+                    />
+                  ) : key === 'accountManager' ? (
+                    <Select
+                      options={users.map((user) => ({ value: user._id, label: user.name }))}
+                      onChange={(selectedOption) => setAccountManager(selectedOption.value)}
+                      value={accountManager ? { value: accountManager, label: users.find(user => user._id === accountManager).name } : null}
+                      className="w-full"
+                      placeholder="Search and select Account Manager"
+                    />
+                  ) : key === 'accountHead' ? (
+                    <Select
+                      options={users.map((user) => ({ value: user._id, label: user.name }))}
+                      onChange={(selectedOption) => setAccountHead(selectedOption.value)}
+                      value={accountHead ? { value: accountHead, label: users.find(user => user._id === accountHead).name } : null}
+                      className="w-full"
+                      placeholder="Search and select Account Head"
+                    />
+                  ) : key === 'pandLhead' ? (
+                    <Select
+                      options={users.map((user) => ({ value: user._id, label: user.name }))}
+                      onChange={(selectedOption) => setPandLHead(selectedOption.value)}
+                      value={pandLhead ? { value: pandLhead, label: users.find(user => user._id === pandLhead).name } : null}
+                      className="w-full"
+                      placeholder="Search and select P&L Head"
+                    />
+                  )
+                   : (
                     <input
                       type="text"
                       name={key}

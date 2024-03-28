@@ -127,17 +127,17 @@ const AdminPlacementTable = () => {
       if (selectedOption) {
         updatedValue = selectedOption.value; // Assign only the ID
       }
-    }else if (field === "cnadidateOwner") {
+    } else if (field === "cnadidateOwner") {
       const selectedOption = candidateOwnerOptions.find(option => option.label === updatedValue);
       if (selectedOption) {
         updatedValue = selectedOption.value; // Assign only the ID
       }
-    }else if (field === "accountHead") {
+    } else if (field === "accountHead") {
       const selectedOption = accountHeadOptions.find(option => option.label === updatedValue);
       if (selectedOption) {
         updatedValue = selectedOption.value; // Assign only the ID
       }
-    }else if (field === "pandLhead") {
+    } else if (field === "pandLhead") {
       const selectedOption = pandLHeadOptions.find(option => option.label === updatedValue);
       if (selectedOption) {
         updatedValue = selectedOption.value; // Assign only the ID
@@ -226,7 +226,7 @@ const AdminPlacementTable = () => {
                       key={fieldIndex}
                       className="px-6 py-2 whitespace-nowrap border border-gray-800"
                     >
-                      {fieldIndex === 14 || fieldIndex === 15 ? ( 
+                      {fieldIndex === 14 || fieldIndex === 15 ? (
                         <select
                           onChange={(e) => handleInputChange(e, field)}
                           value={placement[field]}
@@ -246,7 +246,7 @@ const AdminPlacementTable = () => {
                         </select>
                       ) : fieldIndex === 4 ? (<>
                         <input type="date" value={placement[field]}
-                                                 className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                          className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
 
                           onChange={(e) => handleInputChange(e, field)}
 
@@ -268,77 +268,77 @@ const AdminPlacementTable = () => {
                         />
                       )}
                       {field === "cnadidateOwner" && (
-                       <>
-                       <input
-                         type="text"
-                         onChange={(e) => handleInputChange(e, field)}
-                         value={placement[field]?.name}
-                         list="candidateOwnerOptionsList"
-                         className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                       />
-                       <datalist id="candidateOwnerOptionsList">
-                         {candidateOwnerOptions.map((option, index) => (
-                           <option key={index} value={option.label}></option>
-                         ))}
-                       </datalist>
-                     </>
-                     
-)}
+                        <>
+                          <input
+                            type="text"
+                            onChange={(e) => handleInputChange(e, field)}
+                            value={placement[field]?.name}
+                            list="candidateOwnerOptionsList"
+                            className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                          />
+                          <datalist id="candidateOwnerOptionsList">
+                            {candidateOwnerOptions.map((option, index) => (
+                              <option key={index} value={option.label}></option>
+                            ))}
+                          </datalist>
+                        </>
+
+                      )}
                       {field === "accountManager" && (
                         <>
-  <input
-    type="text"
-    onChange={(e) => handleInputChange(e, field)}
-    className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                          <input
+                            type="text"
+                            onChange={(e) => handleInputChange(e, field)}
+                            className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
 
-    value={placement[field]?.name}
-    list="accountManagerOptionsList"
-  />
-  <datalist id="accountManagerOptionsList">
-    {accountManagerOptions.map((option, index) => (
-      <option key={index} value={option.label} >
-        </option>
-    ))}
-  </datalist>
-  </>
-)}
-                      {field === "pandLhead" &&(
+                            value={placement[field]?.name}
+                            list="accountManagerOptionsList"
+                          />
+                          <datalist id="accountManagerOptionsList">
+                            {accountManagerOptions.map((option, index) => (
+                              <option key={index} value={option.label} >
+                              </option>
+                            ))}
+                          </datalist>
+                        </>
+                      )}
+                      {field === "pandLhead" && (
                         <>
-  <input
-    type="text"
-    onChange={(e) => handleInputChange(e, field)}
-    className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                          <input
+                            type="text"
+                            onChange={(e) => handleInputChange(e, field)}
+                            className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
 
-    value={placement[field]?.name}
-    list="pandLheadOptionsList"
-  />
-  <datalist id="pandLheadOptionsList">
-    {pandLHeadOptions.map((option, index) => (
-      <option key={index} value={option.label} >
-        </option>
-    ))}
-  </datalist>
-  </>
-)}
+                            value={placement[field]?.name}
+                            list="pandLheadOptionsList"
+                          />
+                          <datalist id="pandLheadOptionsList">
+                            {pandLHeadOptions.map((option, index) => (
+                              <option key={index} value={option.label} >
+                              </option>
+                            ))}
+                          </datalist>
+                        </>
+                      )}
                       {field === "accountHead" && (
                         <>
-  <input
-    type="text"
-    onChange={(e) => handleInputChange(e, field)}
-    value={placement[field]?.name}
-    className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                          <input
+                            type="text"
+                            onChange={(e) => handleInputChange(e, field)}
+                            value={placement[field]?.name}
+                            className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
 
-    list="accountHeadOptionsList"
-  />
-  <datalist id="accountHeadOptionsList">
-    {accountHeadOptions.map((option, index) => (
-      <option key={index} value={option.label} >
-        </option>
-    ))}
-  </datalist>
-  </>
-)
-}
+                            list="accountHeadOptionsList"
+                          />
+                          <datalist id="accountHeadOptionsList">
+                            {accountHeadOptions.map((option, index) => (
+                              <option key={index} value={option.label} >
+                              </option>
+                            ))}
+                          </datalist>
+                        </>
+                      )
+                      }
 
 
                     </td>
