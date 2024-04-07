@@ -24,7 +24,7 @@ const toggleForm = () => {
       <div className="flex flex-wrap">
         <div className="w-full">
           <ul
-            className="flex mb-0 list-none flex-wrap pt-3 pb-4 flex-row"
+            className=" flex list-none flex-wrap  pb-4 flex-row"
             role="tablist"
           >
             <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
@@ -105,12 +105,12 @@ const toggleForm = () => {
             </li>
           </ul>
           <div className="relative flex flex-col  w-[90vw] break-words bg-white mb-6 shadow-lg rounded">
-            <div className="px-4 py-5 flex-auto">
+            <div className="px-4  flex-auto">
               <div className="tab-content tab-space relative">
-                <div className={openTab === 1 ? "block" : "hidden"} id="link1">
-                  <div className=" flex w-full  justify-end">
+                <div className={openTab === 1 ? "block " : "hidden"} id="link1">
+                  {/* <div className=" flex w-full  justify-end">
                   <AddPlacementButton/>
-                  </div>
+                  </div> */}
                   <AdminPlacementTable/>
                   <div className="absolute bottom-0 right-0">
                      {/* <button className=" h-10 w-10">

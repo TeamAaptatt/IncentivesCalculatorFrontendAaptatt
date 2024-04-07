@@ -1,15 +1,19 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { BASE_URL } from "../../../../constants/api";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
   faEdit,
   faMultiply,
   faTrash,
+  faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import useUserManagement from "../../../../utils/hooks/useUserMangement";
+import AddPlacementButton from "./AddPlacementButton";
+import { setLoading } from "../../../../utils/redux/loadSlice/loadSlice";
+import { validateFormData } from "../../../../utils/helpers/validationHelpers";
 
 const AdminPlacementTable = () => {
   const token = useSelector((state) => state.auth.token.token);
@@ -17,6 +21,10 @@ const AdminPlacementTable = () => {
   const [updateFieldId, setupdateFieldId] = useState(null);
   const [updatedData, setUpdatedData] = useState(null);
   const [deleteFieldId, setDeleteFieldId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('')
+  const dispatch = useDispatch()
+  const [error, setErrors] = useState({})
+  const [filteredPlacements, setFilteredPlacements] = useState([]);
   const dataFields = [
     "Status",
     "Candidate",
@@ -103,17 +111,26 @@ const AdminPlacementTable = () => {
 
   useEffect(() => {
     getAllPlacements();
-  }, [updateFieldId, deleteFieldId]);
+  }, []);
 
   const getAllPlacements = async () => {
-    const response = await axios.get(BASE_URL + "get-all-placements", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const data = await response.data;
-    setPlacements(data);
-    console.log(data);
+    try {
+      dispatch(setLoading(true))
+      const response = await axios.get(BASE_URL + "get-all-placements", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.data;
+      setPlacements(data);
+      setFilteredPlacements(data)
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }finally{
+      dispatch(setLoading(false))
+    }
+    
   };
 
   const handleInputChange = (event, field) => {
@@ -142,7 +159,7 @@ const AdminPlacementTable = () => {
       if (selectedOption) {
         updatedValue = selectedOption.value; // Assign only the ID
       }
-    }
+    } 
 
     // Use the field name to update the corresponding state in a new array
     const updatedPlacements = placements.map((placement) => {
@@ -157,25 +174,56 @@ const AdminPlacementTable = () => {
     setPlacements(updatedPlacements);
   };
 
+  
   const saveChangesHandler = async () => {
     const updatedPlacement = placements.find(
       (placement) => placement._id === updateFieldId
     );
-    console.log(updatedPlacement);
-    const response = await axios.put(
-      BASE_URL + `/updatePlacement/${updateFieldId}`,
-      updatedPlacement,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    setupdateFieldId(null);
-    if (response.status === "200") {
-      setupdateFieldId(null);
+    const newErrors = validateFormData(updatedPlacement); // Use validation function
+    console.log(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
     }
+   
+    try {
+      dispatch(setLoading(true))
+      const response = await axios.put(
+        BASE_URL + `/updatePlacement/${updateFieldId}`,
+        updatedPlacement,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setupdateFieldId(null);
+      if (response.status === "200") {
+        setupdateFieldId(null);
+      }
+    } catch (error) {
+      console.log(error);
+    }finally{
+      dispatch(setLoading(false))
+
+    }
+    
   };
+
+  const handleSearch = ()=>{
+    const  filteredPlacement = filteredPlacements.filter((item)=>{
+      return item.candidate?.toLowerCase().includes(searchQuery.toLowerCase()) || item.cnadidateOwner.name?.toString().includes(searchQuery) ||  item.accountManager.name?.toString().includes(searchQuery) 
+      ||item.accountHead.name?.toString().includes(searchQuery) ||item.pandLhead.name?.toString().includes(searchQuery)
+
+    })
+  console.log(filteredPlacements);
+  setPlacements(filteredPlacement)
+
+  }
+
+  useEffect(()=>{
+    handleSearch()
+  }, [searchQuery])
 
   useEffect(() => {
     if (deleteFieldId !== null) {
@@ -201,14 +249,31 @@ const AdminPlacementTable = () => {
   };
 
   return (
-    <div className="overflow-hidden border rounded border-collapse border-gray-800 overflow-x-scroll w-full m-4">
-      <table className="min-w-full border border-gray-800">
-        <thead className="text-indigo-600 uppercase text-center">
-          <tr>
+    <>
+    
+    <div className=" flex items-center w-full  ">
+        <div className="justify-start w-1/2">
+        <input type="text" placeholder="Search..." 
+        value={searchQuery}
+        onChange={(e)=>setSearchQuery(e.target.value)}
+        className=" w-2/3 p-2 mb-2 outline-1 border-2 border-black rounded "
+        />
+
+        </div>
+        <div className=" w-1/2 flex justify-end">
+        <AddPlacementButton/>
+
+        </div>
+      </div>
+    <div className="overflow-hidden  border-2 border-gray-800  rounded-sm overflow-x-scroll overflow-y-scroll h-[62vh] w-full mb-2">
+
+      <table className="min-w-full ">
+      <thead className="text-black bg-white uppercase text-center sticky top-0  z-10 shadow">
+          <tr > 
             {dataFields.map((data, index) => (
               <th
                 key={index}
-                className={`px-4 py-2 border border-b border-black ${index === dataFields.length - 1 ? 'sticky right-0 bg-white' : ''
+                className={`py-4 px-2 font-semibold   text-[1rem]  text-nowrap border-x border-gray-800 ${index === dataFields.length - 1 ? 'sticky right-0 bg-white  ' : ' '
                   }`}
               >
                 {data}
@@ -336,12 +401,16 @@ const AdminPlacementTable = () => {
                               </option>
                             ))}
                           </datalist>
+                          
                         </>
                       )
                       }
-
-
-                    </td>
+              
+              {error[field] && (
+                    <p className="text-red-500 text-xs lowercase">{`*${error[field]}`}</p>
+                  )}
+                     
+                     </td>
                   ))}
                   <td className="px-4 py-2 border-b sticky right-0 bg-white border-gray-800">
                     <button
@@ -388,7 +457,7 @@ const AdminPlacementTable = () => {
                         console.log(placement._id);
                       }}
                     >
-                      <FontAwesomeIcon icon={faEdit} className="mr-2" />
+                      <FontAwesomeIcon icon={faEdit} className="mr-2 text-[#23C132]" />
                     </button>
                     <button
                       onClick={() => {
@@ -396,7 +465,7 @@ const AdminPlacementTable = () => {
                         // deleteRowHandler();
                       }}
                     >
-                      <FontAwesomeIcon icon={faTrash} className="mr-2" />
+                      <FontAwesomeIcon icon={ faTrashAlt} className="mr-2   text-red-700" />
                     </button>
                   </td>
                 </tr>
@@ -405,9 +474,12 @@ const AdminPlacementTable = () => {
           ))}
         </tbody>
       </table>
+      
     </div>
+    </>
   );
 
 };
 
 export default AdminPlacementTable;
+

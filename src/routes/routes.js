@@ -7,6 +7,9 @@ import UserTypeCheck from "./UserTypeCheck";
 import UserDashboard from "../components/user/Dashboard/UserDashboard";
 import SignIn from "../components/Auth/SignIn";
 import UserPage from "../components/user/pages/adminPages/UserPage";
+import Profile from "../components/user/Profile/UserProfile";
+import AdminProfile from "../components/user/Profile/AdminProfile";
+import UserProfile from "../components/user/Profile/UserProfile";
 
 const router = createBrowserRouter([
   {
@@ -27,7 +30,10 @@ const router = createBrowserRouter([
           <UserTypeCheck admin={<UserPage/>}
           user={<UserDashboard/>}
           />
-      ),      },
+      ),      },{
+        path:"/profile",
+        element:<UserTypeCheck admin={<AdminProfile/>} user={<UserProfile/>}/>
+      }
      
     ],
   },

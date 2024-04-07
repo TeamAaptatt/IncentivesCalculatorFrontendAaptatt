@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../../../../constants/api';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import useUserManagement from '../../../../utils/hooks/useUserMangement';
+import { setLoading } from '../../../../utils/redux/loadSlice/loadSlice';
 
 const AddIncentivePeriod = ({ handleClose }) => {
   const {users, filteredUsers} = useUserManagement();
@@ -13,6 +14,8 @@ const AddIncentivePeriod = ({ handleClose }) => {
       endDate: '',
     },
   });
+
+  const dispatch = useDispatch()
 
   const token = useSelector((state) => state.auth.token.token);
 
@@ -35,6 +38,8 @@ const AddIncentivePeriod = ({ handleClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      dispatch(setLoading(true))
+
       const response = await axios.post(BASE_URL + 'add-incentive-period', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -52,6 +57,9 @@ const AddIncentivePeriod = ({ handleClose }) => {
       handleClose();  
     } catch (error) {
       console.error(error.response.data.error);
+    }finally{
+      dispatch(setLoading(false))
+      
     }
   };
 

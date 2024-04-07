@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../../../../constants/api';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import useUserManagement from '../../../../utils/hooks/useUserMangement';
+import { setLoading } from '../../../../utils/redux/loadSlice/loadSlice';
+import showToast from '../../../../utils/helpers/showToast';
 
 const CreateUserForm = ({ handleClose }) => {
   const [levels, setLevels] = useState([]);
@@ -12,7 +14,7 @@ const CreateUserForm = ({ handleClose }) => {
   const [salaryId, setSalaryId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-
+ const dispatch = useDispatch()
   // Function to handle search
   const handleSearch = (event) => {
     const searchTerm = event.target.value;
@@ -81,9 +83,10 @@ const CreateUserForm = ({ handleClose }) => {
     level: '',
     salary: '',
     assignedRole: '',
-    status: '',
+    //status: '',
     // reporting: '',
     skip: '',
+    joiningDate:'',
     designation: '',
     // type: '',
     // ownedTeam: '',
@@ -96,6 +99,7 @@ const CreateUserForm = ({ handleClose }) => {
     e.preventDefault();
 
     try {
+      dispatch(setLoading(true))
       // Create salary first
       const salaryResponse = await axios.post(BASE_URL + 'add-salary', {
         cid: formData.cid,
@@ -107,7 +111,7 @@ const CreateUserForm = ({ handleClose }) => {
         },
       });
 
-      const salaryData = salaryResponse.data;
+      const salaryData = salaryResponse?.data;
 
       if (salaryResponse.status === 201) {
         // Save the salary ID
@@ -126,7 +130,17 @@ const CreateUserForm = ({ handleClose }) => {
 
         const userData = userResponse.data;
 
-        alert('User and Salary created successfully!');
+        showToast('User created successfully! ', {
+          duration: 3000,
+          position: 'top-center', 
+          style: {
+            border: '1px solid ',
+            padding: '4px',
+            color: 'white',
+            background: '#00FF00',
+            
+          },
+        });
         // You can perform further actions, such as redirecting the user or showing a success message
         setFormData({
           cid: '',
@@ -137,6 +151,7 @@ const CreateUserForm = ({ handleClose }) => {
           assignedRole: '',
           status: '',
           // reporting: '',
+          joiningDate:'',
           skip: '',
           designation: '',
           // type: '',
@@ -147,13 +162,38 @@ const CreateUserForm = ({ handleClose }) => {
 
         })
       } else {
+        showToast('Error Adding Salary', {
+          duration: 3000,
+          position: 'top-center', 
+          style: {
+            border: '1px solid ',
+            padding: '4px',
+            color: 'white',
+            background: '#23C552',
+            
+          },
+        });
         console.error('Error creating salary:', salaryData.error);
         // Handle error, show error message to the user, etc.
       }
       handleClose();
     } catch (error) {
-      console.error('Error creating user and salary:', error);
+      showToast(error.response.data.message || error.response.data.error , {
+        duration: 4000,
+        position: 'top-center', 
+        style: {
+          border: '1px solid ',
+          padding: '4px',
+          color: 'white',
+          background: '#FF0000',
+          
+        },
+      });
+      console.error('Error creating user!:', error);
       // Handle unexpected errors
+    }finally {
+  
+      dispatch(setLoading(false))
     }
   };
 
@@ -163,6 +203,7 @@ const CreateUserForm = ({ handleClose }) => {
     }
   };
   const handleUserClick = (userId, userName) => {
+    setSearchResults([])
     setSearchTerm(userName);
     setFormData({
       ...formData,
@@ -175,10 +216,11 @@ const CreateUserForm = ({ handleClose }) => {
       ...formData,
       [e.target.name]: e.target.value,
     });
+    console.log(formData);
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50 z-50" onClick={handleOutsideClick}>
+    <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50 " onClick={handleOutsideClick}>
       <div className="bg-white p-8 rounded shadow-md max-w-xl w-full">
         <form
           onSubmit={handleSubmit}
@@ -238,11 +280,24 @@ const CreateUserForm = ({ handleClose }) => {
                   placeholder="Salary"
                 />
               </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="salary">
+                  Date of Joining:
+                </label>
+                <input
+                  className="border rounded w-full py-2 px-3"
+                  type="Date"
+                  name="joiningDate"
+                  value={formData.joiningDate}
+                  onChange={handleChange}
+                />
+              </div>
+              
                           </div>
             <div>
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="skip">
-                  Skip:
+                  Reporting
                 </label>
                 <input
                   className="flex-1 border-none outline-none px-2"
@@ -252,7 +307,7 @@ const CreateUserForm = ({ handleClose }) => {
                   placeholder="Search users"
 
                 />
-                {searchTerm && (
+                {searchResults && (
                   <div className='w-48 absolute bg-gray-50 mt-2'>
                     {searchResults.map(user => (
                       <ul className=''>

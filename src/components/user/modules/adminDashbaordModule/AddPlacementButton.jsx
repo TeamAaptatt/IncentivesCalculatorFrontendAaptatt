@@ -1,62 +1,74 @@
-import React, { useState } from 'react';
-import { BASE_URL } from '../../../../constants/api';
-import axios from 'axios';
-import { useSelector } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClose } from '@fortawesome/free-solid-svg-icons';
-import Select from 'react-select'; // Import react-select
-import useUserManagement from '../../../../utils/hooks/useUserMangement';
+import React, { useState } from "react";
+import { BASE_URL } from "../../../../constants/api";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faClose } from "@fortawesome/free-solid-svg-icons";
+import Select from "react-select";
+import useUserManagement from "../../../../utils/hooks/useUserMangement";
+import { setLoading } from "../../../../utils/redux/loadSlice/loadSlice";
+import showToast from "../../../../utils/helpers/showToast";
+import { validateFormData } from "../../../../utils/helpers/validationHelpers";
 
 const AddPlacementButton = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    status: '',
-    candidate: '',
-    client: '',
-    offeredPosition: '',
-    dateOfJoining: '',
-    cnadidateOwner: '',
-    accountManager: '',
-    accountHead: '',
-    pandLhead: '',
-    resumeSource: '',
-    billableSalary: '',
-    commercial: '',
-    fee: '',
-    sendOff: '',
-    securityPeriod: '',
-    paymentStaus: '',
+    //status: '',
+    candidate: "",
+    client: "",
+    offeredPosition: "",
+    dateOfJoining: "",
+    cnadidateOwner: "",
+    accountManager: "",
+    accountHead: "",
+    pandLhead: "",
+    resumeSource: "",
+    billableSalary: "",
+    commercial: "",
+    fee: "",
+    sendOff: "",
+    securityPeriod: "",
+    paymentStaus: "",
   });
+  const [errors, setErrors] = useState({});
   const token = useSelector((state) => state.auth.token.token);
   const { users } = useUserManagement();
 
-  
   const [candidateOwner, setCandidateOwner] = useState(null);
   const [accountManager, setAccountManager] = useState(null);
   const [accountHead, setAccountHead] = useState(null);
   const [pandLhead, setPandLHead] = useState(null);
-
+  const dispatch = useDispatch();
   const handleInputChange = (e) => {
     console.log(e.target.value);
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-     const updatedFormData = {
+    const updatedFormData = {
       ...formData,
       cnadidateOwner: candidateOwner,
       accountManager: accountManager,
       accountHead: accountHead,
       pandLhead: pandLhead,
     };
-  
+
+    const newErrors = validateFormData(updatedFormData); // Use validation function
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+    
     console.log(updatedFormData);
 
     try {
+      dispatch(setLoading(true));
       const response = await axios.post(
-        BASE_URL + 'add-placement',
+        BASE_URL + "add-placement",
         updatedFormData,
         {
           headers: {
@@ -64,37 +76,78 @@ const AddPlacementButton = () => {
           },
         }
       );
+      showToast("Placement created successfully ", {
+        duration: 3000,
+        position: "top-center",
+        style: {
+          border: "1px solid ",
+          padding: "4px",
+          color: "white",
+          background: "#00FF00",
+        },
+      });
 
-      alert('Placement created successfully');
       setIsModalOpen(false);
       setFormData({
-        status: '',
-        candidate: '',
-        client: '',
-        offeredPosition: '',
-        dateOfJoining: '',
-        cnadidateOwner: '',
-        accountManager: '',
-        accountHead: '',
-        pandLhead: '',
-        resumeSource: '',
-        billableSalary: '',
-        commercial: '',
-        fee: '',
-        sendOff: '',
-        securityPeriod: '',
-        paymentStaus: '',
+        //status: '',
+        candidate: "",
+        client: "",
+        offeredPosition: "",
+        dateOfJoining: "",
+        cnadidateOwner: "",
+        accountManager: "",
+        accountHead: "",
+        pandLhead: "",
+        resumeSource: "",
+        billableSalary: "",
+        commercial: "",
+        fee: "",
+        sendOff: "",
+        securityPeriod: "",
+        paymentStaus: "",
       });
     } catch (error) {
-      console.error('Error:', error.message);
+      showToast(error.response.data.error, {
+        duration: 3000,
+        position: "top-center",
+        style: {
+          border: "1px solid ",
+          padding: "4px",
+          color: "white",
+          background: "#FF0000",
+        },
+      });
+      console.error("Error:", );
+    } finally {
+      dispatch(setLoading(false));
     }
   };
+  const handleCandidateOwnerChange = (selectedOption) => {
+    setCandidateOwner(selectedOption.value);
+    setErrors((prevErrors) => ({ ...prevErrors, cnadidateOwner: '' }));
+  };
+  
+  const handleAccountManagerChange = (selectedOption) => {
+    setAccountManager(selectedOption.value);
+    setErrors((prevErrors) => ({ ...prevErrors, accountManager: '' }));
+  };
+  
+  const handleAccountHeadChange = (selectedOption) => {
+    setAccountHead(selectedOption.value);
+    setErrors((prevErrors) => ({ ...prevErrors, accountHead: '' }));
+  };
+  
+  const handlePandLHeadChange = (selectedOption) => {
+    setPandLHead(selectedOption.value);
+    setErrors((prevErrors) => ({ ...prevErrors, pandLhead: '' }));
+  };
+  
 
   return (
-    <div>
+    <div className=" z-20">
       <button
         onClick={() => setIsModalOpen(true)}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+        className=" bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
       >
         Add Placement
       </button>
@@ -119,9 +172,9 @@ const AddPlacementButton = () => {
               {Object.entries(formData).map(([key, value]) => (
                 <div key={key}>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {key.replace(/([a-z])([A-Z])/g, '$1 $2')}:
+                    {key.replace(/([a-z])([A-Z])/g, "$1 $2")}:
                   </label>
-                  {key === 'dateOfJoining' ? (
+                  {key === "dateOfJoining" ? (
                     <input
                       type="date"
                       name={key}
@@ -129,61 +182,116 @@ const AddPlacementButton = () => {
                       onChange={handleInputChange}
                       className="p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-500"
                     />
-                  ) : key === 'securityPeriod' || key === 'paymentStaus' ? (
+                  ) : key === "securityPeriod" || key === "paymentStaus" ? (
                     <select
                       name={key}
                       value={value}
                       onChange={handleInputChange}
                       className="p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-500"
                     >
-                      {key === 'securityPeriod' ? (
-                        ['On-Going', 'Completed', 'Send-Off'].map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))
-                      ) : (
-                        ['Pending', 'Received', 'Adjusted', 'Returning', 'Compromised'].map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))
-                      )}
+                      {key === "securityPeriod"
+                        ? ["On-Going", "Completed", "Send-Off"].map(
+                            (option) => (
+                              <option key={option} value={option}>
+                                {option}
+                              </option>
+                            )
+                          )
+                        : [
+                            "Pending",
+                            "Received",
+                            "Adjusted",
+                            "Returning",
+                            "Compromised",
+                          ].map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
                     </select>
-                  ) : key === 'cnadidateOwner' ? (
+                  ) : key === "cnadidateOwner" ? (
                     <Select
-                      options={users.map((user) => ({ value: user._id, label: user.name }))}
-                      onChange={(selectedOption) => setCandidateOwner(selectedOption.value)}
-                      value={candidateOwner ? { value: candidateOwner, label: users.find(user => user._id === candidateOwner).name } : null}
+                      options={users.map((user) => ({
+                        value: user._id,
+                        label: user.name,
+                      }))}
+                      onChange={handleCandidateOwnerChange}
+                      value={
+                        candidateOwner
+                          ? {
+                              value: candidateOwner,
+                              label: users.find(
+                                (user) => user._id === candidateOwner
+                              ).name,
+                            }
+                          : null
+                      }
                       className="w-full"
                       placeholder="Search and select Candidate Owner"
                     />
-                  ) : key === 'accountManager' ? (
+                  ) : key === "accountManager" ? (
                     <Select
-                      options={users.map((user) => ({ value: user._id, label: user.name }))}
-                      onChange={(selectedOption) => setAccountManager(selectedOption.value)}
-                      value={accountManager ? { value: accountManager, label: users.find(user => user._id === accountManager).name } : null}
+                      options={users.map((user) => ({
+                        value: user._id,
+                        label: user.name,
+                      }))}
+                      onChange={handleAccountManagerChange}
+
+                      value={
+                        accountManager
+                          ? {
+                              value: accountManager,
+                              label: users.find(
+                                (user) => user._id === accountManager
+                              ).name,
+                            }
+                          : null
+                      }
                       className="w-full"
                       placeholder="Search and select Account Manager"
                     />
-                  ) : key === 'accountHead' ? (
+                  ) : key === "accountHead" ? (
                     <Select
-                      options={users.map((user) => ({ value: user._id, label: user.name }))}
-                      onChange={(selectedOption) => setAccountHead(selectedOption.value)}
-                      value={accountHead ? { value: accountHead, label: users.find(user => user._id === accountHead).name } : null}
+                      options={users.map((user) => ({
+                        value: user._id,
+                        label: user.name,
+                      }))}
+                      onChange={handleAccountHeadChange}
+
+                      value={
+                        accountHead
+                          ? {
+                              value: accountHead,
+                              label: users.find(
+                                (user) => user._id === accountHead
+                              ).name,
+                            }
+                          : null
+                      }
                       className="w-full"
                       placeholder="Search and select Account Head"
                     />
-                  ) : key === 'pandLhead' ? (
+                  ) : key === "pandLhead" ? (
                     <Select
-                      options={users.map((user) => ({ value: user._id, label: user.name }))}
-                      onChange={(selectedOption) => setPandLHead(selectedOption.value)}
-                      value={pandLhead ? { value: pandLhead, label: users.find(user => user._id === pandLhead).name } : null}
+                      options={users.map((user) => ({
+                        value: user._id,
+                        label: user.name,
+                      }))}
+                     onChange={handlePandLHeadChange}
+                      value={
+                        pandLhead
+                          ? {
+                              value: pandLhead,
+                              label: users.find(
+                                (user) => user._id === pandLhead
+                              ).name,
+                            }
+                          : null
+                      }
                       className="w-full"
                       placeholder="Search and select P&L Head"
                     />
-                  )
-                   : (
+                  ) : (
                     <input
                       type="text"
                       name={key}
@@ -191,6 +299,9 @@ const AddPlacementButton = () => {
                       onChange={handleInputChange}
                       className="p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-500"
                     />
+                  )}
+                  {errors[key] && (
+                    <p className="text-red-500 text-xs lowercase">{`*${errors[key]}`}</p>
                   )}
                 </div>
               ))}

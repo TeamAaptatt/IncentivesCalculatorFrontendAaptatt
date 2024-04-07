@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { BASE_URL } from '../../../../constants/api';
 import axios from 'axios';
 import useUserManagement from '../../../../utils/hooks/useUserMangement';
+import { setLoading } from '../../../../utils/redux/loadSlice/loadSlice';
+import showToast from '../../../../utils/helpers/showToast';
 
 const NewReporting = ({ onSubmission, onClose }) => {
   const { users, filteredUsers } = useUserManagement();
@@ -14,8 +16,7 @@ const NewReporting = ({ onSubmission, onClose }) => {
   // const [showModal, setShowModal] = useState(false); // State to control the visibility of the modal
   const token = useSelector((state) => state.auth.token.token);
 
-  useEffect(() => { }, []);
-
+  const dispatch = useDispatch()
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -39,6 +40,7 @@ const NewReporting = ({ onSubmission, onClose }) => {
   };
 
   const handleSubmit = async (e) => {
+    
     e.preventDefault();
     await createNewReporting();
     if (onSubmission && typeof onSubmission === 'function') {
@@ -48,13 +50,36 @@ const NewReporting = ({ onSubmission, onClose }) => {
 
   const createNewReporting = async () => {
     try {
+       dispatch(setLoading(true))
       const response = await axios.post(BASE_URL + '/reporting', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       console.log(response.data);
+      showToast('Reporting created successfully ', {
+        duration: 3000,
+        position: 'top-center', 
+        style: {
+          border: '1px solid ',
+          padding: '4px',
+          color: 'white',
+          background: '#00FF00',
+          
+        },
+      });
     } catch (err) {
+      showToast('Error Creating Reporting ', {
+        duration: 3000,
+        position: 'top-center', 
+        style: {
+          border: '1px solid ',
+          padding: '4px',
+          color: 'white',
+          background: '#FF0000',
+          
+        },
+      });
       console.log(err);
     }
   };
@@ -66,7 +91,7 @@ const NewReporting = ({ onSubmission, onClose }) => {
   };
 
   return (
-    <div>
+    <div  className=' z-20'>
       <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
         <div className="bg-white p-6 rounded-lg w-1/2">
           <form onSubmit={handleSubmit}>

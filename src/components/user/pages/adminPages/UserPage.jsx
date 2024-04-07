@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { BASE_URL } from '../../../../constants/api';
 
 const UserPage = () => {
   const { userId } = useParams();
@@ -14,7 +15,7 @@ const UserPage = () => {
   const getIncentivePeriod = async () => {
     try {
       console.log('Fetching incentive period data...');
-      const response = await fetch(`http://localhost:3001/api/v1/get-incentive-period?userId=${userId}`, {
+      const response = await fetch(`${BASE_URL}get-incentive-period?userId=${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

@@ -1,51 +1,71 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../../../../constants/api';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import Loader from '../../../Loader';
+import { setLoading } from '../../../../utils/redux/loadSlice/loadSlice';
+import showToast from '../../../../utils/helpers/showToast';
 
 const IncentiveCalculator = () => {
   // State variables
   const [cid, setCid] = useState('');
+  const [error, setError] = useState(false);
   const [incentiveData, setIncentiveData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const loading = useSelector((state) => state.loader.loading);
   const token = useSelector((state) => state.auth.token.token);
-
+const dispatch = useDispatch()
   // Function to fetch incentive data
-  const calculateOwnership = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(BASE_URL + `/owenership-cost/${cid}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      console.log(response.data);
-    } catch (error) {
-      console.error('Error fetching ownership data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+ // const calculateOwnership = async () => {
+//    try {
+  //    setLoading(true);
+    //  const response = await axios.get(BASE_URL + `/owenership-cost/${cid}`, {
+      //  headers: {
+        //  Authorization: `Bearer ${token}`
+       // }
+      //});
+      //console.log(response.data);
+    //} catch (error) {
+      //console.error('Error fetching ownership data:', error);
+    //} finally {
+      //setLoading(false);
+    //}
+  //};
 
   const fetchIncentiveData = async () => {
-    // await calculateOwnership();
+    if(!validateCid(cid)){
+      setError(true)
+      return};
+      setError(false)
+    setIncentiveData(null)
+    dispatch(setLoading(true)); // Dispatch action to set loading to true
     try {
-      setLoading(true);
       const response = await axios.get(BASE_URL + `/calculate-incentive/${cid}`, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       setIncentiveData(response.data);
-      console.log(response.data);
     } catch (error) {
+      showToast(error.response.data.message, {
+        duration: 3000,
+        position: 'top-center', 
+        style: {
+          border: '1px solid ',
+          padding: '4px',
+          color: 'white',
+          background: '#FF0000',
+          
+        },
+      });
       console.error('Error fetching incentive data:', error);
     } finally {
-      setLoading(false);
+      dispatch(setLoading(false)); // Dispatch action to set loading to false
     }
   };
+  const validateCid = (input) => {
+    return input.startsWith('SP');
+  };
 
-  const tablestyle = "border-collapse border border-gray-800 p-2"
 
   return (
     <div className="flex  m-4">
@@ -65,6 +85,9 @@ const IncentiveCalculator = () => {
             onChange={(e) => setCid(e.target.value)}
             className="mt-1 p-2  border border-gray-300 rounded-md w-96"
           />
+            {error && (
+                    <p className="text-red-500 text-xs lowercase">{`*Enter Valid CID`}</p>
+                  )}
           </div>
           
            <button disabled={!cid.length} className="px-4 w-32 my-4 mx-4 py-2 text-white bg-red-500 rounded-md " onClick={fetchIncentiveData}>
@@ -75,7 +98,7 @@ const IncentiveCalculator = () => {
        
         {incentiveData || loading ? <>
           {loading ? (
-            <p className="mt-4 text-gray-600 text-center">Loading...</p>
+             <></>
           ) : (
             // <div>
             //   <ul>
