@@ -10,7 +10,7 @@ import { setLoading } from "../../../../utils/redux/loadSlice/loadSlice";
 import showToast from "../../../../utils/helpers/showToast";
 import { validateFormData } from "../../../../utils/helpers/validationHelpers";
 
-const AddPlacementButton = () => {
+const AddPlacementButton = ({getAllPlacements}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     //status: '',
@@ -43,6 +43,7 @@ const AddPlacementButton = () => {
     console.log(e.target.value);
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
+    console.log(formData);
     setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
   };
 
@@ -86,8 +87,9 @@ const AddPlacementButton = () => {
           background: "#00FF00",
         },
       });
-
+      await getAllPlacements();
       setIsModalOpen(false);
+     
       setFormData({
         //status: '',
         candidate: "",
@@ -107,7 +109,7 @@ const AddPlacementButton = () => {
         paymentStaus: "",
       });
     } catch (error) {
-      showToast(error.response.data.error, {
+      showToast(error.response?.data?.error, {
         duration: 3000,
         position: "top-center",
         style: {

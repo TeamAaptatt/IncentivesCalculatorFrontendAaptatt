@@ -1,17 +1,18 @@
 export function validateFormData(formData) {
   const errors = {};
 
-  if (!formData.candidate.trim()) {
+  if (!formData.candidate?.trim()) {
     errors.candidate = 'Please enter candidate name.';
-  } else if (!/^[a-zA-Z]+(?:\s[a-zA-Z]+)?$/.test(formData.candidate.trim())) {
+  } else if (!/^[a-zA-Z]+(?:\s[a-zA-Z]+)?$/.test(formData.candidate?.trim())) {
     errors.candidate = 'Candidate name must contain only letters.';
   }
-  if (!formData.client.trim()) {
+  if (!formData.client?.trim()) {
     errors.client = 'Please enter client name.';
-  }else if (!/^[a-zA-Z]+(?:\s[a-zA-Z]+)?$/.test(formData.client.trim())) {
-    errors.client = 'Client name must contain only letters.';
+  } else if (!/^[\w\s.-]+$/.test(formData.client.trim())) {
+    errors.client = 'Client name must contain only letters, numbers, spaces, dots, and hyphens.';
   }
-  if (!formData.offeredPosition.trim()) {
+  
+  if (!formData.offeredPosition?.trim()) {
     errors.offeredPosition = 'Please enter offered position.';
   }
   if (!formData.dateOfJoining) {
@@ -38,10 +39,11 @@ export function validateFormData(formData) {
     errors.billableSalary = 'Billable must contain only numbers.';
   } 
   if (!formData.commercial) {
-    errors.commercial = 'Please Enter Comercial.';
-  }else if (!/^\d+$/.test(formData.commercial)) {
+    errors.commercial = 'Please Enter Commercial.';
+} else if (!/^\d+(\.\d+)?$/.test(formData.commercial)) {
     errors.commercial = 'Commercial must contain only numbers.';
-  } 
+}
+ 
   if (!formData.fee) {
     errors.fee = 'Please Enter Fee.';
   } else if (!/^\d+$/.test(formData.fee)) {

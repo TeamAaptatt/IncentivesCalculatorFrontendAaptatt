@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import useUserManagement from '../../../../utils/hooks/useUserMangement';
 import { setLoading } from '../../../../utils/redux/loadSlice/loadSlice';
 import showToast from '../../../../utils/helpers/showToast';
+import { validateFormData } from '../../../../utils/helpers/validationHelpers';
+import { validateCreateUserFormData } from '../../../../utils/helpers/validateCreateUserData';
 
 const CreateUserForm = ({ handleClose }) => {
   const [levels, setLevels] = useState([]);
@@ -14,9 +16,11 @@ const CreateUserForm = ({ handleClose }) => {
   const [salaryId, setSalaryId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [errors, setErrors] =  useState({});
  const dispatch = useDispatch()
-  // Function to handle search
   const handleSearch = (event) => {
+    setErrors((prevError)=>({...prevError, [event.target.name]:''}))
+
     const searchTerm = event.target.value;
     setSearchTerm(searchTerm);
     if (searchTerm) {
@@ -98,9 +102,15 @@ const CreateUserForm = ({ handleClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const newErrors = validateCreateUserFormData(formData);
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+
     try {
       dispatch(setLoading(true))
-      // Create salary first
       const salaryResponse = await axios.post(BASE_URL + 'add-salary', {
         cid: formData.cid,
         amount: formData.salary,
@@ -114,10 +124,7 @@ const CreateUserForm = ({ handleClose }) => {
       const salaryData = salaryResponse?.data;
 
       if (salaryResponse.status === 201) {
-        // Save the salary ID
         setSalaryId(salaryData._id);
-
-        // Create user with associated salary
         const userResponse = await axios.post(BASE_URL + '/create-user', {
           ...formData,
           salary: salaryData._id,
@@ -141,7 +148,6 @@ const CreateUserForm = ({ handleClose }) => {
             
           },
         });
-        // You can perform further actions, such as redirecting the user or showing a success message
         setFormData({
           cid: '',
           name: '',
@@ -174,7 +180,6 @@ const CreateUserForm = ({ handleClose }) => {
           },
         });
         console.error('Error creating salary:', salaryData.error);
-        // Handle error, show error message to the user, etc.
       }
       handleClose();
     } catch (error) {
@@ -190,7 +195,6 @@ const CreateUserForm = ({ handleClose }) => {
         },
       });
       console.error('Error creating user!:', error);
-      // Handle unexpected errors
     }finally {
   
       dispatch(setLoading(false))
@@ -207,11 +211,12 @@ const CreateUserForm = ({ handleClose }) => {
     setSearchTerm(userName);
     setFormData({
       ...formData,
-      skip: userId // Assuming 'skip' corresponds to the user ID
+      skip: userId 
     });
   };
 
   const handleChange = (e) => {
+    setErrors((prevError)=>({...prevError, [e.target.name]:''}))
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -220,12 +225,13 @@ const CreateUserForm = ({ handleClose }) => {
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50 " onClick={handleOutsideClick}>
-      <div className="bg-white p-8 rounded shadow-md max-w-xl w-full">
+    <div className="fixed top-0 left-0 w-full  flex items-center justify-center bg-gray-800 bg-opacity-50 " onClick={handleOutsideClick}>
+      <div className="bg-white p-8 rounded shadow-md max-w-xl w-[100vh] min-h-[100vh]">
         <form
           onSubmit={handleSubmit}
-          className="bg-white p-8 rounded shadow-md max-w-md w-full flex gap-4 flex-wrap "
-        >        <h2 className="text-2xl font-bold mb-2 text-center">Create User</h2>
+          className=" p-8 rounded  max-w-md w-full h-full flex gap-4 flex-wrap "
+        >       
+         <h2 className="text-2xl font-bold mb-2 text-center">Create User</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <div className="mb-4">
@@ -240,6 +246,9 @@ const CreateUserForm = ({ handleClose }) => {
                   onChange={handleChange}
                   placeholder="CID"
                 />
+                {errors.cid && (
+    <p className="text-red-500 text-xs italic">{errors.cid}</p>
+  )}
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
@@ -253,6 +262,9 @@ const CreateUserForm = ({ handleClose }) => {
                   onChange={handleChange}
                   placeholder="Name"
                 />
+                {errors.name && (
+    <p className="text-red-500 text-xs italic">{errors.name}</p>
+  )}
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
@@ -266,6 +278,9 @@ const CreateUserForm = ({ handleClose }) => {
                   onChange={handleChange}
                   placeholder="Email"
                 />
+                {errors.email && (
+    <p className="text-red-500 text-xs italic">{errors.email}</p>
+  )}
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="salary">
@@ -279,6 +294,9 @@ const CreateUserForm = ({ handleClose }) => {
                   onChange={handleChange}
                   placeholder="Salary"
                 />
+                {errors.salary && (
+    <p className="text-red-500 text-xs italic">{errors.salary}</p>
+  )}
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="salary">
@@ -291,6 +309,9 @@ const CreateUserForm = ({ handleClose }) => {
                   value={formData.joiningDate}
                   onChange={handleChange}
                 />
+                {errors.joiningDate && (
+    <p className="text-red-500 text-xs italic">{errors.joiningDate}</p>
+  )}
               </div>
               
                           </div>
@@ -307,6 +328,7 @@ const CreateUserForm = ({ handleClose }) => {
                   placeholder="Search users"
 
                 />
+                
                 {searchResults && (
                   <div className='w-48 absolute bg-gray-50 mt-2'>
                     {searchResults.map(user => (
@@ -319,6 +341,9 @@ const CreateUserForm = ({ handleClose }) => {
 
                 )
                 }
+                {errors.skip && (
+    <p className="text-red-500 text-xs italic">{errors.skip}</p>
+  )}
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="level">
@@ -339,6 +364,9 @@ const CreateUserForm = ({ handleClose }) => {
                     </option>
                   ))}
                 </select>
+                {errors.level && (
+    <p className="text-red-500 text-xs italic">{errors.level}</p>
+  )}
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="assignedRole">
@@ -359,6 +387,9 @@ const CreateUserForm = ({ handleClose }) => {
                     </option>
                   ))}
                 </select>
+                {errors.assignedRole && (
+    <p className="text-red-500 text-xs italic">{errors.assignedRole}</p>
+  )}
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="designation">
@@ -379,6 +410,9 @@ const CreateUserForm = ({ handleClose }) => {
                     </option>
                   ))}
                 </select>
+                {errors.designation && (
+    <p className="text-red-500 text-xs italic">{errors.designation}</p>
+  )}
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
@@ -392,8 +426,11 @@ const CreateUserForm = ({ handleClose }) => {
                   onChange={handleChange}
                   placeholder="Password"
                 />
+                 {errors.password && (
+    <p className="text-red-500 text-xs italic">{errors.password}</p>
+  )}
               </div>
-            </div>
+                          </div>
           </div>
           <div className="flex justify-end mt-4">
             <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">
@@ -410,7 +447,7 @@ const CreateUserForm = ({ handleClose }) => {
   );
 
 
-  // return (
+
   //   <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50 z-50 overflow-y-auto" onClick={handleOutsideClick}>
   //     <div className="bg-white p-8 rounded shadow-md max-w-md w-full flex flex-col">
   //       <h2 className="text-2xl font-bold mb-4 text-center">Create User</h2>

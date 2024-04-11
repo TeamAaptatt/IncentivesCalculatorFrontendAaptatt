@@ -7,115 +7,68 @@ import {
   faCheck,
   faEdit,
   faMultiply,
-  faTrash,
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import useUserManagement from "../../../../utils/hooks/useUserMangement";
 import AddPlacementButton from "./AddPlacementButton";
 import { setLoading } from "../../../../utils/redux/loadSlice/loadSlice";
 import { validateFormData } from "../../../../utils/helpers/validationHelpers";
+import {
+  dataFields,
+  fields,
+  paymentStatusOptions,
+  securityPeriodOptions,
+} from "../../../../constants/placementTable";
+import { getFieldOptions } from "../../../../utils/helpers/getFieldOptions";
 
 const AdminPlacementTable = () => {
   const token = useSelector((state) => state.auth.token.token);
   const [placements, setPlacements] = useState([]);
   const [updateFieldId, setupdateFieldId] = useState(null);
-  const [updatedData, setUpdatedData] = useState(null);
   const [deleteFieldId, setDeleteFieldId] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('')
-  const dispatch = useDispatch()
-  const [error, setErrors] = useState({})
+  const [searchQuery, setSearchQuery] = useState("");
+  const dispatch = useDispatch();
+  const [error, setErrors] = useState({});
   const [filteredPlacements, setFilteredPlacements] = useState([]);
-  const dataFields = [
-    "Status",
-    "Candidate",
-    "Client",
-    "Offered Position",
-    "Date Of Joining",
-    "Candidate Owner",
-    "Account Manager",
-    "Account Head",
-    "P&L Head",
-    "Resume Source",
-    "Billable Salary",
-    "Commercial",
-    "Fee",
-    "Send Off",
-    "Security Period",
-    "Payment Status",
-    "Update",
-  ];
-  const fields = [
-    "status",
-    "candidate",
-    "client",
-    "offeredPosition",
-    "dateOfJoining",
-    "cnadidateOwner",
-    "accountManager",
-    "accountHead",
-    "pandLhead",
-    "resumeSource",
-    "billableSalary",
-    "commercial",
-    "fee",
-    "sendOff",
-    "securityPeriod",
-    "paymentStaus",
-  ];
-  const securityPeriodOptions = ["On-Going", "Completed", "Send-Off"]; // Replace with your actual options
-  const paymentStatusOptions = ["Pending", "Received", "Adjusted", "Returning", "Compromised"]; // Replace with your actual options
-
+  const [searchBy, setSearchBy] = useState(null);
+  const [selectedRowId, setSelectedRowId] = useState(null);
   const { users, filteredUsers } = useUserManagement();
 
+  const candidateOwnerOptions = getFieldOptions(
+    "cnadidateOwner",
+    users,
+    filteredUsers
+  );
 
-  const getFieldOptions = (field) => {
-    switch (field) {
-      case "cnadidateOwner":
-      case "accountManager":
-      case "accountHead":
-      case "pandLhead":
-        const usersToDisplay = field === "cnadidateOwner" ?
-          users?.map((user) => ({
-            label: `${user.name} (${user.cid})`,
-            value: user._id,
-          })) : filteredUsers?.map((user) => ({
-            label: `${user.name} (${user.cid})`,
-            value: user._id,
-          }))
-        return usersToDisplay;
-
-      case "securityPeriod":
-        return securityPeriodOptions.map((option) => ({
-          label: option,
-          value: option,
-        }));
-      case "paymentStatus":
-        return paymentStatusOptions.map((option) => ({
-          label: option,
-          value: option,
-        }));
-      default:
-        return [];
-    }
-  };
-
-  const candidateOwnerOptions = getFieldOptions("cnadidateOwner");
-
-  const accountManagerOptions = getFieldOptions("accountManager");
-  const accountHeadOptions = getFieldOptions("accountHead");
-  const pandLHeadOptions = getFieldOptions("pandLhead");
-  const securityPeriodOption = getFieldOptions("securityPeriod");
-  const paymentStatusOption = getFieldOptions('paymentStatus')
-
-
+  const accountManagerOptions = getFieldOptions(
+    "accountManager",
+    users,
+    filteredUsers
+  );
+  const accountHeadOptions = getFieldOptions(
+    "accountHead",
+    users,
+    filteredUsers
+  );
+  const pandLHeadOptions = getFieldOptions("pandLhead", users, filteredUsers);
+  const securityPeriodOption = getFieldOptions(
+    "securityPeriod",
+    users,
+    filteredUsers
+  );
+  const paymentStatusOption = getFieldOptions(
+    "paymentStatus",
+    users,
+    filteredUsers
+  );
 
   useEffect(() => {
     getAllPlacements();
-  }, []);
+  }, [updateFieldId, deleteFieldId]);
 
   const getAllPlacements = async () => {
     try {
-      dispatch(setLoading(true))
+      dispatch(setLoading(true));
       const response = await axios.get(BASE_URL + "get-all-placements", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -123,45 +76,51 @@ const AdminPlacementTable = () => {
       });
       const data = await response.data;
       setPlacements(data);
-      setFilteredPlacements(data)
+      setFilteredPlacements(data);
       console.log(data);
     } catch (error) {
       console.log(error);
-    }finally{
-      dispatch(setLoading(false))
+    } finally {
+      dispatch(setLoading(false));
     }
-    
   };
 
   const handleInputChange = (event, field) => {
+    setErrors((prevErrors) => ({ ...prevErrors, [field]: "" }));
     let updatedValue = event.target.value;
 
-    // Handle special cases based on the field name
     if (field === "dateOfJoining") {
       updatedValue = updatedValue;
     } else if (field === "accountManager") {
-      const selectedOption = accountManagerOptions.find(option => option.label === updatedValue);
+      const selectedOption = accountManagerOptions.find(
+        (option) => option.label === updatedValue
+      );
       if (selectedOption) {
-        updatedValue = selectedOption.value; // Assign only the ID
+        updatedValue = selectedOption.value;
       }
     } else if (field === "cnadidateOwner") {
-      const selectedOption = candidateOwnerOptions.find(option => option.label === updatedValue);
+      const selectedOption = candidateOwnerOptions.find(
+        (option) => option.label === updatedValue
+      );
       if (selectedOption) {
-        updatedValue = selectedOption.value; // Assign only the ID
+        updatedValue = selectedOption.value;
       }
     } else if (field === "accountHead") {
-      const selectedOption = accountHeadOptions.find(option => option.label === updatedValue);
+      const selectedOption = accountHeadOptions.find(
+        (option) => option.label === updatedValue
+      );
       if (selectedOption) {
-        updatedValue = selectedOption.value; // Assign only the ID
+        updatedValue = selectedOption.value;
       }
     } else if (field === "pandLhead") {
-      const selectedOption = pandLHeadOptions.find(option => option.label === updatedValue);
+      const selectedOption = pandLHeadOptions.find(
+        (option) => option.label === updatedValue
+      );
       if (selectedOption) {
-        updatedValue = selectedOption.value; // Assign only the ID
+        updatedValue = selectedOption.value;
       }
-    } 
+    }
 
-    // Use the field name to update the corresponding state in a new array
     const updatedPlacements = placements.map((placement) => {
       if (placement._id === updateFieldId) {
         return {
@@ -174,20 +133,19 @@ const AdminPlacementTable = () => {
     setPlacements(updatedPlacements);
   };
 
-  
   const saveChangesHandler = async () => {
     const updatedPlacement = placements.find(
       (placement) => placement._id === updateFieldId
     );
-    const newErrors = validateFormData(updatedPlacement); // Use validation function
+    const newErrors = validateFormData(updatedPlacement);
     console.log(newErrors);
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-   
+
     try {
-      dispatch(setLoading(true))
+      dispatch(setLoading(true));
       const response = await axios.put(
         BASE_URL + `/updatePlacement/${updateFieldId}`,
         updatedPlacement,
@@ -203,27 +161,75 @@ const AdminPlacementTable = () => {
       }
     } catch (error) {
       console.log(error);
-    }finally{
-      dispatch(setLoading(false))
-
+    } finally {
+      dispatch(setLoading(false));
     }
-    
   };
 
-  const handleSearch = ()=>{
-    const  filteredPlacement = filteredPlacements.filter((item)=>{
-      return item.candidate?.toLowerCase().includes(searchQuery.toLowerCase()) || item.cnadidateOwner.name?.toString().includes(searchQuery) ||  item.accountManager.name?.toString().includes(searchQuery) 
-      ||item.accountHead.name?.toString().includes(searchQuery) ||item.pandLhead.name?.toString().includes(searchQuery)
+  const handleSearch = () => {
+    let filteredPlacement = [];
+    switch (searchBy) {
+      case "candidate":
+        filteredPlacement = filteredPlacements.filter((item) =>
+          item.candidate?.toLowerCase().includes(searchQuery.toLowerCase()) 
+        );
+        break;
+      case "candidateOwner":
+        filteredPlacement = filteredPlacements.filter((item) =>
+          item.cnadidateOwner.name
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase())||item?.cnadidateOwner?.cid?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        break;
+      case "accountHead":
+        filteredPlacement = filteredPlacements.filter((item) =>
+          item.accountHead.name
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase())||item?.accountHead?.cid?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        break;
+      case "accountManager":
+        filteredPlacement = filteredPlacements.filter((item) =>
+          item.accountManager.name
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase())||item?.accountManager?.cid?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        break;
+      case "pandLhead":
+        filteredPlacement = filteredPlacements.filter((item) =>
+          item.pandLhead.name?.toLowerCase().includes(searchQuery.toLowerCase())||item?.pandLhead?.cid?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        break;
+      default:
+        filteredPlacement = filteredPlacements;
+        filteredPlacement = filteredPlacements?.filter((item) => {
+          return (
+            item.candidate?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.cnadidateOwner.name
+              ?.toLowerCase()
+              .includes(searchQuery.toLowerCase()) ||item?.cnadidateOwner?.cid?.toLowerCase().includes(searchQuery.toLowerCase())||
+            item.accountManager.name
+              ?.toLowerCase()
+              .includes(searchQuery.toLowerCase()) ||item?.accountManager?.cid?.toLowerCase().includes(searchQuery.toLowerCase())||
+            item.accountHead.name
+              ?.toLowerCase()
+              .includes(searchQuery.toLowerCase()) ||item?.accountHead?.cid?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.pandLhead.name
+              ?.toLowerCase()
+              .includes(searchQuery.toLowerCase())||item?.pandLhead?.cid?.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        });
+    }
+    setPlacements(filteredPlacement);
+  };
 
-    })
-  console.log(filteredPlacements);
-  setPlacements(filteredPlacement)
+  useEffect(() => {
+    handleSearch();
+  }, [searchQuery, searchBy]);
 
-  }
-
-  useEffect(()=>{
-    handleSearch()
-  }, [searchQuery])
+  useEffect(() => {
+    handleSearch();
+  }, [searchQuery]);
 
   useEffect(() => {
     if (deleteFieldId !== null) {
@@ -232,254 +238,303 @@ const AdminPlacementTable = () => {
   }, [deleteFieldId]);
 
   const deleteRowHandler = async () => {
-    const response = await axios.delete(
-      BASE_URL + `/deletePlacement/${deleteFieldId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    try {
+      dispatch(setLoading(true));
+      const response = await axios.delete(
+        BASE_URL + `/deletePlacement/${deleteFieldId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    if (response.status === "200") {
       setDeleteFieldId(null);
-      setupdateFieldId(null);
       getAllPlacements();
+      setupdateFieldId(null);
+    } catch (error) {
+      alert("Error deleting placement");
     }
   };
-
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return "";
+    const dateObject = new Date(dateString);
+    const year = dateObject.getFullYear();
+    const month = (dateObject.getMonth() + 1).toString().padStart(2, "0");
+    const day = dateObject.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
   return (
     <>
-    
-    <div className=" flex items-center w-full  ">
-        <div className="justify-start w-1/2">
-        <input type="text" placeholder="Search..." 
-        value={searchQuery}
-        onChange={(e)=>setSearchQuery(e.target.value)}
-        className=" w-2/3 p-2 mb-2 outline-1 border-2 border-black rounded "
-        />
+      <div className=" flex items-center w-full  ">
+        <div className="justify-start w-1/2 flex gap-2">
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className=" w-2/3 p-2 mb-2 outline-1 border-2 border-black rounded "
+          />
 
+          <select
+            onChange={(e) => {
+              const selectedOption = e.target.value;
+              setSearchBy(selectedOption);
+            }}
+            className=" p-2 mb-2 outline-1 border-2 border-black rounded"
+          >
+            <option value="">Search Filter</option>
+            <option value="candidate">Candidate</option>
+            <option value="candidateOwner">Candidate Owner</option>
+            <option value="accountHead">Account Head</option>
+            <option value="accountManager">Account Manager</option>
+            <option value="pandLhead">P&L Head</option>
+          </select>
         </div>
         <div className=" w-1/2 flex justify-end">
-        <AddPlacementButton/>
-
+          <AddPlacementButton getAllPlacements={getAllPlacements} />
         </div>
       </div>
-    <div className="overflow-hidden  border-2 border-gray-800  rounded-sm overflow-x-scroll overflow-y-scroll h-[62vh] w-full mb-2">
-
-      <table className="min-w-full ">
-      <thead className="text-black bg-white uppercase text-center sticky top-0  z-10 shadow">
-          <tr > 
-            {dataFields.map((data, index) => (
-              <th
-                key={index}
-                className={`py-4 px-2 font-semibold   text-[1rem]  text-nowrap border-x border-gray-800 ${index === dataFields.length - 1 ? 'sticky right-0 bg-white  ' : ' '
+      <div className="overflow-hidden  border-2 border-gray-800  rounded-sm overflow-x-scroll overflow-y-scroll h-[62vh] w-full mb-2">
+        <table className="min-w-full ">
+          <thead className="text-black bg-white uppercase text-center sticky top-0  z-10 shadow">
+            <tr > 
+              {dataFields.map((data, index) => (
+                <th
+                  key={index}
+                  className={`py-4 px-2 font-semibold   text-[1rem]  text-nowrap border-x border-gray-800 ${
+                    index === dataFields.length - 1
+                      ? "sticky right-0 bg-white  "
+                      : " "
                   }`}
-              >
-                {data}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="text-center text-sm">
-          {placements?.map((placement) => (
-            <>
-              {placement._id === updateFieldId ? (
-                <tr key={placement._id} className="hover:bg-gray-100">
-                  {fields.map((field, fieldIndex) => (
-                    <td
-                      key={fieldIndex}
-                      className="px-6 py-2 whitespace-nowrap border border-gray-800"
-                    >
-                      {fieldIndex === 14 || fieldIndex === 15 ? (
-                        <select
-                          onChange={(e) => handleInputChange(e, field)}
-                          value={placement[field]}
-                          className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                        >
-                          {fieldIndex === 14
-                            ? securityPeriodOptions.map((option, index) => (
-                              <option key={index} value={option}>
-                                {option}
-                              </option>
-                            ))
-                            : paymentStatusOptions.map((option, index) => (
-                              <option key={index} value={option}>
-                                {option}
-                              </option>
-                            ))}
-                        </select>
-                      ) : fieldIndex === 4 ? (<>
-                        <input type="date" value={placement[field]}
-                          className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-
-                          onChange={(e) => handleInputChange(e, field)}
-
-                        />
-
-                      </>) : (
-                        <input
-                          onChange={(e) => handleInputChange(e, field)}
-                          className={`${fieldIndex === 5 || fieldIndex === 6 || fieldIndex === 7 || fieldIndex === 8 ? 'hidden' : 'visible border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500'}`}
-
-                          value={
-                            field === "accountManager" ||
+                >
+                  {data}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="text-center text-sm">
+            {placements?.map((placement) => (
+              <>
+                {placement._id === updateFieldId ? (
+                  <tr   key={placement._id}
+                  className={`hover:bg-red-400 ${
+                    selectedRowId === placement._id ? 'bg-red-500' : ''
+                  }`}
+                  onClick={() => setSelectedRowId(placement._id)}>
+                    {fields.map((field, fieldIndex) => (
+                      <td
+                        key={fieldIndex}
+                        className="px-6 py-2 whitespace-nowrap border border-gray-800"
+                      >
+                        {fieldIndex === 14 || fieldIndex === 15 ? (
+                          <select
+                            onChange={(e) => handleInputChange(e, field)}
+                            value={placement[field]}
+                            className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                          >
+                            {fieldIndex === 14
+                              ? securityPeriodOptions.map((option, index) => (
+                                  <option key={index} value={option}>
+                                    {option}
+                                  </option>
+                                ))
+                              : paymentStatusOptions.map((option, index) => (
+                                  <option key={index} value={option}>
+                                    {option}
+                                  </option>
+                                ))}
+                          </select>
+                        ) : fieldIndex === 4 ? (
+                          <>
+                            <input
+                              type="date"
+                              value={formatDateForInput(placement[field])}
+                              className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                              onChange={(e) => handleInputChange(e, field)}
+                            />
+                          </>
+                        ) : (
+                          <input
+                            onChange={(e) => handleInputChange(e, field)}
+                            className={`${
+                              fieldIndex === 5 ||
+                              fieldIndex === 6 ||
+                              fieldIndex === 7 ||
+                              fieldIndex === 8
+                                ? "hidden"
+                                : "visible border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                            }`}
+                            value={
+                              field === "accountManager" ||
                               field === "cnadidateOwner" ||
                               field === "pandLhead" ||
                               field === "accountHead"
-                              ? placement[field]?.name
-                              : placement[field]
-                          }
-                        />
-                      )}
-                      {field === "cnadidateOwner" && (
-                        <>
-                          <input
-                            type="text"
-                            onChange={(e) => handleInputChange(e, field)}
-                            value={placement[field]?.name}
-                            list="candidateOwnerOptionsList"
-                            className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                                ? placement[field]?.name
+                                : placement[field]
+                            }
                           />
-                          <datalist id="candidateOwnerOptionsList">
-                            {candidateOwnerOptions.map((option, index) => (
-                              <option key={index} value={option.label}></option>
-                            ))}
-                          </datalist>
-                        </>
+                        )}
+                        {field === "cnadidateOwner" && (
+                          <>
+                            <input
+                              type="text"
+                              onChange={(e) => handleInputChange(e, field)}
+                              value={placement[field]?.name}
+                              list="candidateOwnerOptionsList"
+                              className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                            />
+                            <datalist id="candidateOwnerOptionsList">
+                              {candidateOwnerOptions.map((option, index) => (
+                                <option
+                                  key={index}
+                                  value={option.label}
+                                ></option>
+                              ))}
+                            </datalist>
+                          </>
+                        )}
+                        {field === "accountManager" && (
+                          <>
+                            <input
+                              type="text"
+                              onChange={(e) => handleInputChange(e, field)}
+                              className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                              value={placement[field]?.name}
+                              list="accountManagerOptionsList"
+                            />
+                            <datalist id="accountManagerOptionsList">
+                              {accountManagerOptions.map((option, index) => (
+                                <option
+                                  key={index}
+                                  value={option.label}
+                                ></option>
+                              ))}
+                            </datalist>
+                          </>
+                        )}
+                        {field === "pandLhead" && (
+                          <>
+                            <input
+                              type="text"
+                              onChange={(e) => handleInputChange(e, field)}
+                              className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                              value={placement[field]?.name}
+                              list="pandLheadOptionsList"
+                            />
+                            <datalist id="pandLheadOptionsList">
+                              {pandLHeadOptions.map((option, index) => (
+                                <option
+                                  key={index}
+                                  value={option.label}
+                                ></option>
+                              ))}
+                            </datalist>
+                          </>
+                        )}
+                        {field === "accountHead" && (
+                          <>
+                            <input
+                              type="text"
+                              onChange={(e) => handleInputChange(e, field)}
+                              value={placement[field]?.name}
+                              className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                              list="accountHeadOptionsList"
+                            />
+                            <datalist id="accountHeadOptionsList">
+                              {accountHeadOptions.map((option, index) => (
+                                <option
+                                  key={index}
+                                  value={option.label}
+                                ></option>
+                              ))}
+                            </datalist>
+                          </>
+                        )}
 
-                      )}
-                      {field === "accountManager" && (
-                        <>
-                          <input
-                            type="text"
-                            onChange={(e) => handleInputChange(e, field)}
-                            className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-
-                            value={placement[field]?.name}
-                            list="accountManagerOptionsList"
-                          />
-                          <datalist id="accountManagerOptionsList">
-                            {accountManagerOptions.map((option, index) => (
-                              <option key={index} value={option.label} >
-                              </option>
-                            ))}
-                          </datalist>
-                        </>
-                      )}
-                      {field === "pandLhead" && (
-                        <>
-                          <input
-                            type="text"
-                            onChange={(e) => handleInputChange(e, field)}
-                            className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-
-                            value={placement[field]?.name}
-                            list="pandLheadOptionsList"
-                          />
-                          <datalist id="pandLheadOptionsList">
-                            {pandLHeadOptions.map((option, index) => (
-                              <option key={index} value={option.label} >
-                              </option>
-                            ))}
-                          </datalist>
-                        </>
-                      )}
-                      {field === "accountHead" && (
-                        <>
-                          <input
-                            type="text"
-                            onChange={(e) => handleInputChange(e, field)}
-                            value={placement[field]?.name}
-                            className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-
-                            list="accountHeadOptionsList"
-                          />
-                          <datalist id="accountHeadOptionsList">
-                            {accountHeadOptions.map((option, index) => (
-                              <option key={index} value={option.label} >
-                              </option>
-                            ))}
-                          </datalist>
-                          
-                        </>
-                      )
-                      }
-              
-              {error[field] && (
-                    <p className="text-red-500 text-xs lowercase">{`*${error[field]}`}</p>
-                  )}
-                     
-                     </td>
-                  ))}
-                  <td className="px-4 py-2 border-b sticky right-0 bg-white border-gray-800">
-                    <button
-                      onClick={() => {
-                        saveChangesHandler();
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faCheck} className="mr-2" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setupdateFieldId(null);
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faMultiply} className="mr-2" />
-                    </button>
-                  </td>
-                </tr>
-              ) : (
-                <tr key={placement._id} className="hover:bg-gray-100">
-                  {fields?.map((field, fieldIndex) => (
-                    <td
-                      key={fieldIndex}
-                      className="px-6 py-2 whitespace-nowrap border border-black w-32" // Set fixed width here
-                    >
-                      {field === "accountManager"
-                        ? `${placement[field]?.name} (${placement[field].cid})`
-                        : field === "cnadidateOwner"
-                          ? `${placement[field].name} (${placement[field].cid})`
-                          : field === "pandLhead"
-                            ? `${placement[field].name} (${placement[field].cid})`
-                            : field === "dateOfJoining"
-                              // ? new Date(placement[field]).toLocaleDateString() 
-                              ? new Date(placement[field]).toLocaleDateString("en-US", { day: 'numeric', month: 'long', year: 'numeric' })
-                              : field === "accountHead"
-                                ? `${placement[field].name} (${placement[field].cid})`
-                                : placement[field]}
+                        {error[field] && (
+                          <p className="text-red-500 text-xs lowercase">{`*${error[field]}`}</p>
+                        )}
+                      </td>
+                    ))}
+                    <td className="px-4 py-2 border-b sticky right-0 bg-white border-gray-800">
+                      <button
+                        onClick={() => {
+                          saveChangesHandler();
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faCheck} className="mr-2" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setupdateFieldId(null);
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faMultiply} className="mr-2" />
+                      </button>
                     </td>
-                  ))}
-                  <td className="py-2 px-4 border-b sticky right-0 bg-white border border-gray-800">
-                    <button
-                      onClick={() => {
-                        setupdateFieldId(placement._id);
-                        console.log(placement._id);
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faEdit} className="mr-2 text-[#23C132]" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setDeleteFieldId(placement._id);
-                        // deleteRowHandler();
-                      }}
-                    >
-                      <FontAwesomeIcon icon={ faTrashAlt} className="mr-2   text-red-700" />
-                    </button>
-                  </td>
-                </tr>
-              )}
-            </>
-          ))}
-        </tbody>
-      </table>
-      
-    </div>
+                  </tr>
+                ) : (
+                  <tr   key={placement._id}
+                  className={`hover:bg-red-400  ${
+                    selectedRowId === placement._id ? 'bg-red-600 ' : ''
+                  }`}
+                  onClick={() => setSelectedRowId(placement._id)}>
+                    {fields?.map((field, fieldIndex) => (
+                      <td
+                        key={fieldIndex}
+                        className="px-6 py-2 whitespace-nowrap border border-black w-32" // Set fixed width here
+                      >
+                        {field === "accountManager"
+                          ? `${placement[field]?.name} (${placement[field].cid})`
+                          : field === "cnadidateOwner"
+                          ? `${placement[field]?.name} (${placement[field]?.cid})`
+                          : field === "pandLhead"
+                          ? `${placement[field].name} (${placement[field].cid})`
+                          : field === "dateOfJoining"
+                          ? // ? new Date(placement[field]).toLocaleDateString()
+                            new Date(placement[field]).toLocaleDateString(
+                              "en-US",
+                              { day: "numeric", month: "long", year: "numeric" }
+                            )
+                          : field === "accountHead"
+                          ? `${placement[field].name} (${placement[field].cid})`
+                          : placement[field]}
+                      </td>
+                    ))}
+                    <td className="py-2 px-4 border-b sticky right-0 bg-white border border-gray-800">
+                      <button
+                        onClick={() => {
+                          setupdateFieldId(placement._id);
+                          console.log(placement._id);
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faEdit}
+                          className="mr-2 text-[#23C132]"
+                        />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setDeleteFieldId(placement._id);
+                          // deleteRowHandler();
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faTrashAlt}
+                          className="mr-2   text-red-700"
+                        />
+                      </button>
+                    </td>
+                  </tr>
+                )}
+              </>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
-
 };
 
 export default AdminPlacementTable;
-

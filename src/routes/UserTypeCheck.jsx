@@ -9,6 +9,7 @@ const UserTypeCheck = ({ admin, user }) => {
     const token = useSelector((store)=>store.auth?.token?.token) || '';
     const dispatch =useDispatch();
     useEffect(() => {
+      
       const checkUserType = () => {
           try {
             const decodedToken = JSON.parse(atob(token?.split('.')[1]));
@@ -44,7 +45,7 @@ const UserTypeCheck = ({ admin, user }) => {
         } catch (error) {
           console.error('Error refreshing token:', error);
         }
-      }, 2000000 );  
+      }, 300000 );  
     
       return () => {
         clearInterval(intervalId);
@@ -55,17 +56,32 @@ const UserTypeCheck = ({ admin, user }) => {
     }, [token, dispatch]); 
   
     console.log(userType);
+    useEffect(()=>{
+         setTokenOnFirstRender();
+    }, [])
+
+    const setTokenOnFirstRender = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const token= await getIdToken(user,  true);
+                    dispatch(setUser({token }));
+        }
+      } catch (error) {
+        console.error('Error refreshing token:', error);
+      }
+    }
   //   useEffect(()=>{
   //     const user = JSON.parse(localStorage.getItem('User'))
   //       getToken(user)
   // }, [])
 
-  const getToken = async (user) =>{
-    if (user) {
-      const token= await getIdToken(user,  true);
-                dispatch(setUser({token }));
-    }
-  }
+  // const getToken = async (user) =>{
+  //   if (user) {
+  //     const token= await getIdToken(user,  true);
+  //               dispatch(setUser({token }));
+  //   }
+  // }
   
     return (
       <>
