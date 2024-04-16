@@ -4,6 +4,8 @@ export function validateCreateUserFormData(formData) {
     // CID Validation
     if (!formData.cid.trim()) {
       errors.cid = 'CID is required.';
+    }else if(!/^SP\d{1,4}$/.test(formData.cid.trim())){
+      errors.cid = 'Invalid Format for CID'
     }
   
     // Name Validation

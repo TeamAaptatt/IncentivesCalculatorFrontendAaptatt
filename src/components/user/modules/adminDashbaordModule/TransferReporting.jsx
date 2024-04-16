@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { BASE_URL } from '../../../../constants/api';
 import axios from 'axios';
 import useUserManagement from '../../../../utils/hooks/useUserMangement';
+import showToast from '../../../../utils/helpers/showToast';
 
 const TransferReporting = ({ user, onSubmission }) => {
     // const [isFormOpen, setIsFormOpen] = useState(false);
@@ -54,6 +55,42 @@ const TransferReporting = ({ user, onSubmission }) => {
   
     const handleSubmit =async (e) => {
       e.preventDefault();
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+      const aprilFirst = new Date(currentYear, 3, 1); 
+      const nextYearMarch31 = new Date(currentYear + 1, 2, 31); 
+    
+     
+      const startDate = new Date(formData.startDate);
+    
+      if (startDate < aprilFirst) {
+        showToast('Start date cannot be earlier than April 1st of the current year.', {
+          duration: 3000,
+          position: 'top-center',
+          style: {
+            border: '1px solid',
+            padding: '4px',
+            color: 'white',
+            background: '#FF0000',
+          },
+        });
+        return;
+      }
+    
+      if (startDate > nextYearMarch31) {
+        showToast('Start date cannot be later than March 31st of the next year.', {
+          duration: 3000,
+          position: 'top-center',
+          style: {
+            border: '1px solid',
+            padding: '4px',
+            color: 'white',
+            background: '#FF0000',
+          },
+        });
+        return;
+      }
+    
      await createNewReporting();
       if (onSubmission && typeof onSubmission === 'function') {
         onSubmission();

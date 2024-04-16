@@ -17,6 +17,8 @@ const UserList = () => {
       .catch(error => console.error("Error fetching users:", error));
   }, []);
 
+  console.log(users);
+
   return (
     <div className="flex flex-wrap">
       {users?.map((user) => (

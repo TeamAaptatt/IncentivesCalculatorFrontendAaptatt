@@ -5,17 +5,16 @@ import { BASE_URL } from '../../../../constants/api';
 
 const UserPage = () => {
   const { userId } = useParams();
-  const token = useSelector((store) => store.auth.token?.token);
-  const [incentivePeriodData, setIncentivePeriodData] = useState(null);
-
+  const token = useSelector((store) => store.auth?.token?.token);
+  const [userData, setUserData] = useState(null);
+ const [user, setUser] = useState('');
   useEffect(() => {
-    getIncentivePeriod();
+    getUserData();
   }, []);
 
-  const getIncentivePeriod = async () => {
+  const getUserData = async () => {
     try {
-      console.log('Fetching incentive period data...');
-      const response = await fetch(`${BASE_URL}get-incentive-period?userId=${userId}`, {
+      const response = await fetch(`${BASE_URL}get-incentive-period/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -30,74 +29,78 @@ const UserPage = () => {
       const data = await response.json();
       console.log('Data received:', data);
 
-      // Convert UTC date strings to local date strings
-      data.incentivePeriod.startDate = new Date(data.incentivePeriod.startDate).toLocaleDateString();
-      data.incentivePeriod.endDate = new Date(data.incentivePeriod.endDate).toLocaleDateString();
-
-      setIncentivePeriodData(data);
+      // Setting default values for target and achievedTarget if not provided
+      const userDataWithDefaults = data?.incentivePeriodDetails.map(periodData => ({
+        ...periodData,
+        incentive: {
+          ...(periodData.incentive || {}),
+          target: periodData.incentive?.target || 0,
+          achievedTarget: periodData.incentive?.achievedTarget || 0
+        }
+      }));
+      setUser(data);
+      setUserData(userDataWithDefaults);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
 
-  // Render UI and table with Tailwind CSS
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">{`${incentivePeriodData?.user?.name}'s Data`}</h2>
-      <div className="mb-4">
-      </div>
-      <div>
-        <h3 className="text-xl font-bold mb-2">Incentive Period Data</h3>
-        {incentivePeriodData ? (
-          <table className="min-w-full border rounded overflow-hidden mb-4">
-            <thead className="bg-gray-800 text-white">
-              <tr>
-                <th className="py-2 px-4">Start Date</th>
-                <th className="py-2 px-4">End Date</th>
-                <th className="py-2 px-4">Target</th>
-                <th className="py-2 px-4">Achieved Target</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className=' text-center'>
-                <td className="py-2 px-4">{incentivePeriodData.incentivePeriod.startDate}</td>
-                <td className="py-2 px-4">{incentivePeriodData.incentivePeriod.endDate}</td>
-                <td className="py-2 px-4">{incentivePeriodData.target}</td>
-                <td className="py-2 px-4">{incentivePeriodData.achievedTarget}</td>
-              </tr>
-            </tbody>
-          </table>
-        ) : (
-          <p>Loading...</p>
-        )}
-      </div>
-      <div>
-        <h3 className="text-xl font-bold mb-2">Placements Data</h3>
-        {incentivePeriodData?.placements ? (
-          <table className="min-w-full border rounded overflow-hidden">
-            <thead className="bg-gray-800 text-white">
-              <tr>
-                <th className="py-2 px-4">Candidate</th>
-                <th className="py-2 px-4">Client</th>
-                <th className="py-2 px-4">Date of Joining</th>
-                {/* Add more column headers as needed */}
-              </tr>
-            </thead>
-            <tbody>
-              {incentivePeriodData.placements.map((placement) => (
-                <tr key={placement._id} className=' text-center'>
-                  <td className="py-2 px-4">{placement.candidate}</td>
-                  <td className="py-2 px-4">{placement.client}</td>
-                  <td className="py-2 px-4">{new Date(placement.dateOfJoining).toLocaleDateString()}</td>
-                  {/* Add more cells with placement data */}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p>No placements data available.</p>
-        )}
-      </div>
+    <div className="container mx-auto px-4 py-8">
+      {userData && (
+        <>
+          <h2 className="text-3xl font-bold mb-8 text-yellow-700 text-center">Incentive Period Data of {user?.name}</h2>
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {userData.map((periodData, index) => (
+              <div key={index} className=" rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 ease-in-out">
+                <h3 className="text-xl font-semibold mb-4 text-yellow-700">Incentive Period</h3>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <span className="text-purple-800 block">Start Date</span>
+                    <span className="text-lg font-semibold">{new Date(periodData.incentive.incentivePeriod?.startDate).toLocaleDateString()}</span>
+                  </div>
+                  <div>
+                    <span className="text-purple-800 block">End Date</span>
+                    <span className="text-lg font-semibold">{new Date(periodData.incentive.incentivePeriod?.endDate).toLocaleDateString()}</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <span className="text-purple-800 block">Target</span>
+                    <span className="text-lg font-semibold text-green-700">{periodData.incentive.target||0}</span>
+                  </div>
+                  <div>
+                    <span className="text-purple-800 block">Achieved Target:</span>
+                    <span className="text-lg font-semibold text-green-700">{periodData.incentive.achievedTarget||0}</span>
+                  </div>
+                </div>
+                <hr className="my-4" />
+                <h4 className="text-lg font-semibold mb-4 text-yellow-700">Placements Data</h4>
+                <div className="overflow-auto max-h-48">
+                  <table className="w-full">
+                    <thead className="bg-pink-200">
+                      <tr>
+                        <th className="py-2 px-4 text-yellow-800">Candidate</th>
+                        <th className="py-2 px-4 text-yellow-800">Client</th>
+                        <th className="py-2 px-4 text-yellow-800">Date of Joining</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {periodData.placements && periodData.placements.map((placement, placementIndex) => (
+                        <tr key={placementIndex} className="text-center">
+                          <td className="py-2 px-4">{placement.candidate}</td>
+                          <td className="py-2 px-4">{placement.client}</td>
+                          <td className="py-2 px-4">{new Date(placement.dateOfJoining).toLocaleDateString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };

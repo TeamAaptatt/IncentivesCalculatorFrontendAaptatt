@@ -13,7 +13,6 @@ const NewReporting = ({ onSubmission, onClose }) => {
     reportingTo: '',
     startDate: '',
   });
-  // const [showModal, setShowModal] = useState(false); // State to control the visibility of the modal
   const token = useSelector((state) => state.auth.token.token);
 
   const dispatch = useDispatch()
@@ -39,9 +38,26 @@ const NewReporting = ({ onSubmission, onClose }) => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    
+  const handleSubmit = async (e) => {  
     e.preventDefault();
+    const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const aprilFirst = new Date(currentYear, 3, 1); // Note: Months are zero-based index, so 3 represents April
+  const startDate = new Date(formData.startDate);
+
+  if (startDate < aprilFirst) {
+    showToast('Start date should be greater than or equal to April 1st of the current year.', {
+      duration: 3000,
+      position: 'top-center',
+      style: {
+        border: '1px solid',
+        padding: '4px',
+        color: 'white',
+        background: '#FF0000',
+      },
+    });
+    return; // Prevent further execution
+  }
     await createNewReporting();
     if (onSubmission && typeof onSubmission === 'function') {
       onSubmission();
@@ -69,7 +85,7 @@ const NewReporting = ({ onSubmission, onClose }) => {
         },
       });
     } catch (err) {
-      showToast('Error Creating Reporting ', {
+      showToast(err.response.data.message, {
         duration: 3000,
         position: 'top-center', 
         style: {

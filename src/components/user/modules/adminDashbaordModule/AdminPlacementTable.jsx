@@ -20,6 +20,7 @@ import {
   securityPeriodOptions,
 } from "../../../../constants/placementTable";
 import { getFieldOptions } from "../../../../utils/helpers/getFieldOptions";
+import '../../../../Styles.css'
 
 const AdminPlacementTable = () => {
   const token = useSelector((state) => state.auth.token.token);

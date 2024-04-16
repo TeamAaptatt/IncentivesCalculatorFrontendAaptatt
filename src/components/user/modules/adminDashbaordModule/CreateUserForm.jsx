@@ -160,7 +160,7 @@ const CreateUserForm = ({ handleClose }) => {
           joiningDate:'',
           skip: '',
           designation: '',
-          // type: '',
+          type: '',
           // ownedTeam: '',
           // incentivePeriod: '',
           // imageUrl: '',
