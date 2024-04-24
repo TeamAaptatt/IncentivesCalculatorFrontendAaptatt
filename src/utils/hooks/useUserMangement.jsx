@@ -18,8 +18,20 @@ const useUserManagement = () => {
         });
         const data = response.data;
         setUsers(data);
-        setFilteredUsers(data.filter(user => user.level?.level !== 'Level 1' && user.level?.level !== 'Level 2'));
-        console.log("Users:", data);
+        setFilteredUsers(data.map((user) => {
+          const levelRangesCopy = [...user.levelRanges]; // Create a copy of levelRanges array
+          const lastElementInLevel = levelRangesCopy.pop(); // Remove the last element from the copied array
+          return {
+            ...user,
+            levelRanges: levelRangesCopy, // Update the levelRanges property with the modified array
+          };
+        }).filter((user) => {
+          const lastElementInLevel = user.levelRanges[user.levelRanges.length - 1];
+          return lastElementInLevel.level?.level !== 'Level 1' && lastElementInLevel.level?.level !== 'Level 2';
+        }));
+      
+      console.log("Users:", data);
+      console.log(filteredUsers);
       } catch (err) {
         console.log(err);
       }

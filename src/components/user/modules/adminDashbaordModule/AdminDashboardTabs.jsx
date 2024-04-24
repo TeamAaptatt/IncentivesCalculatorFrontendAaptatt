@@ -14,10 +14,6 @@ import AddPlacementButton from "./AddPlacementButton";
 const AdminDashboardTabs = ({ color }) => {
   const [openTab, setOpenTab] = React.useState(1);
   const [usertoggle, setUSerToggle] = useState(false);
-const [toggle, setToggle] = useState(false);
-const toggleForm = () => {
-    setToggle((prevState) => !prevState);
-  };
 
   return (
     <>
@@ -125,9 +121,7 @@ const toggleForm = () => {
                   <IncentiveCalculator/>                </div>
               </div>
               <div className={openTab === 4 ? "block" : "hidden"} id="link4">
-              <button className="bg-black hover:bg-blue-400 translate-x-[70rem] text-white px-4 py-2 rounded-md w-44" onClick={() => setToggle((state) => !state)}>{toggle === true ? 'Close' : 'Create User'}
-        </button>
-        {toggle && <CreateUserForm handleClose={toggleForm} />}             
+     
         
          <UserList />
          </div>    

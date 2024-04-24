@@ -16,6 +16,7 @@ import CreateReporting from "./TransferReporting";
 import TransferReporting from "./TransferReporting";
 import NewReporting from "./NewReporting";
 import { setLoading } from "../../../../utils/redux/loadSlice/loadSlice";
+import { generateFiscalYearOptions } from "../../../../utils/helpers/genereateDateRange";
 
 const OwnerShipTable = () => {
   const [users, setUsers] = useState([]);
@@ -32,9 +33,11 @@ const OwnerShipTable = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredReporting, setFilterdReporting] = useState([]);
   const [selectedRowId, setSelectedRowId] = useState(null);
+  const [selectedDateRange, setSelectedDateRange] = useState(generateFiscalYearOptions().slice(-1)[0].value);
+  const [searchBy, setSearchBy] = useState(null);
 
   const tableHeadNames = [
-    //"Employee Status",
+    "Employee Status",
     "Emoployee Name",
     // "Emp. ID ",
     "Level Of Job",
@@ -48,10 +51,10 @@ const OwnerShipTable = () => {
     "Update",
   ];
   const tableFields = [
-    //"status",
+    "status",
     "name",
     // "cid",
-    "level",
+    "levelRanges",
     "designation",
     "assignedRole",
     "reportingTo",
@@ -63,12 +66,13 @@ const OwnerShipTable = () => {
 
   const token = useSelector((state) => state.auth.token.token);
   useEffect(() => {
+    
     // getAllUsers();
     getAllReportings();
     getAllLevels();
     getAllDesignations();
     getAllAssignedRoles();
-  }, []);
+  }, [selectedDateRange]);
   //ALL USERS
   // const getAllUsers = async () => {
   //   try {
@@ -88,16 +92,24 @@ const OwnerShipTable = () => {
   //GET ALL LEVELS
   const dispatch = useDispatch();
   const getAllReportings = async () => {
+    const [startDate, endDate] = selectedDateRange.split(",");
     try {
       dispatch(setLoading(true));
-      const response = await axios.get(`${BASE_URL}/get-reportings`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
+      const response = await axios.post(
+        `${BASE_URL}/get-reportings`,
+        {
+          startDate: startDate,
+          endDate: endDate
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+  
       const data = response.data;
       setReportings(data);
       setFilterdReporting(data);
-
+  
       console.log(data);
     } catch (err) {
       console.log(err);
@@ -105,7 +117,7 @@ const OwnerShipTable = () => {
       dispatch(setLoading(false));
     }
   };
-
+  
   const getAllLevels = async () => {
     try {
       const response = await axios.get(BASE_URL + "/get-levels", {
@@ -151,7 +163,6 @@ const OwnerShipTable = () => {
       (reporting) => reporting.user._id === updateUserId
     );
     const cid = reportingToUpdate.user.cid;
-    console.log(reportingToUpdate);
     try {
       const response = await axios.put(
         BASE_URL + `/update-salary/${cid}`,
@@ -162,19 +173,23 @@ const OwnerShipTable = () => {
           },
         }
       );
+      reportingToUpdate.user.salary = response?.data?._id;
       getAllReportings();
       console.log(response.data);
     } catch (err) {
       console.log(err);
     }
   };
+  
   //UPDATE USER
   const updateUser = async () => {
+    
+    dispatch(setLoading(true));
+    // await updateSalryOfUser();
+    await getAllReportings();
     const reportingToUpdate = reportings.find(
       (reporting) => reporting.user._id === updateUserId
     );
-    dispatch(setLoading(true));
-    await updateSalryOfUser();
     try {
       const response = await axios.put(
         `${BASE_URL}update-user/${updateUserId} `,
@@ -202,8 +217,22 @@ const OwnerShipTable = () => {
   }, [searchQuery]);
 
   const handleSearch = () => {
-    console.log("called");
-    const filteredReportings = filteredReporting.filter((item) => {
+   let filteredReportings = [];
+   switch(searchBy){
+     case "name":
+      filteredReportings = filteredReporting.filter((item) =>
+      item.user.name?.toLowerCase().includes(searchQuery.toLowerCase()) 
+    );
+    break;
+  case "reportingTo":
+    filteredReportings = filteredReporting.filter((item) =>
+      item.reportingTo.name
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase())
+    );
+    break;
+  default:  
+  filteredReportings = filteredReporting.filter((item) => {
       return (
         item.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item?.user?.cid?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -216,7 +245,22 @@ const OwnerShipTable = () => {
       );
     });
 
-    console.log(filteredReportings);
+   }
+
+    // const filteredReportings = filteredReporting.filter((item) => {
+    //   return (
+    //     item.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    //     item?.user?.cid?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    //     item.reportingTo.name
+    //       .toLowerCase()
+    //       .includes(searchQuery.toLowerCase()) ||
+    //     item?.reportingTo?.cid
+    //       ?.toLowerCase()
+    //       .includes(searchQuery.toLowerCase())
+    //   );
+    // });
+
+    // console.log(filteredReportings);
     setReportings(filteredReportings);
   };
   const handleUpdateUser = (e, field) => {
@@ -225,7 +269,7 @@ const OwnerShipTable = () => {
       updateValue = { amount: updateValue };
     }
     if (
-      field === "level" ||
+      field === "levelRange" ||
       field === "designation" ||
       field === "assignedRole" ||
       field === "skip"
@@ -265,18 +309,43 @@ const OwnerShipTable = () => {
       console.log(error);
     }
   };
+  const handleDateRangeChange = (event) => {
+    setSelectedDateRange(event.target.value);
+  };
 
+ 
   return (
     <>
       <div className=" flex items-center w-full ">
-        <div className="justify-start w-1/2">
+       <div className="justify-start w-1/2 flex gap-2">
           <input
             type="text"
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className=" w-2/3 p-2  outline-1 border-2 border-black rounded "
+            className=" w-2/3 p-2 mb-2 outline-1 border-2 border-black rounded "
           />
+             <select
+            onChange={(e) => {
+              const selectedOption = e.target.value;
+              setSearchBy(selectedOption);
+            }}
+            className=" p-2 mb-2 outline-1 border-2 border-black rounded"
+          >
+            <option value="">Search Filter</option>
+            <option value="name">Employee</option>
+            <option value="reportingTo">Reporting To</option>
+          </select>
+          <div className="p-2">
+          <select value={selectedDateRange} onChange={handleDateRangeChange}>
+            <option value="">Select Date Range</option>
+            {generateFiscalYearOptions().map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
         </div>
         <div className=" w-1/2 flex justify-end">
           <button
@@ -300,8 +369,8 @@ const OwnerShipTable = () => {
                     key={index}
                     className={`py-4 px-2  font-semibold  text-[1rem]  text-nowrap  w-20  border-x border-gray-800 border-collapse ${
                       index === tableHeadNames.length - 1
-                        ? "sticky right-0 bg-white "
-                        :index===0? "sticky left-0 bg-slate-100  outline-1	 outline ":""
+                        ? "sticky right-0 bg-white"
+                        :index===1? "sticky left-0 outline-1	bg-white outline ":""
                     }`}
                   >
                     {head}
@@ -322,10 +391,11 @@ const OwnerShipTable = () => {
                     >
                       {tableFields.map((field, index) => (
                         <td key={index}                           
-                        className={` ${index===0?'sticky left-0 outline-1	 outline bg-slate-100':" "} border border-gray-800 px-4 whitespace-nowrap`}
+                        className={` ${index===1?'sticky left-0 outline-1	 outline bg-slate-100':" "} border border-gray-800 px-4 whitespace-nowrap`}
                         >
-                          {field === "level" ? (
+                          {field === "levelRanges" ? (
                             <select
+                             disabled
                               value={reporting.user[field]?.level}
                               onClick={(e) => handleUpdateUser(e, field)}
                               className="w-full rounded  py-1 shadow bg-white  "
@@ -382,6 +452,7 @@ const OwnerShipTable = () => {
                             reporting.user?.skip?.name
                           ) : field === "salary" ? (
                             <input
+                             disabled
                               value={salaryValue}
                               className="w-full rounded  py-1 shadow bg-white"
                               onChange={(e) => setSalaryValue(e.target.value)}
@@ -393,6 +464,16 @@ const OwnerShipTable = () => {
                               value={reporting.user[field]}
                               onChange={(e) => handleUpdateUser(e, field)}
                             />
+                          ):field==="status" ?(
+                            <select
+                            className="w-full rounded py-1 shadow bg-white"
+                            value={reporting.user[field]}
+                            onChange={(e) => handleUpdateUser(e, field)}                    
+                            >
+                                   <option value="Active">Active</option>
+                                    <option value="Left">Left</option>
+
+                            </select>
                           ):(<></>)}
                         </td>
                       ))}
@@ -424,10 +505,16 @@ const OwnerShipTable = () => {
                       {tableFields.map((field, index) => (
                         <td
                           key={index}
-                          className={` ${index===0?'sticky left-0 outline-1	 outline bg-slate-100':" "} border border-gray-800 px-4 p-2 whitespace-nowrap`}
+                          className={` ${index===1?`sticky left-0 outline-1	 outline   
+                          
+                          hover:bg-red-400 ${
+                            selectedRowId === reporting._id ? "bg-red-500" : " bg-white"
+                          }
+                          
+                          `:" "} border border-gray-800 px-4 p-2 whitespace-nowrap`}
                         >
-                          {field === "level" ? (
-                            reporting.user[field]?.level
+                          {field === "levelRanges" ? (
+                            reporting.user[field][0]?.level?.level
                           ) : field === "designation" ? (
                             reporting.user[field]?.name
                           ) : field === "assignedRole" ? (

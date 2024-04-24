@@ -21,6 +21,8 @@ import {
 } from "../../../../constants/placementTable";
 import { getFieldOptions } from "../../../../utils/helpers/getFieldOptions";
 import '../../../../Styles.css'
+import { generateFiscalYearOptions } from "../../../../utils/helpers/genereateDateRange";
+import { formatDateForInput } from "../../../../utils/helpers/formatDateforInput";
 
 const AdminPlacementTable = () => {
   const token = useSelector((state) => state.auth.token.token);
@@ -33,6 +35,8 @@ const AdminPlacementTable = () => {
   const [filteredPlacements, setFilteredPlacements] = useState([]);
   const [searchBy, setSearchBy] = useState(null);
   const [selectedRowId, setSelectedRowId] = useState(null);
+  const [selectedDateRange, setSelectedDateRange] = useState(generateFiscalYearOptions().slice(-1)[0].value);
+
   const { users, filteredUsers } = useUserManagement();
 
   const candidateOwnerOptions = getFieldOptions(
@@ -65,12 +69,17 @@ const AdminPlacementTable = () => {
 
   useEffect(() => {
     getAllPlacements();
-  }, [updateFieldId, deleteFieldId]);
+  }, [updateFieldId, deleteFieldId, selectedDateRange]);
 
   const getAllPlacements = async () => {
+    const [startDate, endDate] = selectedDateRange.split(",");
+
     try {
       dispatch(setLoading(true));
-      const response = await axios.get(BASE_URL + "get-all-placements", {
+      const response = await axios.post(BASE_URL + "get-all-placements",{
+        startDate: startDate,
+        endDate: endDate
+      }, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -257,14 +266,11 @@ const AdminPlacementTable = () => {
       alert("Error deleting placement");
     }
   };
-  const formatDateForInput = (dateString) => {
-    if (!dateString) return "";
-    const dateObject = new Date(dateString);
-    const year = dateObject.getFullYear();
-    const month = (dateObject.getMonth() + 1).toString().padStart(2, "0");
-    const day = dateObject.getDate().toString().padStart(2, "0");
-    return `${year}-${month}-${day}`;
+  
+  const handleDateRangeChange = (event) => {
+    setSelectedDateRange(event.target.value);
   };
+
   return (
     <>
       <div className=" flex items-center w-full  ">
@@ -291,6 +297,17 @@ const AdminPlacementTable = () => {
             <option value="accountManager">Account Manager</option>
             <option value="pandLhead">P&L Head</option>
           </select>
+
+          <div className="p-2">
+          <select value={selectedDateRange} onChange={handleDateRangeChange}>
+            <option value="">Select Date Range</option>
+            {generateFiscalYearOptions().map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
         </div>
         <div className=" w-1/2 flex justify-end">
           <AddPlacementButton getAllPlacements={getAllPlacements} />
