@@ -20,7 +20,7 @@ const router = createBrowserRouter([
         path: "/",
         element:(
             <UserTypeCheck admin={<AdminDashboard/>}
-            user={<UserDashboard/>}
+            user={<UserProfile/>}
             />
         ),
       },

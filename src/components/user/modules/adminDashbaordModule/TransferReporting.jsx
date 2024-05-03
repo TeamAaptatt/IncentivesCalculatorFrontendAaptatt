@@ -107,38 +107,49 @@ const TransferReporting = ({ user, onSubmission }) => {
         })
         console.log(response.data);
     } catch (err) {
-        console.log(err);
+      showToast(err.response.data?.message, {
+        duration: 3000,
+        position: 'top-center',
+        style: {
+          border: '1px solid',
+          padding: '4px',
+          color: 'white',
+          background: '#FF0000',
+        },
+      });        console.log(err);
     }
    } 
     return (
-      <div className="flex items-center">
+      <div className="flex items-center my-4">
         <form className="mt-4" onSubmit={handleSubmit}>
-          <label>
-            Reporting To:
+          <label className='font-medium '>
+           Reporting
             <select
               name="reportingTo"
               value={formData.reportingTo}
               onChange={(e) => handleReportingToChange(e.target.value)}
+              className=' w-24 font-medium mx-2 border p-2'
+
             >
-              <option value="" disabled>Select Reporting To</option>
+              <option value="" disabled>Select</option>
               {filteredUsers.map((user) => (
                 <option key={user._id} value={user._id}>{`${user.name} (${user.cid})`}</option>
               ))}
             </select>
           </label>
-          <label>
-            Start Date:
+          <label className=' font-medium mx-4'>
+            Start Date
             <input
               type="Date"
               name="startDate"
               value={formData.startDate}
               onChange={handleInputChange}
+              className=' uppercase  mx-2 border p-1 rounded'
             />
           </label>
                   <button
             type="submit"
-            className="bg-green-500 text-white p-2 rounded-full ml-2"
-          >
+            className="bg-pink-600 text-white py-2 px-4 rounded hover:bg-pink-700 ml-4"          >
             Submit
           </button>
         </form>

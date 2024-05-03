@@ -4,43 +4,53 @@ import { BASE_URL } from '../../constants/api';
 import axios from 'axios';
 
 const useUserManagement = () => {
-  const [users, setUsers] = useState(null);
+  const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const token = useSelector((state) => state.auth.token.token);
+  const [usersAboveFour, setUsersAboveFour] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const token = useSelector(state => state.auth.token.token);
 
   useEffect(() => {
     const getAllUsers = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get(BASE_URL + "/get-users", {
+        const response = await axios.get(`${BASE_URL}/get-users`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         const data = response.data;
         setUsers(data);
-        setFilteredUsers(data.map((user) => {
-          const levelRangesCopy = [...user.levelRanges]; // Create a copy of levelRanges array
-          const lastElementInLevel = levelRangesCopy.pop(); // Remove the last element from the copied array
+        const filteredData = data.map(user => {
+          const levelRangesCopy = [...user.levelRanges];
+          const lastElementInLevel = levelRangesCopy.pop();
           return {
             ...user,
-            levelRanges: levelRangesCopy, // Update the levelRanges property with the modified array
+            levelRanges: levelRangesCopy,
           };
-        }).filter((user) => {
-          const lastElementInLevel = user.levelRanges[user.levelRanges.length - 1];
-          return lastElementInLevel.level?.level !== 'Level 1' && lastElementInLevel.level?.level !== 'Level 2';
+        });
+        setFilteredUsers(filteredData.filter(user => {
+          const lastLevel = user.levelRanges[user.levelRanges.length - 1]?.level?.level;
+          return lastLevel !== 'Level 1' && lastLevel !== 'Level 2';
         }));
-      
-      console.log("Users:", data);
-      console.log(filteredUsers);
+        setUsersAboveFour(filteredData.filter(user => {
+          const lastLevel = user.levelRanges[user.levelRanges.length - 1]?.level?.level;
+          return lastLevel !== 'Level 1' && lastLevel !== 'Level 2' && lastLevel !== 'Level 3';
+        }));
+
+        console.log(usersAboveFour);
       } catch (err) {
-        console.log(err);
+        setError(err);
+        console.error(err);
       }
+      setLoading(false);
     };
 
     getAllUsers();
   }, [token]);
 
-  return { users, filteredUsers };
+  return { users, filteredUsers, usersAboveFour, loading, error };
 };
 
 export default useUserManagement;

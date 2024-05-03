@@ -1,4 +1,5 @@
 export const dataFields = [
+    "S.No",
     "Status",
     "Candidate",
     "Client",

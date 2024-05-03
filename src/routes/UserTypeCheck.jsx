@@ -3,11 +3,14 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { auth } from '../utils/firebase/firebase';
 import { setUser } from '../utils/redux/authSlice/authSlice';
+import useUserDetails from '../components/Auth/useUserDetails';
 
 const UserTypeCheck = ({ admin, user }) => {
     const [userType, setUserType] = useState(null);
     const token = useSelector((store)=>store.auth?.token?.token) || '';
     const dispatch =useDispatch();
+    const { getUserDetails } = useUserDetails();
+
     useEffect(() => {
       
       const checkUserType = () => {
@@ -41,6 +44,7 @@ const UserTypeCheck = ({ admin, user }) => {
           if (user) {
             const token= await getIdToken(user,  true);
                       dispatch(setUser({token }));
+                      getUserDetails();
           }
         } catch (error) {
           console.error('Error refreshing token:', error);

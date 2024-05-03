@@ -10,7 +10,7 @@ import { setLoading } from "../../../../utils/redux/loadSlice/loadSlice";
 import showToast from "../../../../utils/helpers/showToast";
 import { validateFormData } from "../../../../utils/helpers/validationHelpers";
 
-const AddPlacementButton = ({getAllPlacements}) => {
+const AddPlacementButton = ({ getAllPlacements }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     //status: '',
@@ -26,13 +26,13 @@ const AddPlacementButton = ({getAllPlacements}) => {
     billableSalary: "",
     commercial: "",
     fee: "",
-    sendOff: "",
+    // sendOff: "",
     securityPeriod: "",
     paymentStaus: "",
   });
   const [errors, setErrors] = useState({});
   const token = useSelector((state) => state.auth.token.token);
-  const { users } = useUserManagement();
+  const { users, filteredUsers, usersAboveFour } = useUserManagement();
 
   const [candidateOwner, setCandidateOwner] = useState(null);
   const [accountManager, setAccountManager] = useState(null);
@@ -44,7 +44,7 @@ const AddPlacementButton = ({getAllPlacements}) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
     console.log(formData);
-    setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
   };
 
   const handleSubmit = async (e) => {
@@ -57,13 +57,13 @@ const AddPlacementButton = ({getAllPlacements}) => {
       pandLhead: pandLhead,
     };
 
-    const newErrors = validateFormData(updatedFormData); // Use validation function
+    const newErrors = validateFormData(updatedFormData);
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-    
+
     console.log(updatedFormData);
 
     try {
@@ -89,7 +89,7 @@ const AddPlacementButton = ({getAllPlacements}) => {
       });
       await getAllPlacements();
       setIsModalOpen(false);
-     
+
       setFormData({
         //status: '',
         candidate: "",
@@ -104,7 +104,7 @@ const AddPlacementButton = ({getAllPlacements}) => {
         billableSalary: "",
         commercial: "",
         fee: "",
-        sendOff: "",
+        // sendOff: "",
         securityPeriod: "",
         paymentStaus: "",
       });
@@ -119,30 +119,43 @@ const AddPlacementButton = ({getAllPlacements}) => {
           background: "#FF0000",
         },
       });
-      console.error("Error:", );
+      console.error("Error:", error);
     } finally {
       dispatch(setLoading(false));
     }
   };
   const handleCandidateOwnerChange = (selectedOption) => {
     setCandidateOwner(selectedOption.value);
-    setErrors((prevErrors) => ({ ...prevErrors, cnadidateOwner: '' }));
+    setErrors((prevErrors) => ({ ...prevErrors, cnadidateOwner: "" }));
   };
-  
+
   const handleAccountManagerChange = (selectedOption) => {
     setAccountManager(selectedOption.value);
-    setErrors((prevErrors) => ({ ...prevErrors, accountManager: '' }));
+    setErrors((prevErrors) => ({ ...prevErrors, accountManager: "" }));
   };
-  
+
   const handleAccountHeadChange = (selectedOption) => {
     setAccountHead(selectedOption.value);
-    setErrors((prevErrors) => ({ ...prevErrors, accountHead: '' }));
+    setErrors((prevErrors) => ({ ...prevErrors, accountHead: "" }));
   };
-  
+
   const handlePandLHeadChange = (selectedOption) => {
     setPandLHead(selectedOption.value);
-    setErrors((prevErrors) => ({ ...prevErrors, pandLhead: '' }));
+    setErrors((prevErrors) => ({ ...prevErrors, pandLhead: "" }));
   };
+  const handleOutsideClick = (e) => {
+    if (e.target === e.currentTarget) {
+      setIsModalOpen(false);
+    }
+  };
+
+  const strictFilter = (option, rawInput) => {
+    const inputValue = rawInput.trim().toLowerCase();
+    const optionLabel = option.label.toLowerCase();
+
+    return optionLabel.startsWith(inputValue);
+  };
+
   
 
   return (
@@ -155,15 +168,12 @@ const AddPlacementButton = ({getAllPlacements}) => {
       </button>
 
       {isModalOpen && (
-        <div className="fixed inset-0 m-8 flex items-center justify-center">
-          <div className="bg-white w-full md:max-w-[60rem] p-4 md:p-8 rounded-md shadow-lg overflow-y-auto max-h-full">
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="mt-4 fixed translate-x-[54rem] text-red-600 border-2 border-black p-1 hover:text-gray-800 focus:outline-none"
-            >
-              <FontAwesomeIcon icon={faClose} />
-            </button>
-            <h2 className="text-xl md:text-2xl font-bold mb-4 text-blue-500">
+        <div
+          className="fixed inset-0  flex items-center justify-center bg-gray-500 bg-opacity-50 "
+          onClick={handleOutsideClick}
+        >
+          <div className="bg-white w-full md:max-w-[60rem] p-4 md:p-8 rounded-md shadow-lg overflow-y-auto min-h-screen">
+            <h2 className="text-xl md:text-2xl font-bold mb-4 mt-20 text-pink-600">
               Add Placement
             </h2>
 
@@ -182,7 +192,7 @@ const AddPlacementButton = ({getAllPlacements}) => {
                       name={key}
                       value={value}
                       onChange={handleInputChange}
-                      className="p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-500"
+                      className="p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-500 uppercase"
                     />
                   ) : key === "securityPeriod" || key === "paymentStaus" ? (
                     <select
@@ -213,7 +223,7 @@ const AddPlacementButton = ({getAllPlacements}) => {
                     </select>
                   ) : key === "cnadidateOwner" ? (
                     <Select
-                      options={users.map((user) => ({
+                      options={users?.map((user) => ({
                         value: user._id,
                         label: user.name,
                       }))}
@@ -229,16 +239,16 @@ const AddPlacementButton = ({getAllPlacements}) => {
                           : null
                       }
                       className="w-full"
-                      placeholder="Search and select Candidate Owner"
+                      placeholder="Search Candidate Owner"
+                      filterOption={strictFilter}
                     />
                   ) : key === "accountManager" ? (
                     <Select
-                      options={users.map((user) => ({
+                      options={filteredUsers?.map((user) => ({
                         value: user._id,
                         label: user.name,
                       }))}
                       onChange={handleAccountManagerChange}
-
                       value={
                         accountManager
                           ? {
@@ -250,16 +260,16 @@ const AddPlacementButton = ({getAllPlacements}) => {
                           : null
                       }
                       className="w-full"
-                      placeholder="Search and select Account Manager"
+                      placeholder="Search Account Manager"
+                      filterOption={strictFilter}
                     />
                   ) : key === "accountHead" ? (
                     <Select
-                      options={users.map((user) => ({
+                      options={filteredUsers?.map((user) => ({
                         value: user._id,
                         label: user.name,
                       }))}
                       onChange={handleAccountHeadChange}
-
                       value={
                         accountHead
                           ? {
@@ -271,15 +281,16 @@ const AddPlacementButton = ({getAllPlacements}) => {
                           : null
                       }
                       className="w-full"
-                      placeholder="Search and select Account Head"
+                      placeholder="Search Account Head"
+                      filterOption={strictFilter}
                     />
                   ) : key === "pandLhead" ? (
                     <Select
-                      options={users.map((user) => ({
+                      options={usersAboveFour?.map((user) => ({
                         value: user._id,
                         label: user.name,
                       }))}
-                     onChange={handlePandLHeadChange}
+                      onChange={handlePandLHeadChange}
                       value={
                         pandLhead
                           ? {
@@ -291,7 +302,8 @@ const AddPlacementButton = ({getAllPlacements}) => {
                           : null
                       }
                       className="w-full"
-                      placeholder="Search and select P&L Head"
+                      placeholder="Search P&L Head"
+                      filterOption={strictFilter}
                     />
                   ) : (
                     <input
@@ -308,12 +320,18 @@ const AddPlacementButton = ({getAllPlacements}) => {
                 </div>
               ))}
 
-              <div className="m-8 flex justify-center items-center w-full">
+              <div className="m-8 flex justify-center items-center w-full gap-4">
                 <button
                   type="submit"
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+                  className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
                 >
                   Submit
+                </button>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+                >
+                  Cancel
                 </button>
               </div>
             </form>

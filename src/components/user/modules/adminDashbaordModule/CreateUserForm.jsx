@@ -27,6 +27,7 @@ const CreateUserForm = ({ handleClose }) => {
       const filteredResults = filteredUsers.filter(user =>
         user.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
+      console.log(filteredResults);
       setSearchResults(filteredResults.slice(0, 5));
     } else {
       setSearchResults([]);
@@ -114,6 +115,7 @@ const CreateUserForm = ({ handleClose }) => {
       const salaryResponse = await axios.post(BASE_URL + 'add-salary', {
         cid: formData.cid,
         amount: formData.salary,
+        joiningDate:formData.joiningDate
       }, {
         headers: {
           'Content-Type': 'application/json',
@@ -225,11 +227,11 @@ const CreateUserForm = ({ handleClose }) => {
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full  flex items-center justify-center bg-gray-800 bg-opacity-50 " onClick={handleOutsideClick}>
-      <div className="bg-white p-8 rounded shadow-md max-w-xl w-[100vh] min-h-[100vh]">
+    <div className="fixed  top-0  left-0 w-full h-screen  flex items-center justify-center bg-gray-800 bg-opacity-50 " onClick={handleOutsideClick}>
+      <div className="bg-white p-8 rounded shadow-md max-w-xl max-h-[90vh] w-[100vh] mt-10 overflow-y-scroll">
         <form
           onSubmit={handleSubmit}
-          className=" p-8 rounded  max-w-md w-full h-full flex gap-4 flex-wrap "
+          className=" px-8 rounded  max-w-xl w-full flex gap-4 flex-wrap h-full "
         >       
          <h2 className="text-2xl font-bold mb-2 text-center">Create User</h2>
           <div className="grid grid-cols-2 gap-4">
@@ -303,7 +305,7 @@ const CreateUserForm = ({ handleClose }) => {
                   Date of Joining:
                 </label>
                 <input
-                  className="border rounded w-full py-2 px-3"
+                  className="border rounded w-full py-2 px-3 uppercase"
                   type="Date"
                   name="joiningDate"
                   value={formData.joiningDate}
@@ -321,7 +323,7 @@ const CreateUserForm = ({ handleClose }) => {
                   Reporting
                 </label>
                 <input
-                  className="flex-1 border-none outline-none px-2"
+                  className="border rounded w-full py-2 px-3"
                   name="skip"
                   value={searchTerm}
                   onChange={handleSearch}
@@ -330,7 +332,7 @@ const CreateUserForm = ({ handleClose }) => {
                 />
                 
                 {searchResults && (
-                  <div className='w-48 absolute bg-gray-50 mt-2'>
+                  <div className='w-48 absolute bg-gray-50'>
                     {searchResults.map(user => (
                       <ul className=''>
                         <li onClick={() => handleUserClick(user._id, user.name)}
@@ -345,7 +347,7 @@ const CreateUserForm = ({ handleClose }) => {
     <p className="text-red-500 text-xs italic">{errors.skip}</p>
   )}
               </div>
-              <div className="mb-4">
+              <div className="mb-4 mt-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="level">
                   Level:
                 </label>
@@ -432,13 +434,13 @@ const CreateUserForm = ({ handleClose }) => {
               </div>
                           </div>
           </div>
-          <div className="flex justify-end mt-4">
-            <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">
+          <div className="flex justify-end ">
+            <button type="submit" className="bg-pink-600 text-white py-2 px-4 rounded hover:bg-pink-700">
               Create User
             </button>
 
-            <button type="button" className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700 ml-4" onClick={handleClose}>
-              Close
+            <button type="button" className="bg-pink-600 text-white py-2 px-4 rounded hover:bg-pink-700 ml-4" onClick={handleClose}>
+              Cancel
             </button>
           </div>
         </form>

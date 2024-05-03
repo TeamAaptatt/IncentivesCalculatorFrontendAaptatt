@@ -16,6 +16,8 @@ const LevelRanges = ({ cid }) => {
   const [editLevel, setEditLevel] = useState("");
   const [levels, setLevels] = useState([]);
   const token = useSelector((store) => store.auth?.token?.token);
+  const [error, setError] = useState(null);
+
 
   useEffect(() => {
    
@@ -73,6 +75,28 @@ const LevelRanges = ({ cid }) => {
   };
 
   const handleUpdate = async () => {
+    setError("")
+    if (editLevel === "" || editStartDate === "") {
+      return setError("Choose both level and start date");
+    }
+  
+    const originalRange = levelRanges.find(range => range._id === editingRange);
+  
+    if (editLevel === originalRange.level._id && editStartDate === formatDateForInput(originalRange.startDate)) {
+
+      showToast("No changes made.", {
+        duration: 3000,
+        position: "top-center",
+        style: {
+          border: "1px solid ",
+          padding: "4px",
+          color: "white",
+          background: "#FFA500",
+        },
+      });
+      return;
+    }
+  
     try {
       const response = await axios.put(`${BASE_URL}update-level-range`, {
         _id:editingRange,
@@ -102,12 +126,14 @@ const LevelRanges = ({ cid }) => {
 
   return (
     <div className="container mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900 text-center">Level Ranges</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div className="flex justify-end">
+      <CreateLevelRange cid={cid} getAllLevelRange={fetchLevelRanges} />
+      </div>
+      <div className=" ml-72 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 ">
         {levelRanges.map((range,index) => (
           <div
             key={range._id}
-            className=" p-6 rounded-lg shadow-md cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 flex-wrap"
+            className=" p-6 rounded-lg  shadow-md cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 flex-wrap"
           >
             <h3 className="text-xl font-semibold mb-4 text-yellow-700">Level Period</h3>
             <div className="flex justify-between">
@@ -118,6 +144,7 @@ const LevelRanges = ({ cid }) => {
                     type="date"
                     value={editStartDate}
                     onChange={(e) => setEditStartDate(e.target.value)}
+                    className="border p-2"
                   />
                 ) : (
                 <p className="text-lg font-semibold">{formatDate(range?.startDate)}</p>
@@ -151,33 +178,35 @@ const LevelRanges = ({ cid }) => {
             <div className="flex justify-between">
               {editingRange === range._id ? (
                 <>
-                  <button onClick={handleUpdate} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                  <button onClick={handleUpdate} className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded">
                     Save
                   </button>
                   <button onClick={() => setEditingRange(null)} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
                     Cancel
                   </button>
                 </>
+                
               ) : (
                 <>
                   <button onClick={() =>{
                     setEditingRange(range._id);
                     setEditLevel(range.level._id);
                     setEditStartDate(formatDateForInput(range.startDate));
-                  }}  className="hover:bg-[#2399D0] bg-[#02131e] outline outline-1 rounded-md w-auto text-white font-semibold p-2">
+                  }}  className="hover:bg-pink-700 bg-pink-600 outline outline-1 rounded-md w-auto text-white font-semibold p-2">
                     Edit  <FontAwesomeIcon className=" ml-2" icon={faEdit} />
                   </button>
-                  <button onClick={() => handleDelete(range._id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                    Delete <FontAwesomeIcon className=" ml-2" icon={faTrash} />
+                  <button onClick={() => handleDelete(range._id)} className=" hover:bg-slate-100 text-white font-bold py-2 px-4 rounded">
+                    <FontAwesomeIcon className=" ml-2 text-red-800" icon={faTrash} />
                   </button>
                 </>
               )}
             </div>
           </div>
         ))}
+                      {error && <p className="text-red-500 text-sm mx-6">{error}</p>}
+
       </div>
-      <div className="w-full justify-start flex">
-        <CreateLevelRange cid={cid} getAllLevelRange={fetchLevelRanges} />
+      <div className="w-full justify-start flex mb-6">
       </div>
     </div>
   );

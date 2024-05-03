@@ -9,16 +9,18 @@ import useUserManagement from "../../../../utils/hooks/useUserMangement";
 import { generateFiscalYearOptions } from "../../../../utils/helpers/genereateDateRange";
 import { formatNumberIndianSystem } from "../../../../utils/helpers/formatNumberInIndianSystem";
 
-const IncentiveCalculator = () => {
-  const [cid, setCid] = useState("");
+const UserTarget = ({selectedDate}) => {
+  console.log(selectedDate);
+    const user = useSelector((state) => state.user.userData?.userData);
+
+  const [cid, setCid] = useState(user?.cid);
   const [error, setError] = useState(false);
   const [incentiveData, setIncentiveData] = useState(null);
-  const {users, filteredUsers} = useUserManagement();
-  const [selectedDateRange, setSelectedDateRange] = useState(generateFiscalYearOptions().slice(-1)[0].value);
-  const[incentivePeriod, setIncentivePeriod] = useState(null)
+  const[incentivePeriod, setIncentivePeriod] = useState()
 
   const loading = useSelector((state) => state.loader.loading);
   const token = useSelector((state) => state.auth.token.token);
+  const [selectedDateRange, setSelectedDateRange] = useState(selectedDate)
   const dispatch = useDispatch();
   useEffect(() => {
     if (incentivePeriod) {
@@ -26,15 +28,17 @@ const IncentiveCalculator = () => {
     }
     
   }, [incentivePeriod]);
+  useEffect(()=>{handleDateRangeChange()}, [selectedDate])
   
   const fetchIncentiveData = async () => {
 
     setIncentiveData(null);
     dispatch(setLoading(true));
+    setCid(user.cid);
     const { startDate, endDate} = incentivePeriod;
     try {
       const response = await axios.post(
-        BASE_URL + `/calculate-incentive/${cid}`,{
+        BASE_URL + `/target/${user.cid}`,{
           startRange:startDate,
          endRange:endDate
         },
@@ -45,6 +49,7 @@ const IncentiveCalculator = () => {
         }
       );
       setIncentiveData(response.data);
+      console.log(incentiveData, "hereS");
     } catch (error) {
       showToast(error.response.data.message, {
         duration: 3000,
@@ -67,9 +72,7 @@ const IncentiveCalculator = () => {
 
   const customUIforIncentiveCycle = ()=>{
     
-    const user = users?.find(user=>{
-     return user.cid === cid})
-    console.log(user);
+    
     const [startDateofRange, endDateofRange] = selectedDateRange.split(",");
 
     const level = user?.levelRanges
@@ -86,52 +89,52 @@ const IncentiveCalculator = () => {
      console.log(user.cid);
      switch(level.level.level){
        case 'Level 1':
-         return (<div className=' flex  items-center gap-2 m-2 w-2/3'>
+         return (<div className=' flex  items-center  gap-2 m-2 w-fit flex-wrap'>
                        <button
                  type="button"
                  onClick={() => handleQuarterButtonClick(1)}
-                 className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 w-1/4"
+                 className="bg-[#0a3a2a] text-white p-2 rounded-md hover:bg-[#4d9981] w-fit"
                >
-                 Quarter 1
+                 See Target Of Quarter 1
                </button>
                <button
                  type="button"
                  onClick={() => handleQuarterButtonClick(2)}
-                 className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 w-1/4"
+                 className="bg-[#0a3a2a] text-white p-2 rounded-md hover:bg-[#4d9981] w-fit"
                >
-                 Quarter 2
+                 See Target Of Quarter 2
                </button>
                <button
                  type="button"
                  onClick={() => handleQuarterButtonClick(3)}
-                 className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 w-1/4"
+                 className="bg-[#0a3a2a] text-white p-2 rounded-md hover:bg-[#4d9981] w-fit"
                >
-                 Quarter 3
+                 See Target Of Quarter 3
                </button>
                <button
                  type="button"
                  onClick={() => handleQuarterButtonClick(4)}
-                 className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 w-1/4"
+                 className="bg-[#0a3a2a] text-white p-2 rounded-md hover:bg-[#4d9981] w-fit"
                >
-                 Quarter 4
+                 See Target Of Quarter 4
                </button>
  
          </div>);
         case 'Level 2':
-         return (<div className='flex items-center gap-2 m-2 w-96'>
+         return (<div className='flex items-center gap-2 m-2 w-fit flex-wrap'>
          <button
                  type="button"
                  onClick={() => handleHalfYearButtonClick(1)}
-                 className="bg-green-500 text-white p-2 rounded-md hover:bg-green-600 w-1/2"
+                 className="bg-[#0a3a2a] text-white p-2 rounded-md hover:bg-[#4d9981] wpink"
                >
-                 Half Year 1
+               See Target of Half Year 1
                </button>
                <button
                  type="button"
                  onClick={() => handleHalfYearButtonClick(2)}
-                 className="bg-green-500 text-white p-2 rounded-md hover:bg-green-600 w-1/2"
+                 className="bg-[#0a3a2a] text-white p-2 rounded-md hover:bg-[#4d9981] w-fit"
                >
-                 Half Year 2
+                 See Target Of Half Year 2
                </button>
  
          </div>)
@@ -140,13 +143,13 @@ const IncentiveCalculator = () => {
                    case 'Level 5':
                    case 'Level 6':
                      return (
-                       <div className='flex flex-col items-center gap-2 m-2 w-40'>
+                       <div className='flex flex-col items-center gap-2 m-2 w-fit'>
                          <button
                            type="button"
                            onClick={() => handleYearButtonClick()}
-                           className="bg-yellow-500 text-white p-2 rounded-md hover:bg-yellow-600 w-full"
+                           className="bg-[#0a3a2a]  text-white p-2 w-fit rounded-md hover:bg-[#4d9981] "
                          >
-                           Yearly
+                 See Target
                          </button>
                        </div>
                      );
@@ -163,7 +166,7 @@ const IncentiveCalculator = () => {
 
  const handleQuarterButtonClick = (quarter) => {
   const [startDateofRange, endDateofRange] = selectedDateRange.split(",");
-
+  
   const fiscalYearStart = new Date(new Date(startDateofRange).getFullYear(), 3, 1);
   const currentDate = new Date(startDateofRange);
 
@@ -186,11 +189,11 @@ setIncentivePeriod({
 };
 
 const handleYearButtonClick = () => {
+
   const [startDateofRange, endDateofRange] = selectedDateRange.split(",");
 
   const fiscalYearStart = new Date(new Date(startDateofRange).getFullYear(), 3, 1);
   const currentDate = new Date(startDateofRange);
-
 
   if (currentDate < new Date(currentDate.getFullYear(), 2, 31)) {
     fiscalYearStart.setFullYear(fiscalYearStart.getFullYear() - 1);
@@ -231,7 +234,7 @@ console.log(startDate, endDate);
 
 };
 const handleDateRangeChange = (event) => {
-  setSelectedDateRange(event.target.value);
+  setSelectedDateRange(selectedDate);
 };
  console.log(incentivePeriod);
 const cidValidator = ()=>{
@@ -243,9 +246,9 @@ const cidValidator = ()=>{
   }
 }  
   return (
-    <div className="  m-4 flex flex-col">
-      <div className="m-4 flex gap-44">
-      <div className="mx-4">
+    <div className=" mt-2 flex flex-col">
+      <div className=" flex  ">
+      {/* <div className="mx-4">
       <label
               htmlFor="cid"
               className="block text-sm   ml-28 font-bold text-gray-800"
@@ -267,53 +270,28 @@ const cidValidator = ()=>{
   </select>
 </div>
 
-        </div>
+        </div> */}
 
-      <div className="flex flex-col w-auto mx-4">
-            <label
-              htmlFor="cid"
-              className="block text-sm font-bold text-gray-800"
-            >
-              User CID:
-            </label>
-            <input
-              type="text"
-              id="cid"
-              name="cid"
-              value={cid}
-              onChange={(e) => {
-                setError(false)       
-
-                setCid(e.target.value.toUpperCase());
-                
-                cidValidator();
-              }}
-              className="mt-1 p-2 uppercase border border-gray-300 rounded-md w-96"
-            />
-            {error && (
-              <p className="text-red-500 text-xs lowercase">{`*Enter Valid CID`}</p>
-            )}
-          </div>
+           
 
       </div>
-      <div className="w-full flex justify-center flex-col items-center">
+      <div className="w-full flex justify-center flex-col items-center translate-x-[-10rem] mt-2">
         {customUIforIncentiveCycle()}
         </div>
 
-    <div className="  m-4 flex flex-col">
+    <div className="   flex flex-col">
       {incentiveData || loading ? (
         <>
           {loading ? (
             <></>
           ) : (
             <div className=" text-center m-2">
-              <h1 className=" font-bold text-wrap text-lg">{`Incentive Calculation for ${incentiveData?.user?.name}`}</h1>
             </div>
           )}
         </>
       ) : null}
-      <div className="w-full flex flex-wrap max-w-md p-6 bg-white ">
-        <div className="mb-4 mx-8 w-full flex flex-col">
+      <div className="w-full flex flex-wrap max-w-md  bg-inherit ">
+        <div className="mb-4 flex flex-col">
           
 
           {/* <button
@@ -332,29 +310,29 @@ const cidValidator = ()=>{
             {loading ? (
               <></>
             ) : (
-              <table className="mt-4 text-gray-600 text-center border-collapse border border-black">
-  <thead>
-    <tr className="">
-      <th className="border border-black px-4 py-2">Target</th>
-      <th className="border border-black px-4 py-2">Achieved Target</th>
-      <th className="border border-black px-4 py-2">Incentive Amount</th>
-    </tr>
-  </thead>
-  <tbody> 
-    <tr className="">
-      <td className="border border-black px-4 py-2 text-nowrap">
-       ₹ {formatNumberIndianSystem(incentiveData?.target?.toFixed(2))}
-      </td>
-      <td className="border border-black px-4 py-2 text-nowrap">
-       ₹ {formatNumberIndianSystem(incentiveData?.achievedTarget?.toFixed(2))}
-      </td>
-      <td className="border border-black px-4 py-2 text-nowrap">
-       ₹ {formatNumberIndianSystem(incentiveData?.incentiveAmount?.toFixed(2))}
-      </td>
-    </tr>
-  </tbody>
-</table>
-
+              <table className="border-collapse translate-x-[-12rem] border text-white border-gray-800 transte y-[6rem]">
+              <thead>
+                <tr>
+                  <th className="border border-gray-800 px-4 py-2 text-left">Achieved Target</th>
+                  <th className="border border-gray-800 px-4 py-2 text-left">Target</th>
+                  <th className="border border-gray-800 px-4 py-2 text-left">Pending</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="border border-gray-800 px-4 py-2">
+                    ₹{formatNumberIndianSystem(incentiveData.achievedTarget.toFixed(2))}
+                  </td>
+                  <td className="border border-gray-800 px-4 py-2">
+                    ₹{formatNumberIndianSystem(incentiveData.target.toFixed(2))}
+                  </td>
+                  <td className="border border-gray-800 px-4 py-2">
+                    ₹{formatNumberIndianSystem(incentiveData.target - incentiveData.achievedTarget)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
             )}
           </>
         ) : null}
@@ -364,4 +342,4 @@ const cidValidator = ()=>{
   );
 };
 
-export default IncentiveCalculator;
+export default UserTarget;

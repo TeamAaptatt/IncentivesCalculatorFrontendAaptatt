@@ -10,10 +10,13 @@ export function validateCreateUserFormData(formData) {
   
     // Name Validation
     if (!formData.name.trim()) {
-      errors.name = 'Name is required.';
-    } else if (!/^[a-zA-Z\s]+$/.test(formData.name.trim())) {
-      errors.name = 'Name must contain only letters and spaces.';
-    }
+  errors.name = 'Name is required.';
+} else if (formData.name.trim().length > 100) {
+  errors.name = 'Name length cannot exceed 100 characters.';
+} else if (!/^[a-zA-Z\s]+$/.test(formData.name.trim())) {
+  errors.name = 'Name must contain only letters and spaces.';
+}
+
   
     // Email Validation
     if (!formData.email.trim()) {
@@ -27,7 +30,10 @@ export function validateCreateUserFormData(formData) {
       errors.salary = 'Salary is required.';
     } else if (!/^\d+$/.test(formData.salary.trim())) {
       errors.salary = 'Salary must be a number.';
+    } else if (formData.salary.trim().length > 16) {
+      errors.salary = 'Salary must be at most 16 digits.';
     }
+    
   
     // Date of Joining Validation
     if (!formData.joiningDate.trim()) {
@@ -57,8 +63,11 @@ export function validateCreateUserFormData(formData) {
       errors.password = 'Password is required.';
     } else if (formData.password.length < 6) {
       errors.password = 'Password must be at least 6 characters long.';
-    }
-  
+    } else if (!/^[a-zA-Z0-9!@#$%^&*()_+{}\[\]:;<>,.?~\-\\/]+$/g.test(formData.password)) {
+      errors.password = 'Password must contain only alphanumeric characters and special characters.';
+    }else if(formData.password.length >20){
+      errors.password = 'Password should not exceed 20 characters'
+    }  
     return errors;
   }
   

@@ -7,6 +7,7 @@ import {
   faCheck,
   faEdit,
   faMultiply,
+  faTrash,
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import useUserManagement from "../../../../utils/hooks/useUserMangement";
@@ -23,6 +24,9 @@ import { getFieldOptions } from "../../../../utils/helpers/getFieldOptions";
 import '../../../../Styles.css'
 import { generateFiscalYearOptions } from "../../../../utils/helpers/genereateDateRange";
 import { formatDateForInput } from "../../../../utils/helpers/formatDateforInput";
+import { exportToExcel } from "../../../../utils/helpers/exportToExcel";
+import { saveAs } from "file-saver";
+import * as XLSX from "xlsx";
 
 const AdminPlacementTable = () => {
   const token = useSelector((state) => state.auth.token.token);
@@ -36,6 +40,7 @@ const AdminPlacementTable = () => {
   const [searchBy, setSearchBy] = useState(null);
   const [selectedRowId, setSelectedRowId] = useState(null);
   const [selectedDateRange, setSelectedDateRange] = useState(generateFiscalYearOptions().slice(-1)[0].value);
+  const [inputError, setInputError] = useState(false);
 
   const { users, filteredUsers } = useUserManagement();
 
@@ -178,6 +183,10 @@ const AdminPlacementTable = () => {
 
   const handleSearch = () => {
     let filteredPlacement = [];
+    if(searchQuery.length>100){
+      setInputError(true)
+      setSearchQuery('')
+    }
     switch (searchBy) {
       case "candidate":
         filteredPlacement = filteredPlacements.filter((item) =>
@@ -210,6 +219,11 @@ const AdminPlacementTable = () => {
           item.pandLhead.name?.toLowerCase().includes(searchQuery.toLowerCase())||item?.pandLhead?.cid?.toLowerCase().includes(searchQuery.toLowerCase())
         );
         break;
+        case "resumeSource":
+          filteredPlacement = filteredPlacements.filter((item) =>
+            item.resumeSource?.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          break;   
       default:
         filteredPlacement = filteredPlacements;
         filteredPlacement = filteredPlacements?.filter((item) => {
@@ -235,6 +249,7 @@ const AdminPlacementTable = () => {
 
   useEffect(() => {
     handleSearch();
+    setInputError(false)
   }, [searchQuery, searchBy]);
 
   useEffect(() => {
@@ -270,6 +285,73 @@ const AdminPlacementTable = () => {
   const handleDateRangeChange = (event) => {
     setSelectedDateRange(event.target.value);
   };
+  const handleExportToExcel = () => {
+    // Define all fields
+    const allFields = [
+        "Status",
+        "Candidate",
+        "Client",
+        "Offered Position",
+        "Date of Joining",
+        "Candidate Owner",
+        "Account Manager",
+        "Account Head",
+        "P&L Head",
+        "Resume Source",
+        "Billable Salary",
+        "Commercial Fee",
+        "Fee",
+        "Send Off",
+        "Security Period",
+        "Payment Status",
+    ];
+
+    const fieldMap = {
+        "Status": "status",
+        "Candidate": "candidate",
+        "Client": "client",
+        "Offered Position": "offeredPosition",
+        "Date of Joining": "dateOfJoining",
+        "Candidate Owner": "cnadidateOwner",
+        "Account Manager": "accountManager",
+        "Account Head": "accountHead",
+        "P&L Head": "pandLhead",
+        "Resume Source": "resumeSource",
+        "Billable Salary": "billableSalary",
+        "Commercial Fee": "commercialFee",
+        "Fee": "fee",
+        "Send Off": "sendOff",
+        "Security Period": "securityPeriod",
+        "Payment Status": "paymentStatus",
+    };
+
+    const data = filteredPlacements.map(placement => {
+        const rowData = {};
+        allFields.forEach(field => {
+            const dataKey = fieldMap[field];
+            if (dataKey) {
+                if (dataKey === "dateOfJoining") {
+                    rowData[field] = new Date(placement[dataKey]).toLocaleDateString("en-US");
+                } else if (dataKey === "accountManager" || dataKey === "cnadidateOwner" || dataKey === "pandLhead" || dataKey === "accountHead") {
+                    rowData[field] = `${placement[dataKey]?.name} (${placement[dataKey]?.cid})`;
+                } else {
+                    rowData[field] = placement[dataKey];
+                }
+            }
+        });
+        return rowData;
+    });
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Placement Data");
+
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const excelBlob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    });
+    saveAs(excelBlob, "placement_data.xlsx");
+};
 
   return (
     <>
@@ -288,7 +370,7 @@ const AdminPlacementTable = () => {
               const selectedOption = e.target.value;
               setSearchBy(selectedOption);
             }}
-            className=" p-2 mb-2 outline-1 border-2 border-black rounded"
+            className="  p-2  w-32 mb-2 outline-1 border-2 border-black rounded"
           >
             <option value="">Search Filter</option>
             <option value="candidate">Candidate</option>
@@ -296,20 +378,31 @@ const AdminPlacementTable = () => {
             <option value="accountHead">Account Head</option>
             <option value="accountManager">Account Manager</option>
             <option value="pandLhead">P&L Head</option>
+            <option value="resumeSource">Resume Source</option>
           </select>
 
           <div className="p-2">
           <select value={selectedDateRange} onChange={handleDateRangeChange}>
-            <option value="">Select Date Range</option>
+            <option value="">Choose Year</option>
             {generateFiscalYearOptions().map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
             ))}
           </select>
+
+          
+
         </div>
+        {inputError && <p className="text-red-500 text-xs lowercase">Search  length Can't be more than 100 characters.</p>}
         </div>
-        <div className=" w-1/2 flex justify-end">
+        <div className=" w-1/2 flex justify-end gap-2">
+        <div>
+        <button
+                className=" bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+
+        onClick={handleExportToExcel}>Export to Excel</button>
+      </div>
           <AddPlacementButton getAllPlacements={getAllPlacements} />
         </div>
       </div>
@@ -332,7 +425,7 @@ const AdminPlacementTable = () => {
             </tr>
           </thead>
           <tbody className="text-center text-sm">
-            {placements?.map((placement) => (
+            {placements?.map((placement, index) => (
               <>
                 {placement._id === updateFieldId ? (
                   <tr   key={placement._id}
@@ -340,6 +433,8 @@ const AdminPlacementTable = () => {
                     selectedRowId === placement._id ? 'bg-red-500' : ''
                   }`}
                   onClick={() => setSelectedRowId(placement._id)}>
+                        <td className="px-6 py-2 whitespace-nowrap border border-black w-32">{index + 1}</td>
+
                     {fields.map((field, fieldIndex) => (
                       <td
                         key={fieldIndex}
@@ -498,6 +593,8 @@ const AdminPlacementTable = () => {
                     selectedRowId === placement._id ? 'bg-red-600 ' : ''
                   }`}
                   onClick={() => setSelectedRowId(placement._id)}>
+                        <td className="px-6 py-2 whitespace-nowrap border border-black w-32">{index + 1}</td>
+
                     {fields?.map((field, fieldIndex) => (
                       <td
                         key={fieldIndex}
@@ -529,7 +626,7 @@ const AdminPlacementTable = () => {
                       >
                         <FontAwesomeIcon
                           icon={faEdit}
-                          className="mr-2 text-[#23C132]"
+                          className="mr-2 text-[#030904]"
                         />
                       </button>
                       <button
@@ -539,8 +636,8 @@ const AdminPlacementTable = () => {
                         }}
                       >
                         <FontAwesomeIcon
-                          icon={faTrashAlt}
-                          className="mr-2   text-red-700"
+                          icon={faTrash}
+                          className="mr-2   text-[#030904]"
                         />
                       </button>
                     </td>

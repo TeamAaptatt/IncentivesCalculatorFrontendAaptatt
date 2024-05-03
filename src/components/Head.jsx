@@ -37,7 +37,7 @@ const Head = () => {
     }, []);
 
     return (
-        <div className='flex justify-between  p-4 bg-slate-50 shadow w-full h-16 '>
+        <div className='flex justify-between  p-4 bg-slate-50 shadow w-full h-16 sticky top-0 mb-8  z-50 '>
             <div className='text-2xl  font-bold text-indigo-600  ml-12'>
                 <Link to={"/"}>
                     <img src='https://successpact.com/wp-content/uploads/2022/06/imgpsh_fullsize_anim-2-e1655022773479.png' className=' h-12  w-32 p-2' alt="Logo" />

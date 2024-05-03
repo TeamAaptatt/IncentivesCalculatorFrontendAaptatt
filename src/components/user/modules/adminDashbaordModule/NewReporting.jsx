@@ -108,7 +108,7 @@ const NewReporting = ({ onSubmission, onClose }) => {
 
   return (
     <div  className=' z-20'>
-      <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50" >
         <div className="bg-white p-6 rounded-lg w-1/2">
           <form onSubmit={handleSubmit}>
             <h1 className="font-bold mb-4">Add Ownership</h1>
@@ -152,7 +152,7 @@ const NewReporting = ({ onSubmission, onClose }) => {
               <label className="block mb-2">
                 <h1 className="font-bold">Start Date:</h1>
                 <input
-                  className="block border rounded p-2  min-w-400 w-full"
+                  className="block border rounded p-2  min-w-400 w-full uppercase"
                   type="Date"
                   name="startDate"
                   value={formData.startDate}
@@ -161,11 +161,11 @@ const NewReporting = ({ onSubmission, onClose }) => {
               </label>
             </div>
             <div className="flex justify-center">
-              <button type="submit" className="bg-green-500 text-white p-2 rounded-full mr-2">
+              <button type="submit" className="bg-pink-600 text-white py-2 px-4 rounded hover:bg-pink-700 ml-4">
                 Submit
               </button>
-              <button type="button" className="bg-red-500 text-white p-2 rounded-full" onClick={handleClose}>
-                Close
+              <button type="button" className="bg-pink-600 text-white py-2 px-4 rounded hover:bg-pink-700 ml-4" onClick={handleClose}>
+                Cancel
               </button>
             </div>
           </form>

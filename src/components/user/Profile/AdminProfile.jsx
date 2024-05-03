@@ -7,11 +7,12 @@ import { logout } from '../../../utils/redux/authSlice/authSlice';
 import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faUser, faKey, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { clearUserData } from '../../../utils/redux/userSlice';
 
 const AdminProfile = () => {
 
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user.userData?.userData);
+  const user = useSelector((state) => state.user?.userData?.userData);
   console.log(user);
   const [displayName, setDisplayName] = useState(user?.name || '');
   const [currentPassword, setCurrentPassword] = useState('');
@@ -20,51 +21,80 @@ const AdminProfile = () => {
   const [error, setError] = useState(null);
   const [confirmation, setConfirmation] = useState(null);
   const [loading, setLoading] = useState(false);
+//  const email = user?.email;
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeInOut' } },
   };
 
-  const handleChangeDisplayName = async () => {
-    try {
-      setLoading(true);
+  // const handleChangeDisplayName = async () => {
+  //   try {
+  //     setLoading(true);
 
-      await updateProfile(auth.currentUser, { displayName });
+  //     await updateProfile(auth.currentUser, { displayName });
 
-    //   dispatch(setUser({
-    //     id: user.id,
-    //     name: displayName,
-    //     email: user.email,
-    //   }));
+  //   //   dispatch(setUser({
+  //   //     id: user.id,
+  //   //     name: displayName,
+  //   //     email: user.email,
+  //   //   }));
 
-      setConfirmation('Display name changed successfully!');
-      setError(null);
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     setConfirmation('Display name changed successfully!');
+  //     setError(null);
+  //   } catch (error) {
+  //     setError(error.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleChangePassword = async () => {
+    if(!currentPassword){
+      setError("Enter current Password")
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      setError('New passwords do not match');
+      
+      return;
+    }
+
+  if(!currentPassword ||  !newPassword || !confirmNewPassword ) {
+    setError('Please Fill all Fields')
+    return;
+
+  }
     try {
       setLoading(true);
+      
 
-      if (newPassword !== confirmNewPassword) {
-        setError('New passwords do not match');
-        return;
-      }
-
-      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+      const credential = EmailAuthProvider.credential(auth?.currentUser?.email, currentPassword);
       await reauthenticateWithCredential(auth.currentUser, credential);
 
       await updatePassword(auth.currentUser, newPassword);
-
       setConfirmation('Password changed successfully!');
+
+      dispatch(logout());
+      await signOut(auth);
+      dispatch(clearUserData());
       setError(null);
     } catch (error) {
-      setError('Enter Correct Password' || error.message);
+      let errorMessage = 'An error occurred while signing in.';
+      if (error.code === 'auth/invalid-email') {
+        errorMessage = 'The email address is not valid.';
+      } else if (error.code === 'auth/user-disabled') {
+        errorMessage = 'This user has been disabled.';
+      } else if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No user found with this email address.';
+      } else if (error.code === 'auth/invalid-credential') {
+        errorMessage = 'Incorrect current password';
+      }
+      setError(errorMessage);    
+      // setError( error.message);
+
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -80,7 +110,7 @@ const AdminProfile = () => {
 
   return (
     <motion.div
-      className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-purple-800 via-purple-600 to-purple-500 text-white"
+      className="flex flex-col items-center justify-center h-screen  text-white"
       variants={fadeInUp}
       initial="hidden"
       animate="visible"
@@ -126,7 +156,9 @@ const AdminProfile = () => {
             className="mt-1 p-2 w-full border rounded-md focus:outline-none text-black focus:border-indigo-400  transition-all duration-300"
             placeholder="Enter your current password"
             value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
+            onChange={(e) =>{ 
+              setError('')
+              setCurrentPassword(e.target.value)}}
           />
         </div>
 
@@ -140,7 +172,9 @@ const AdminProfile = () => {
             className="mt-1 p-2 w-full border rounded-md focus:outline-none text-black focus:border-indigo-400 transition-all duration-300"
             placeholder="Enter your new password"
             value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
+            onChange={(e) =>{ 
+              setError('')
+              setNewPassword(e.target.value)}}
           />
         </div>
 
@@ -154,11 +188,13 @@ const AdminProfile = () => {
             className="mt-1 p-2 w-full border rounded-md focus:outline-none  text-black focus:border-indigo-400  transition-all duration-300"
             placeholder="Confirm your new password"
             value={confirmNewPassword}
-            onChange={(e) => setConfirmNewPassword(e.target.value)}
+            onChange={(e) =>{ 
+              setError('')
+              setConfirmNewPassword(e.target.value)}}
           />
           {error && <p className="text-red-500 mt-2">{error}</p>}
           <motion.button
-            className="bg-indigo-600 text-black px-4 py-2 rounded-md mt-2 transition-all duration-300 hover:bg-blue-600 focus:outline-none"
+            className="bg-[#40826D] text-white px-4 py-2 rounded-md mt-2 transition-all duration-300 hover:bg-[#4d9981] focus:outline-none"
             onClick={handleChangePassword}
             disabled={loading}
             whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}

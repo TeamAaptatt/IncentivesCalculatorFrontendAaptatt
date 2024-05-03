@@ -17,6 +17,10 @@ import TransferReporting from "./TransferReporting";
 import NewReporting from "./NewReporting";
 import { setLoading } from "../../../../utils/redux/loadSlice/loadSlice";
 import { generateFiscalYearOptions } from "../../../../utils/helpers/genereateDateRange";
+import showToast from "../../../../utils/helpers/showToast";
+import {  exportToExcel } from "../../../../utils/helpers/exportToExcel";
+import { saveAs } from "file-saver";
+import * as XLSX from "xlsx";
 
 const OwnerShipTable = () => {
   const [users, setUsers] = useState([]);
@@ -35,8 +39,10 @@ const OwnerShipTable = () => {
   const [selectedRowId, setSelectedRowId] = useState(null);
   const [selectedDateRange, setSelectedDateRange] = useState(generateFiscalYearOptions().slice(-1)[0].value);
   const [searchBy, setSearchBy] = useState(null);
+  const [inputError, setInputError] = useState(false);
 
   const tableHeadNames = [
+    "S.No",
     "Employee Status",
     "Emoployee Name",
     // "Emp. ID ",
@@ -214,10 +220,17 @@ const OwnerShipTable = () => {
 
   useEffect(() => {
     handleSearch();
+    setInputError(false)
+
   }, [searchQuery]);
 
   const handleSearch = () => {
    let filteredReportings = [];
+   if(searchQuery.length>100){
+    setInputError(true)
+    setSearchQuery('')
+  }
+  
    switch(searchBy){
      case "name":
       filteredReportings = filteredReporting.filter((item) =>
@@ -303,7 +316,17 @@ const OwnerShipTable = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      alert("Deleted Successfully!");
+      showToast("Deleted Successfully!", {
+        duration: 3000,
+        position: 'top-center', 
+        style: {
+          border: '1px solid ',
+          padding: '4px',
+          color: 'white',
+          background: '#FF0000',
+          
+        },
+      });
       getAllReportings();
     } catch (error) {
       console.log(error);
@@ -312,8 +335,32 @@ const OwnerShipTable = () => {
   const handleDateRangeChange = (event) => {
     setSelectedDateRange(event.target.value);
   };
-
- 
+  const handleExportToExcel = () => {
+    const data = reportings.map(reporting => ({
+      "Employee Status": reporting.user.status,
+      "Employee Name": reporting.user.name,
+      "Level Of Job": reporting.user.levelRanges?.level || "", 
+      "Designation": reporting.user.designation?.name || "", 
+      "Assigned Role Category": reporting.user.assignedRole?.name || "", 
+      "Reporting To": `${reporting.reportingTo?.name} (${reporting.reportingTo?.cid})` || "", 
+      "Start Date": reporting.startDate ? new Date(reporting.startDate).toLocaleDateString("en-US") : "",
+      "End Date": reporting.endDate ? new Date(reporting.endDate).toLocaleDateString("en-US") : "",
+      "Skip Level Manager": reporting.user.skip?.name || "", 
+      "Fixed Yearly Salary": reporting.user.salary?.amount || "", 
+    }));
+  
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Ownership Data");
+  
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const excelBlob = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    });
+    saveAs(excelBlob, "ownership_data.xlsx");
+  };
+  
+  
   return (
     <>
       <div className=" flex items-center w-full ">
@@ -338,7 +385,7 @@ const OwnerShipTable = () => {
           </select>
           <div className="p-2">
           <select value={selectedDateRange} onChange={handleDateRangeChange}>
-            <option value="">Select Date Range</option>
+            <option value="">Choose Year</option>
             {generateFiscalYearOptions().map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
@@ -346,14 +393,22 @@ const OwnerShipTable = () => {
             ))}
           </select>
         </div>
+        {inputError && <p className="text-red-500 text-xs lowercase">Search  length Can't be more than 100 characters.</p>}
+
         </div>
-        <div className=" w-1/2 flex justify-end">
+        <div className=" w-1/2 flex justify-end gap-2">
+        <button
+            className="bg-pink-600 hover:bg-pink-700 my-2  text-white font-bold py-2 px-2 rounded"
+
+        onClick={handleExportToExcel}>Export to Excel</button>
+
           <button
             className="bg-pink-600 hover:bg-pink-700 my-2  text-white font-bold py-2 px-2 rounded"
             onClick={() => setCreateReprtingToggle((prev) => !prev)}
           >
             Add Ownership
           </button>
+         
         </div>
       </div>
       <div className="w-full flex flex-col items-center overflow-x-hidden">
@@ -379,7 +434,7 @@ const OwnerShipTable = () => {
               </tr>
             </thead>
             <tbody>
-              {reportings?.map((reporting) => (
+              {reportings?.map((reporting, index) => (
                 <>
                   {updateUserId === reporting.user._id ? (
                     <tr
@@ -389,6 +444,8 @@ const OwnerShipTable = () => {
                       } `}
                       onClick={() => setSelectedRowId(reporting._id)}
                     >
+                          <td className="px-6 py-2 whitespace-nowrap border border-black w-32">{index + 1}</td>
+
                       {tableFields.map((field, index) => (
                         <td key={index}                           
                         className={` ${index===1?'sticky left-0 outline-1	 outline bg-slate-100':" "} border border-gray-800 px-4 whitespace-nowrap`}
@@ -502,6 +559,8 @@ const OwnerShipTable = () => {
                       }`}
                       onClick={() => setSelectedRowId(reporting._id)}
                     >
+                          <td className="px-6 py-2 whitespace-nowrap border border-black w-32">{index + 1}</td>
+
                       {tableFields.map((field, index) => (
                         <td
                           key={index}
