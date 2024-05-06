@@ -115,6 +115,7 @@ const OwnerShipTable = () => {
       const data = response.data;
       setReportings(data);
       setFilterdReporting(data);
+      setTransferReprtingToggle(false)
   
       console.log(data);
     } catch (err) {

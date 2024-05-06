@@ -5,6 +5,7 @@ import axios from 'axios';
 import useUserManagement from '../../../../utils/hooks/useUserMangement';
 import { setLoading } from '../../../../utils/redux/loadSlice/loadSlice';
 import showToast from '../../../../utils/helpers/showToast';
+import Select from 'react-select';
 
 const NewReporting = ({ onSubmission, onClose }) => {
   const { users, filteredUsers } = useUserManagement();
@@ -112,7 +113,7 @@ const NewReporting = ({ onSubmission, onClose }) => {
         <div className="bg-white p-6 rounded-lg w-1/2">
           <form onSubmit={handleSubmit}>
             <h1 className="font-bold mb-4">Add Ownership</h1>
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <label className="block mb-2">
                 <h1 className="font-bold">User:</h1>
                 <select
@@ -129,8 +130,8 @@ const NewReporting = ({ onSubmission, onClose }) => {
                   ))}
                 </select>
               </label>
-            </div>
-            <div className="mb-4">
+            </div> */}
+            {/* <div className="mb-4">
               <label className="block mb-2">
                 <h1 className="font-bold">Reporting To:</h1>
                 <select
@@ -147,12 +148,37 @@ const NewReporting = ({ onSubmission, onClose }) => {
                   ))}
                 </select>
               </label>
-            </div>
+            </div> */}
+<div className="mb-4">
+  <label className="block mb-2">
+    <h1 className="font-bold">User:</h1>
+    <Select
+  className="block border rounded p-2 w-full"
+  options={users.map(user => ({ value: user._id, label: `${user.name} (${user.cid})` }))}
+  value={{ value: formData.user, label: users.find(user => user._id === formData.user)?.name }}
+  onChange={selectedOption => handleUserToChange(selectedOption.value)}
+/>
+
+  </label>
+</div>
+<div className="mb-4">
+  <label className="block mb-2">
+    <h1 className="font-bold">Reporting To:</h1>
+    <Select
+  className="block border rounded p-2 w-full"
+  options={filteredUsers.map(user => ({ value: user._id, label: `${user.name} (${user.cid})` }))}
+  value={{ value: formData.reportingTo, label: filteredUsers.find(user => user._id === formData.reportingTo)?.name }}
+  onChange={selectedOption => handleReportingToChange(selectedOption.value)}
+/>
+
+  </label>
+</div>
+
             <div className="mb-4">
               <label className="block mb-2">
                 <h1 className="font-bold">Start Date:</h1>
                 <input
-                  className="block border rounded p-2  min-w-400 w-full uppercase"
+                  className="block border rounded p-2  w-1/4 uppercase"
                   type="Date"
                   name="startDate"
                   value={formData.startDate}

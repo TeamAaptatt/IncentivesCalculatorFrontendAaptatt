@@ -4,6 +4,7 @@ import { BASE_URL } from '../../../../constants/api';
 import axios from 'axios';
 import useUserManagement from '../../../../utils/hooks/useUserMangement';
 import showToast from '../../../../utils/helpers/showToast';
+import Select from 'react-select';
 
 const TransferReporting = ({ user, onSubmission }) => {
     // const [isFormOpen, setIsFormOpen] = useState(false);
@@ -46,12 +47,13 @@ const TransferReporting = ({ user, onSubmission }) => {
       });
     };
   
-    const handleReportingToChange = (userId) => {
+    const handleReportingToChange = (selectedOption) => {
       setFormData({
         ...formData,
-        reportingTo: userId,
+        reportingTo: selectedOption.value, 
       });
     };
+    
   
     const handleSubmit =async (e) => {
       e.preventDefault();
@@ -106,6 +108,16 @@ const TransferReporting = ({ user, onSubmission }) => {
             }
         })
         console.log(response.data);
+        showToast(response.data?.message, {
+          duration: 3000,
+          position: 'top-center',
+          style: {
+            border: '1px solid',
+            padding: '4px',
+            color: 'white',
+            background: '#FF0000',
+          },
+        }); 
     } catch (err) {
       showToast(err.response.data?.message, {
         duration: 3000,
@@ -120,22 +132,17 @@ const TransferReporting = ({ user, onSubmission }) => {
     }
    } 
     return (
-      <div className="flex items-center my-4">
+      <div className="flex items-center my-4  absolute z-50 bg-white border-2 p-2 shadow-lg">
         <form className="mt-4" onSubmit={handleSubmit}>
           <label className='font-medium '>
-           Reporting
-            <select
-              name="reportingTo"
-              value={formData.reportingTo}
-              onChange={(e) => handleReportingToChange(e.target.value)}
-              className=' w-24 font-medium mx-2 border p-2'
+           <h1 className='ml-2'>Reporting:</h1> 
+          <Select
+  options={filteredUsers.map(user => ({ value: user._id, label: `${user.name} (${user.cid})` }))}
+  value={{ value: formData.reportingTo, label: filteredUsers.find(user => user._id === formData.reportingTo)?.name }}
+  onChange={handleReportingToChange}
+  className='w-full font-medium mx-2 border p-2'
+/>
 
-            >
-              <option value="" disabled>Select</option>
-              {filteredUsers.map((user) => (
-                <option key={user._id} value={user._id}>{`${user.name} (${user.cid})`}</option>
-              ))}
-            </select>
           </label>
           <label className=' font-medium mx-4'>
             Start Date

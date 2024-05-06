@@ -33,8 +33,16 @@ const UserProfile = () => {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeInOut' } },
   };
+const isBlocked = useSelector((state)=>state?.user?.userData?.userData?.isBlocked)
 
-  
+if (isBlocked) {
+  return (
+    <div className="w-full flex justify-center">
+      <p className="text-red-500 text-xl font-semibold">You are not allowed to access this page. Please Contact support for further details.</p>
+    </div>
+  );
+}
+
  
 
   return (

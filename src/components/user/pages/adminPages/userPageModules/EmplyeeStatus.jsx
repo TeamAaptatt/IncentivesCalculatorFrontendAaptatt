@@ -14,17 +14,36 @@ const EmplyeeStatus = ({ cid }) => {
   const [error, setError] = useState("");
   const [statusData, setStatusData] = useState(null);
   const [toggle, setToggle] = useState(true);
+  const [isBlocked, setIsBlocked] = useState(false)
 
   useEffect(() => {
     getLatestReporing();
     getStatusOfEmployee();
+    
   }, []);
+
+  const blockUser = async () => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/block-user/${cid}`,
+        null, // No data payload
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+  
+      setIsBlocked(await response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  
 
   const getLatestReporing = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/latest-reporting/${cid}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+        headers: { Authorization: `Bearer ${token}` }
+      },);
 
       const data = response.data;
       setReporting(data);
@@ -48,6 +67,9 @@ const EmplyeeStatus = ({ cid }) => {
       if (data.status === "Left") {
         setToggle(false);
       }
+      console.log(data.isBlocked);
+      setIsBlocked(data.isBlocked)
+
     } catch (error) {
       console.log(error);
     }
@@ -186,15 +208,29 @@ const EmplyeeStatus = ({ cid }) => {
               </button>
             </>
           ) : (
-            <>
-              <h2 className="flex mt-6">
+            <div className="flex">
+            <div>
+                <h2 className="flex mt-6">
                 <span className="mx-6 block uppercase font-medium text-sm">
                   {" "}
                   This employee was terminated on{" "}
                   {formatDate(statusData?.statuschangedate)}
                 </span>
+                
               </h2>
-            </>
+              </div>
+              <div>
+                  <button
+                  onClick={blockUser}
+                  className={`${isBlocked?'hover:bg-green-700 bg-green-600 ':'hover:bg-red-700 bg-red-600 '} p-4  w-24 text-white  rounded-2xl border-2`}
+
+                  > {isBlocked? "Unblock": "Block"}</button>
+
+              </div>
+
+
+
+            </div>
           )}
         </div>
       </div>
