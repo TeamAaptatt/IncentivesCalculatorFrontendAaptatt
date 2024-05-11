@@ -16,6 +16,7 @@ const IncentiveCalculator = () => {
   const {users, filteredUsers} = useUserManagement();
   const [selectedDateRange, setSelectedDateRange] = useState(generateFiscalYearOptions().slice(-1)[0].value);
   const[incentivePeriod, setIncentivePeriod] = useState(null)
+  const [targetData, setTargetData] = useState([])
 
   const loading = useSelector((state) => state.loader.loading);
   const token = useSelector((state) => state.auth.token.token);
@@ -31,7 +32,7 @@ const IncentiveCalculator = () => {
 
     setIncentiveData(null);
     dispatch(setLoading(true));
-    const { startDate, endDate} = incentivePeriod;
+    const { startDate, endDate, period} = incentivePeriod;
     try {
       const response = await axios.post(
         BASE_URL + `/calculate-incentive/${cid}`,{
@@ -45,6 +46,19 @@ const IncentiveCalculator = () => {
         }
       );
       setIncentiveData(response.data);
+      const newData = {
+        startDate: startDate,
+        endDate: endDate,
+        target: response.data?.target,
+        achievedTarget:response.data.achievedTarget,
+        incentiveAmount:response.data.incentiveAmount,
+        user:response.data.user, 
+        period:period
+      };
+      console.log(response.data);
+      if (!targetData.some(data => data.period === period )) {
+        setTargetData(prevData => [...prevData, newData]);
+      }      
     } catch (error) {
       showToast(error.response.data.message, {
         duration: 3000,
@@ -179,6 +193,8 @@ console.log(startDate, endDate);
 setIncentivePeriod({
   startDate: startDate.toISOString(),
   endDate: endDate.toISOString(),
+  period:`Q${quarter}`
+
 })
 
 
@@ -204,7 +220,9 @@ const handleYearButtonClick = () => {
   
   setIncentivePeriod({
     startDate: startDate.toISOString(),
-    endDate: endDate.toISOString()
+    endDate: endDate.toISOString(),
+    period:`Yearly`
+
   })
 
 };
@@ -227,10 +245,13 @@ console.log(startDate, endDate);
   setIncentivePeriod({
     startDate: startDate,
     endDate: endDate,
+    period:`H${halfYear}`
+
   })
 
 };
 const handleDateRangeChange = (event) => {
+  setTargetData([])
   setSelectedDateRange(event.target.value);
 };
  console.log(incentivePeriod);
@@ -332,29 +353,43 @@ const cidValidator = ()=>{
             {loading ? (
               <></>
             ) : (
-              <table className="mt-4 text-gray-600 text-center border-collapse border border-black">
-  <thead>
-    <tr className="">
-      <th className="border border-black px-4 py-2">Target</th>
-      <th className="border border-black px-4 py-2">Achieved Target</th>
-      <th className="border border-black px-4 py-2">Incentive Amount</th>
-    </tr>
-  </thead>
-  <tbody> 
-    <tr className="">
-      <td className="border border-black px-4 py-2 text-nowrap">
-       ₹ {formatNumberIndianSystem(incentiveData?.target?.toFixed(2))}
-      </td>
-      <td className="border border-black px-4 py-2 text-nowrap">
-       ₹ {formatNumberIndianSystem(incentiveData?.achievedTarget?.toFixed(2))}
-      </td>
-      <td className="border border-black px-4 py-2 text-nowrap">
-       ₹ {formatNumberIndianSystem(incentiveData?.incentiveAmount?.toFixed(2))}
-      </td>
-    </tr>
-  </tbody>
-</table>
+              <div className=" grid grid-cols-2  w-[60vw] mt-10  ">
+                <table className="mx-4 border-collapse  border border-gray-800 ">
+              <thead>
+                <tr>
+                  <th className="border border-gray-800 px-4 py-2 text-left">Period</th>
+                  <th className="border border-gray-800 px-4 py-2 text-left">Target</th>
+                  <th className="border border-gray-800 px-4 py-2 text-left">Achieved Target</th>
+                  <th className="border border-gray-800 px-4 py-2 text-left">Incentive Amount</th>
+                </tr>
+              </thead>
+              {targetData?.map((incentiveData)=>{
+                return(
+              
+              <tbody>
+                <tr>
+                <td className="border border-gray-800 px-4 py-2">
+                  {incentiveData?.period}
 
+                  </td>
+                  <td className="border border-gray-800 px-4 py-2">
+                  ₹{formatNumberIndianSystem(incentiveData?.target.toFixed(2))}
+
+                  </td>
+                  <td className="border border-gray-800 px-4 py-2">
+                    ₹{formatNumberIndianSystem(incentiveData?.achievedTarget.toFixed(2))}
+
+                  </td>
+                  <td className="border border-gray-800 px-4 py-2">
+                    ₹{formatNumberIndianSystem(incentiveData?.incentiveAmount?.toFixed(2))}
+                  </td>
+                </tr>
+              </tbody>
+                )
+              })}
+                          </table>
+
+            </div>
             )}
           </>
         ) : null}

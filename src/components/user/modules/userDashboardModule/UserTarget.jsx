@@ -2,11 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../../../../constants/api";
 import { useDispatch, useSelector } from "react-redux";
-import Loader from "../../../Loader";
 import { setLoading } from "../../../../utils/redux/loadSlice/loadSlice";
 import showToast from "../../../../utils/helpers/showToast";
-import useUserManagement from "../../../../utils/hooks/useUserMangement";
-import { generateFiscalYearOptions } from "../../../../utils/helpers/genereateDateRange";
 import { formatNumberIndianSystem } from "../../../../utils/helpers/formatNumberInIndianSystem";
 
 const UserTarget = ({selectedDate}) => {
@@ -21,6 +18,7 @@ const UserTarget = ({selectedDate}) => {
   const loading = useSelector((state) => state.loader.loading);
   const token = useSelector((state) => state.auth.token.token);
   const [selectedDateRange, setSelectedDateRange] = useState(selectedDate)
+  const [targetData, setTargetData] = useState([])
   const dispatch = useDispatch();
   useEffect(() => {
     if (incentivePeriod) {
@@ -35,7 +33,7 @@ const UserTarget = ({selectedDate}) => {
     setIncentiveData(null);
     dispatch(setLoading(true));
     setCid(user.cid);
-    const { startDate, endDate} = incentivePeriod;
+    const { startDate, endDate, period} = incentivePeriod;
     try {
       const response = await axios.post(
         BASE_URL + `/target/${user.cid}`,{
@@ -49,9 +47,20 @@ const UserTarget = ({selectedDate}) => {
         }
       );
       setIncentiveData(response.data);
-      console.log(incentiveData, "hereS");
+      const newData = {
+        startDate: startDate,
+        endDate: endDate,
+        target: response.data.target,
+        achievedTarget:response.data.achievedTarget,
+        user:response.data.user, 
+        period:period
+      };
+      console.log(response.data);
+      if (!targetData.some(data => data.period === period )) {
+        setTargetData(prevData => [...prevData, newData]);
+      }      
     } catch (error) {
-      showToast(error.response.data.message, {
+      showToast(error.response?.data.message, {
         duration: 3000,
         position: "top-center",
         style: {
@@ -89,7 +98,7 @@ const UserTarget = ({selectedDate}) => {
      console.log(user.cid);
      switch(level.level.level){
        case 'Level 1':
-         return (<div className=' flex  items-center  gap-2 m-2 w-fit flex-wrap'>
+         return (<div className='flex  right-0 w-96  mb-2 absolute gap-2 m-2  justify-end items-end  flex-wrap'>
                        <button
                  type="button"
                  onClick={() => handleQuarterButtonClick(1)}
@@ -121,7 +130,7 @@ const UserTarget = ({selectedDate}) => {
  
          </div>);
         case 'Level 2':
-         return (<div className='flex items-center gap-2 m-2 w-fit flex-wrap'>
+         return (<div className='flex  right-0 w-96  mb-2 absolute gap-2 m-2  justify-end items-end  flex-wrap'>
          <button
                  type="button"
                  onClick={() => handleHalfYearButtonClick(1)}
@@ -143,15 +152,15 @@ const UserTarget = ({selectedDate}) => {
                    case 'Level 5':
                    case 'Level 6':
                      return (
-                       <div className='flex flex-col items-center gap-2 m-2 w-fit'>
+                      <div className='flex  right-0 w-96  mb-2 absolute gap-2 m-2  justify-end items-end  flex-wrap'>
                          <button
                            type="button"
                            onClick={() => handleYearButtonClick()}
-                           className="bg-[#0a3a2a]  text-white p-2 w-fit rounded-md hover:bg-[#4d9981] "
+                           className="bg-[#0a3a2a]  text-white p-2 mt-3 w-fit rounded-md hover:bg-[#4d9981] "
                          >
                  See Target
                          </button>
-                       </div>
+                         </div>
                      );
            
        default:
@@ -182,6 +191,7 @@ console.log(startDate, endDate);
 setIncentivePeriod({
   startDate: startDate.toISOString(),
   endDate: endDate.toISOString(),
+  period:`Q${quarter}`
 })
 
 
@@ -207,7 +217,9 @@ const handleYearButtonClick = () => {
   
   setIncentivePeriod({
     startDate: startDate.toISOString(),
-    endDate: endDate.toISOString()
+    endDate: endDate.toISOString(),
+    period:`Yearly`
+
   })
 
 };
@@ -230,21 +242,16 @@ console.log(startDate, endDate);
   setIncentivePeriod({
     startDate: startDate,
     endDate: endDate,
+    period:`H${halfYear}`
   })
 
 };
 const handleDateRangeChange = (event) => {
+  setTargetData([])
   setSelectedDateRange(selectedDate);
 };
  console.log(incentivePeriod);
-const cidValidator = ()=>{
-  setError('')
 
-  if (!validateCid(cid)) {
-    setError(true);
-    return;
-  }
-}  
   return (
     <div className=" mt-2 flex flex-col">
       <div className=" flex  ">
@@ -290,7 +297,7 @@ const cidValidator = ()=>{
           )}
         </>
       ) : null}
-      <div className="w-full flex flex-wrap max-w-md  bg-inherit ">
+      <div className="w-full flex justify bg-inherit ">
         <div className="mb-4 flex flex-col">
           
 
@@ -310,29 +317,43 @@ const cidValidator = ()=>{
             {loading ? (
               <></>
             ) : (
-              <table className="border-collapse translate-x-[-12rem] border text-white border-gray-800 transte y-[6rem]">
+              <div className=" grid grid-cols-2  w-[60vw] mt-10  ">
+                <table className="mx-4 border-collapse  border text-white border-gray-800 ">
               <thead>
                 <tr>
-                  <th className="border border-gray-800 px-4 py-2 text-left">Achieved Target</th>
+                  <th className="border border-gray-800 px-4 py-2 text-left">Period</th>
                   <th className="border border-gray-800 px-4 py-2 text-left">Target</th>
+                  <th className="border border-gray-800 px-4 py-2 text-left">Achieved Target</th>
                   <th className="border border-gray-800 px-4 py-2 text-left">Pending</th>
                 </tr>
               </thead>
+              {targetData?.map((incentiveData)=>{
+                return(
+              
               <tbody>
                 <tr>
+                <td className="border border-gray-800 px-4 py-2">
+                  {incentiveData?.period}
+
+                  </td>
+                  <td className="border border-gray-800 px-4 py-2">
+                  ₹{formatNumberIndianSystem(incentiveData.target.toFixed(2))}
+
+                  </td>
                   <td className="border border-gray-800 px-4 py-2">
                     ₹{formatNumberIndianSystem(incentiveData.achievedTarget.toFixed(2))}
+
                   </td>
                   <td className="border border-gray-800 px-4 py-2">
-                    ₹{formatNumberIndianSystem(incentiveData.target.toFixed(2))}
-                  </td>
-                  <td className="border border-gray-800 px-4 py-2">
-                    ₹{formatNumberIndianSystem(incentiveData.target - incentiveData.achievedTarget)}
+                    ₹{formatNumberIndianSystem(incentiveData.target.toFixed(2) - incentiveData.achievedTarget.toFixed(2))}
                   </td>
                 </tr>
               </tbody>
-            </table>
-            
+                )
+              })}
+                          </table>
+
+            </div>
             )}
           </>
         ) : null}

@@ -13,10 +13,11 @@ import { validateFormData } from "../../../../utils/helpers/validationHelpers";
 const AddPlacementButton = ({ getAllPlacements }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    //status: '',
+    status: 'Offered',
     candidate: "",
     client: "",
     offeredPosition: "",
+    offeredDate:"",
     dateOfJoining: "",
     cnadidateOwner: "",
     accountManager: "",
@@ -27,8 +28,8 @@ const AddPlacementButton = ({ getAllPlacements }) => {
     commercial: "",
     fee: "",
     // sendOff: "",
-    securityPeriod: "",
-    paymentStaus: "",
+    securityPeriod: "On-Going",
+    paymentStaus: "Pending",
   });
   const [errors, setErrors] = useState({});
   const token = useSelector((state) => state.auth.token.token);
@@ -91,10 +92,11 @@ const AddPlacementButton = ({ getAllPlacements }) => {
       setIsModalOpen(false);
 
       setFormData({
-        //status: '',
+        status: 'Offered',
         candidate: "",
         client: "",
         offeredPosition: "",
+        offeredDate:"",
         dateOfJoining: "",
         cnadidateOwner: "",
         accountManager: "",
@@ -105,8 +107,8 @@ const AddPlacementButton = ({ getAllPlacements }) => {
         commercial: "",
         fee: "",
         // sendOff: "",
-        securityPeriod: "",
-        paymentStaus: "",
+        securityPeriod: "On-Going",
+        paymentStaus: "Pending",
       });
     } catch (error) {
       showToast(error.response?.data?.error, {
@@ -184,9 +186,9 @@ const AddPlacementButton = ({ getAllPlacements }) => {
               {Object.entries(formData).map(([key, value]) => (
                 <div key={key}>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {key.replace(/([a-z])([A-Z])/g, "$1 $2")}:
+                    {key==='cnadidateOwner'?'Candidate Owner':key==='paymentStaus'?'Payment Status':key.replace(/([a-z])([A-Z])/g, "$1 $2")}:
                   </label>
-                  {key === "dateOfJoining" ? (
+                  {key === "dateOfJoining"||key==='offeredDate' ? (
                     <input
                       type="date"
                       name={key}
@@ -194,7 +196,7 @@ const AddPlacementButton = ({ getAllPlacements }) => {
                       onChange={handleInputChange}
                       className="p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-500 uppercase"
                     />
-                  ) : key === "securityPeriod" || key === "paymentStaus" ? (
+                  ) : key === "securityPeriod" || key === "paymentStaus"||key==="status" ? (
                     <select
                       name={key}
                       value={value}
@@ -209,13 +211,17 @@ const AddPlacementButton = ({ getAllPlacements }) => {
                               </option>
                             )
                           )
-                        : [
+                        :key==="paymentStaus"? [
                             "Pending",
                             "Received",
                             "Adjusted",
                             "Returning",
                             "Compromised",
                           ].map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          )):["Offered","Joined", "Send-Off", "Back Out" ].map((option)=>(
                             <option key={option} value={option}>
                               {option}
                             </option>

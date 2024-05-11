@@ -12,13 +12,13 @@ const ProfileAnalysis = () => {
     const token = useSelector((store)=>store.auth.token?.token) || '';
 
     const [placements, setPlacement] = useState({});
-
+    const [offeredPlacements, setOffredPlacements] = useState({});
   useEffect(() => {
     const fetchPlacementCounts = async () => {
         const [startDate, endDate] = selectedDateRange.split(",");
 
       try {
-        const response = await axios.post(`${BASE_URL}placements-test/${userId}`, { startDate, endDate },{
+        const response = await axios.post(`${BASE_URL}/get-Placements-by-month/${userId}`, { startDate, endDate },{
             headers: {
                 'Authorization': `Bearer ${token}`,
               }
@@ -31,49 +31,67 @@ const ProfileAnalysis = () => {
     };
 
     fetchPlacementCounts();
+    fetchofferedPlacement();
+    
   }, [userId, selectedDateRange]);
-   
-  const organizePlacementsByMonth = () => {
-    const organizedPlacements = {};
 
-    placements.placements?.forEach(placement => {
-      const month = new Date(placement.dateOfJoining).getMonth();
-      if (!organizedPlacements[month]) {
-        organizedPlacements[month] = [];
-      }
-      organizedPlacements[month].push(placement);
+  const fetchofferedPlacement = async () =>{
+    const [startDate, endDate] = selectedDateRange.split(",");
+
+    try {
+      const response = await axios.post(`${BASE_URL}/get-offered-placement/${userId}`, { startDate, endDate },{
+        headers: {
+            'Authorization': `Bearer ${token}`,
+          }
     });
+    setOffredPlacements(response.data);
+    console.log(offeredPlacements);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+   
+  // const organizePlacementsByMonth = () => {
+  //   const organizedPlacements = {};
 
-    return organizedPlacements;
-  };
+  //   placements.placements?.forEach(placement => {
+  //     const month = new Date(placement.dateOfJoining).getMonth();
+  //     if (!organizedPlacements[month]) {
+  //       organizedPlacements[month] = [];
+  //     }
+  //     organizedPlacements[month].push(placement);
+  //   });
+
+  //   return organizedPlacements;
+  // };
+
 
     const handleDateRangeChange = (event) => {
         setSelectedDateRange(event.target.value);
       };
 
-      const calculateTotalFeesByMonth = () => {
-        const totalFeesByMonth = {};
+      // const calculateTotalFeesByMonth = () => {
+      //   const totalFeesByMonth = {};
       
-        placements?.placements?.forEach(placement => {
-          const month = new Date(placement.dateOfJoining).getMonth();
-          totalFeesByMonth[month] = (totalFeesByMonth[month] || 0) + (placement.fee || 0);
-        });
+      //   placements?.placements?.forEach(placement => {
+      //     const month = new Date(placement.dateOfJoining).getMonth();
+      //     totalFeesByMonth[month] = (totalFeesByMonth[month] || 0) + (placement.fee || 0);
+      //   });
       
-        return totalFeesByMonth;
-      };
+      //   return totalFeesByMonth;
+      // };
       
       
-
       const renderTable = () => {
         const months = Array.from({ length: 12 }, (_, i) => new Date(null, i + 1, 0).toLocaleString('default', { month: 'long' }));
-        const organizedPlacements = organizePlacementsByMonth();
+        const organizedPlacements = placements?.placements||{};
     
         return (
           <table className="w-1/2 divide-y divide-gray-200">
             <thead className="bg-[#0a3a2a]">
               <tr>
-                {months.map((month, index) => (
-                  <th key={index} scope="col" className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                {months?.map((month, index) => (
+                  <th key={index} scope="col" className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                     {month}
                   </th>
                 ))}
@@ -81,8 +99,8 @@ const ProfileAnalysis = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               <tr>
-                {months.map((_, index) => (
-                  <td key={index} className="px-6 py-4 whitespace-nowrap  text-white">
+                {months?.map((_, index) => (
+                  <td key={index} className="px-3 py-4 whitespace-nowrap  text-white">
                     {organizedPlacements[index]?.length || 0}
                   </td>
                 ))}
@@ -93,14 +111,14 @@ const ProfileAnalysis = () => {
       };
       const renderTableFeeDistribution = () => {
         const months = Array.from({ length: 12 }, (_, i) => new Date(null, i + 1, 0).toLocaleString('default', { month: 'long' }));
-        const totalFeesByMonth = calculateTotalFeesByMonth();
+        const totalFeesByMonth = placements?.fee || {};
     
         return (
-          <table className="max-w-1/2 divide-y divide-gray-200">
+          <table className="w-1/2 divide-y divide-gray-200">
             <thead className="bg-[#0a3a2a]">
               <tr>
                 {months.map((month, index) => (
-                  <th key={index} scope="col" className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                  <th key={index} scope="col" className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                     {month}
                   </th>
                 ))}
@@ -109,8 +127,62 @@ const ProfileAnalysis = () => {
             <tbody className=" divide-y divide-gray-200">
               <tr>
                 {months.map((_, index) => (
-                  <td key={index} className="px-6 py-4 whitespace-nowrap  text-white">
+                  <td key={index} className="px-3 py-4 whitespace-nowrap  text-white">
                     {totalFeesByMonth[index] || 0}
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        );
+      };
+      const renderOfferedTable = () => {
+        const months = Array.from({ length: 12 }, (_, i) => new Date(null, i + 1, 0).toLocaleString('default', { month: 'long' }));
+        const organizedPlacements = offeredPlacements?.placements||{};
+    
+        return (
+          <table className="w-1/2  divide-y divide-gray-200">
+            <thead className="bg-[#0a3a2a]">
+              <tr>
+                {months?.map((month, index) => (
+                  <th key={index} scope="col" className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                    {month}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              <tr>
+                {months?.map((_, index) => (
+                  <td key={index} className="px-3 py-4 whitespace-nowrap  text-white">
+                    {organizedPlacements[index]?.length || 0}
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        );
+      };
+      const renderofferdTableFeeDistribution = () => {
+        const months = Array.from({ length: 12 }, (_, i) => new Date(null, i + 1, 0).toLocaleString('default', { month: 'long' }));
+        const totalFeesByMonth = offeredPlacements?.fee || {};
+    
+        return (
+          <table className=" w-1/2 divide-y divide-gray-200">
+            <thead className="bg-[#0a3a2a]">
+              <tr>
+                {months.map((month, index) => (
+                  <th key={index} scope="col" className="px-3 text-center py-3  text-xs font-medium text-white uppercase tracking-wider">
+                    {month}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="w-1/2 divide-y divide-gray-200">
+              <tr>
+                {months.map((_, index) => (
+                  <td key={index} className="px-3 py-4 whitespace-nowrap  text-white">
+                    { totalFeesByMonth[index] || 0}
                   </td>
                 ))}
               </tr>
@@ -144,18 +216,37 @@ const ProfileAnalysis = () => {
           </select>
  
     </div>
+    <div className=' justify-end flex w-full mt-3'>
     <UserTarget selectedDate={selectedDateRange}/>
     </div>
+    </div>
+
+    <div></div>
     <div className='ml-4 w-96  flex flex-1 flex-wrap '>
 
-    <h1 className='w-full font-medium uppercase text-white text-xl m-4 p-2 '>Month-Wise Placemnents</h1>     
+<h1 className='w-full font-medium uppercase text-white text-l my-2 py-2 '>Month-Wise offered Placemnents</h1>     
+{renderOfferedTable()}
+
+</div>
+<div className='ml-4 w-96  flex flex-1 flex-wrap '>
+
+    <h1 className='w-full font-medium uppercase text-white text-l my-2 py-2 '>Month-Wise Offred Placemnents Fee</h1>     
+    {renderofferdTableFeeDistribution()}
+
+    </div>
+
+
+
+    <div className='ml-4 w-96  flex flex-1 flex-wrap '>
+
+    <h1 className='w-full font-medium uppercase text-white text-l my-2 py-2 '>Month-Wise Placemnents</h1>     
     {renderTable()}
 
     </div>
 
-    <div className='ml-4  w-96 flex  flex-1 flex-wrap '>
+    <div className='ml-4  w-996flex  flex-1 flex-wrap '>
 
-    <h1 className='w-full font-medium uppercase text-xl m-4 p-2  text-white'>Month-Wise Placemnents Fee</h1>     
+    <h1 className='w-full font-medium uppercase text-l my-2 py-2  text-white'>Month-Wise Placemnents Fee</h1>     
     {renderTableFeeDistribution()}
 
     </div>

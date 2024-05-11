@@ -6,7 +6,7 @@ import axios from 'axios'
 import { BASE_URL } from '../../../constants/api'
 import { generateFiscalYearOptions } from '../../../utils/helpers/genereateDateRange'
 
-const UserDashboard = () => {
+const PlacementDashboard = () => {
    const {getUserDetails} = useUserDetails()
    const [placementData, setPlacementData] = useState([]);
 
@@ -53,8 +53,8 @@ const handleDateRangeChange = (event) => {
 
 
   return (
-    <div className='text-center'>
-            <h1 className='text-center text-3xl font-bold mb-4 uppercase'>My Placements</h1>
+    <div className='text-center min-h-screen '>
+            <h1 className='text-center text-3xl font-bold mb-4 uppercase text-white'>My Placements</h1>
 
     <div className="p-2  flex flex-col justify-start items-start">
           <select value={selectedDateRange} onChange={handleDateRangeChange} className=' border-2 m-4 bg-inherit text-white border-[#0a3a2a] p-2 rounded '>
@@ -84,4 +84,4 @@ const handleDateRangeChange = (event) => {
   )
 }
 
-export default UserDashboard
+export default PlacementDashboard

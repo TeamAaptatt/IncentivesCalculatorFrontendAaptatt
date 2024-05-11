@@ -22,24 +22,26 @@ const useUserManagement = () => {
         });
         const data = response.data;
         setUsers(data);
-        const filteredData = data.map(user => {
-          const levelRangesCopy = [...user.levelRanges];
+        const filteredData = data?.map(user => {
+          const levelRangesCopy = [...user?.levelRanges];
           const lastElementInLevel = levelRangesCopy.pop();
           return {
             ...user,
             levelRanges: levelRangesCopy,
           };
         });
-        setFilteredUsers(filteredData.filter(user => {
-          const lastLevel = user.levelRanges[user.levelRanges.length - 1]?.level?.level;
-          return lastLevel !== 'Level 1' && lastLevel !== 'Level 2';
+        console.log(filteredData);
+        setFilteredUsers(users.filter(user => {
+          const lastLevel = user?.levelRanges[user.levelRanges.length - 1]?.level?.level;
+          return (lastLevel !== 'Level 1') && (lastLevel !== 'Level 2');
         }));
-        setUsersAboveFour(filteredData.filter(user => {
-          const lastLevel = user.levelRanges[user.levelRanges.length - 1]?.level?.level;
-          return lastLevel !== 'Level 1' && lastLevel !== 'Level 2' && lastLevel !== 'Level 3';
+        setUsersAboveFour(users?.filter(user => {
+          const lastLevel = user?.levelRanges[user?.levelRanges?.length - 1]?.level?.level;
+          console.log(lastLevel);
+          return (lastLevel !== 'Level 1') && (lastLevel !== 'Level 2') && (lastLevel !== 'Level 3');
         }));
-
-        console.log(usersAboveFour);
+        
+       
       } catch (err) {
         setError(err);
         console.error(err);

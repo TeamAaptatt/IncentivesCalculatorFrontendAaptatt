@@ -66,12 +66,12 @@ export function validateFormData(formData) {
    if (formData.sendOff &&  !/^\d+$/.test(formData.sendOff)) {
     errors.sendOff = 'Send Off must contain only numbers.';
   }
-  if (!formData.securityPeriod) {
-    errors.securityPeriod= 'Please Select Security Period .';
-  } 
-  if (!formData.paymentStaus) {
-    errors.paymentStaus= 'Please Select Payment  Status.' ;
-  }
+  // if (!formData.securityPeriod) {
+  //   errors.securityPeriod= 'Please Select Security Period .';
+  // } 
+  // if (!formData.paymentStaus) {
+  //   errors.paymentStaus= 'Please Select Payment  Status.' ;
+  // }
   
         
   

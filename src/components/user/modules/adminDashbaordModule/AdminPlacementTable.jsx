@@ -19,6 +19,7 @@ import {
   fields,
   paymentStatusOptions,
   securityPeriodOptions,
+  statusOptions,
 } from "../../../../constants/placementTable";
 import { getFieldOptions } from "../../../../utils/helpers/getFieldOptions";
 import '../../../../Styles.css'
@@ -27,6 +28,7 @@ import { formatDateForInput } from "../../../../utils/helpers/formatDateforInput
 import { exportToExcel } from "../../../../utils/helpers/exportToExcel";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
+import { formatDate } from "../../../../utils/helpers/formatDate";
 
 const AdminPlacementTable = () => {
   const token = useSelector((state) => state.auth.token.token);
@@ -322,7 +324,7 @@ const AdminPlacementTable = () => {
         "Fee": "fee",
         "Send Off": "sendOff",
         "Security Period": "securityPeriod",
-        "Payment Status": "paymentStatus",
+        "Payment Status": "paymentStaus",
     };
 
     const data = filteredPlacements.map(placement => {
@@ -440,25 +442,29 @@ const AdminPlacementTable = () => {
                         key={fieldIndex}
                         className="px-6 py-2 whitespace-nowrap border border-gray-800"
                       >
-                        {fieldIndex === 14 || fieldIndex === 15 ? (
+                        {fieldIndex === 15 || fieldIndex === 16 || fieldIndex === 0? (
                           <select
                             onChange={(e) => handleInputChange(e, field)}
                             value={placement[field]}
                             className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                           >
-                            {fieldIndex === 14
+                            {fieldIndex === 15
                               ? securityPeriodOptions.map((option, index) => (
                                   <option key={index} value={option}>
                                     {option}
                                   </option>
                                 ))
-                              : paymentStatusOptions.map((option, index) => (
+                              : fieldIndex === 16? paymentStatusOptions.map((option, index) => (
                                   <option key={index} value={option}>
                                     {option}
                                   </option>
+                                )): statusOptions.map((option, index)=>(
+                                  <option key={index} value={option}> 
+                                  {option}
+                                  </option>
                                 ))}
                           </select>
-                        ) : fieldIndex === 4 ? (
+                        ) : fieldIndex === 4 ||fieldIndex === 5? (
                           <>
                             <input
                               type="date"
@@ -471,10 +477,10 @@ const AdminPlacementTable = () => {
                           <input
                             onChange={(e) => handleInputChange(e, field)}
                             className={`${
-                              fieldIndex === 5 ||
                               fieldIndex === 6 ||
                               fieldIndex === 7 ||
-                              fieldIndex === 8
+                              fieldIndex === 8 ||
+                              fieldIndex === 9
                                 ? "hidden"
                                 : "visible border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                             }`}
@@ -606,12 +612,9 @@ const AdminPlacementTable = () => {
                           ? `${placement[field]?.name} (${placement[field]?.cid})`
                           : field === "pandLhead"
                           ? `${placement[field].name} (${placement[field].cid})`
-                          : field === "dateOfJoining"
-                          ? // ? new Date(placement[field]).toLocaleDateString()
-                            new Date(placement[field]).toLocaleDateString(
-                              "en-US",
-                              { day: "numeric", month: "long", year: "numeric" }
-                            )
+                          : field === "dateOfJoining" || field === "offeredDate"
+                          ? formatDate(placement[field])
+                           
                           : field === "accountHead"
                           ? `${placement[field].name} (${placement[field].cid})`
                           : placement[field]}

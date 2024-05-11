@@ -21,6 +21,8 @@ export function formatNumberIndianSystem(number) {
     if (number < 0) {
         formattedNumber = "-" + formattedNumber;
     }
-
+    if(formattedNumber===NaN){
+        return 0;
+    }
     return formattedNumber;
 }

@@ -4,6 +4,7 @@ export const dataFields = [
     "Candidate",
     "Client",
     "Offered Position",
+    "Offered Date",
     "Date Of Joining",
     "Candidate Owner",
     "Account Manager",
@@ -23,6 +24,7 @@ export const dataFields = [
     "candidate",
     "client",
     "offeredPosition",
+    "offeredDate",
     "dateOfJoining",
     "cnadidateOwner",
     "accountManager",
@@ -36,5 +38,6 @@ export const dataFields = [
     "securityPeriod",
     "paymentStaus",
   ];
-  export const securityPeriodOptions = ["On-Going", "Completed", "Send-Off"]; // Replace with your actual options
-  export const paymentStatusOptions = ["Pending", "Received", "Adjusted", "Returning", "Compromised"]; // Replace with your actual options
+  export const securityPeriodOptions = ["On-Going", "Completed", "Send-Off"]; 
+  export const paymentStatusOptions = ["Pending", "Received", "Adjusted", "Returning", "Compromised"]; 
+  export const statusOptions = ["Joined","Offered", "Send-Off", "Back Out" ];
