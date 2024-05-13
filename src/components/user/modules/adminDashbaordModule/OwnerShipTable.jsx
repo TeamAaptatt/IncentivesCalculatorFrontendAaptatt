@@ -399,12 +399,12 @@ const OwnerShipTable = () => {
         </div>
         <div className=" w-1/2 flex justify-end gap-2">
         <button
-            className="bg-pink-600 hover:bg-pink-700 my-2  text-white font-bold py-2 px-2 rounded"
+            className="bg-[#0A3A2A] hover:bg-[#4D9981] my-2  text-white font-bold py-2 px-2 rounded"
 
         onClick={handleExportToExcel}>Export to Excel</button>
 
           <button
-            className="bg-pink-600 hover:bg-pink-700 my-2  text-white font-bold py-2 px-2 rounded"
+            className="bg-[#0A3A2A] hover:bg-[#4D9981] my-2  text-white font-bold py-2 px-2 rounded"
             onClick={() => setCreateReprtingToggle((prev) => !prev)}
           >
             Add Ownership
@@ -426,7 +426,7 @@ const OwnerShipTable = () => {
                     className={`py-4 px-2  font-semibold  text-[1rem]  text-nowrap  w-20  border-x border-gray-800 border-collapse ${
                       index === tableHeadNames.length - 1
                         ? "sticky right-0 bg-white"
-                        :index===1? "sticky left-0 outline-1	bg-white outline ":""
+                        :index===2? "sticky left-0 outline-1	bg-white outline ":""
                     }`}
                   >
                     {head}

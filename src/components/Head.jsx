@@ -10,11 +10,14 @@ import { faBell, faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons'
 import NotificationBox from './user/modules/adminDashbaordModule/NotificationBox';
 
 const Head = () => {
+   
+
     const dispatch = useDispatch();
     const [toggle, setToggle] = useState(false);
     const dropdownRef = useRef(null);
-    const [notificationToggle, setNotificationToggle] = useState(false);
-    const notificationCount = useSelector((state)=>state?.notification?.notifications)
+    const [notificationToggle, setNotificationToggle] = useState(true);
+    const userType = useSelector((state)=>state.user?.userData?.userData?.type||'user')
+    
     const handleLogout = async () => {
         try {
             await signOut(auth);
@@ -50,16 +53,7 @@ const Head = () => {
 
             <div className=' flex gap-2' ref={dropdownRef}>
             <div className="relative">
-                <div className="absolute right-[-8px] top-[-8px] bg-red-500 rounded-full h-8 w-8 text-white text-center font-bold">
-                    {notificationCount?notificationCount:''}
-                </div>
-                <button onClick={() => {setNotificationToggle((prev)=>!prev)}} className="relative">
-                    <FontAwesomeIcon icon={faBell} className="h-8 w-8 m-2 focus:outline-none" />
-                </button>
-                {notificationToggle &&(
-                                 <NotificationBox/>
-
-                )}
+                {userType==='admin'&& <NotificationBox/>}
              </div>
 
                 <button

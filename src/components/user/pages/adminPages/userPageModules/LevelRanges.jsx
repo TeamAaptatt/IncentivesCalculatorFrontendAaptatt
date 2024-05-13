@@ -178,7 +178,7 @@ const LevelRanges = ({ cid }) => {
             <div className="flex justify-between">
               {editingRange === range._id ? (
                 <>
-                  <button onClick={handleUpdate} className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded">
+                  <button onClick={handleUpdate} className="bg-[#0A3A2A] hover:bg-[#4D9981] text-white font-bold py-2 px-4 rounded">
                     Save
                   </button>
                   <button onClick={() => setEditingRange(null)} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
@@ -192,7 +192,7 @@ const LevelRanges = ({ cid }) => {
                     setEditingRange(range._id);
                     setEditLevel(range.level._id);
                     setEditStartDate(formatDateForInput(range.startDate));
-                  }}  className="hover:bg-pink-700 bg-pink-600 outline outline-1 rounded-md w-auto text-white font-semibold p-2">
+                  }}  className="hover:bg-[#4D9981] bg-[#0A3A2A] outline outline-1 rounded-md w-auto text-white font-semibold p-2">
                     Edit  <FontAwesomeIcon className=" ml-2" icon={faEdit} />
                   </button>
                   <button onClick={() => handleDelete(range._id)} className=" hover:bg-slate-100 text-white font-bold py-2 px-4 rounded">

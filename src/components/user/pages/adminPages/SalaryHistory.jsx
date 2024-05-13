@@ -115,7 +115,7 @@ const SalaryHistory = ({userId}) => {
                 <div className="mt-8">
                 <button
                   onClick={() => setRaiseToggle((prev) => !prev)}
-                  className="hover:bg-pink-700 bg-pink-600 outline outline-1 rounded-md  text-white font-semibold p-2"
+                  className="hover:bg-[#4D9981] bg-[#0A3A2A] outline outline-1 rounded-md  text-white font-semibold p-2"
                 >
                   Give a Raise
                 </button>
@@ -207,7 +207,7 @@ const SalaryHistory = ({userId}) => {
                       <>
                         <div className="my-2 flex">
                           <button
-                            className={`${changeStartDateToggle?'hidden':''} hover:bg-pink-700 bg-pink-600 outline outline-1 rounded-md w-auto text-white font-semibold p-2`}
+                            className={`${changeStartDateToggle?'hidden':''} hover:bg-[#4D9981] bg-[#0A3A2A] outline outline-1 rounded-md w-auto text-white font-semibold p-2`}
                             onClick={() =>
                               setChangeStartDateToggle((prev) => !prev)
                             }

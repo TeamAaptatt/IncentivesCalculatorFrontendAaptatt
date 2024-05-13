@@ -164,7 +164,7 @@ const AddPlacementButton = ({ getAllPlacements }) => {
     <div className=" z-20">
       <button
         onClick={() => setIsModalOpen(true)}
-        className=" bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+        className=" bg-[#0A3A2A] hover:bg-[#4D9981] text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
       >
         Add Placement
       </button>
@@ -175,7 +175,7 @@ const AddPlacementButton = ({ getAllPlacements }) => {
           onClick={handleOutsideClick}
         >
           <div className="bg-white w-full md:max-w-[60rem] p-4 md:p-8 rounded-md shadow-lg overflow-y-auto min-h-screen">
-            <h2 className="text-xl md:text-2xl font-bold mb-4 mt-20 text-pink-600">
+            <h2 className="text-xl md:text-2xl font-bold mb-4 mt-20 text-[#0A3A2A]">
               Add Placement
             </h2>
 
@@ -329,13 +329,13 @@ const AddPlacementButton = ({ getAllPlacements }) => {
               <div className="m-8 flex justify-center items-center w-full gap-4">
                 <button
                   type="submit"
-                  className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+                  className="bg-[#0A3A2A] hover:bg-[#4D9981] text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
                 >
                   Submit
                 </button>
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+                  className="bg-[#0A3A2A] hover:bg-[#4D9981] text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
                 >
                   Cancel
                 </button>

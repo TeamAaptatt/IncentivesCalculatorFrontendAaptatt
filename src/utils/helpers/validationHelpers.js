@@ -21,6 +21,13 @@ export function validateFormData(formData) {
   }else if(formData.offeredPosition.length > 80){
     errors.offeredPosition = "Name should be less than or equal to 80 characters.";
   }
+  if (!formData.offeredDate) {
+    errors.offeredDate = 'Please select offered date.';
+  }
+
+  if (!formData.dateOfJoining) {
+    errors.dateOfJoining = 'Please select date of joining.';
+  }
   if (!formData.dateOfJoining) {
     errors.dateOfJoining = 'Please select date of joining.';
   }

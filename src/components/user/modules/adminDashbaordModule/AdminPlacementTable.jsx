@@ -401,7 +401,7 @@ const AdminPlacementTable = () => {
         <div className=" w-1/2 flex justify-end gap-2">
         <div>
         <button
-                className=" bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+                className=" bg-[#0A3A2A] hover:bg-[#4D9981] text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
 
         onClick={handleExportToExcel}>Export to Excel</button>
       </div>
@@ -572,7 +572,7 @@ const AdminPlacementTable = () => {
                         )}
 
                         {error[field] && (
-                          <p className="text-red-500 text-xs lowercase">{`*${error[field]}`}</p>
+                          <p className="text-green-900 text-xs lowercase">{`*${error[field]}`}</p>
                         )}
                       </td>
                     ))}

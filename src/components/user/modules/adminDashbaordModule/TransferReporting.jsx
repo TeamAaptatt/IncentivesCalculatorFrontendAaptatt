@@ -156,7 +156,7 @@ const TransferReporting = ({ user, onSubmission }) => {
           </label>
                   <button
             type="submit"
-            className="bg-pink-600 text-white py-2 px-4 rounded hover:bg-pink-700 ml-4"          >
+            className="bg-[#0A3A2A] text-white py-2 px-4 rounded hover:bg-[#4D9981] ml-4"          >
             Submit
           </button>
         </form>

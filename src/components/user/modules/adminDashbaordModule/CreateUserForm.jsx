@@ -435,11 +435,11 @@ const CreateUserForm = ({ handleClose }) => {
                           </div>
           </div>
           <div className="flex justify-end ">
-            <button type="submit" className="bg-pink-600 text-white py-2 px-4 rounded hover:bg-pink-700">
+            <button type="submit" className="bg-[#0A3A2A] text-white py-2 px-4 rounded hover:bg-pink-700">
               Create User
             </button>
 
-            <button type="button" className="bg-pink-600 text-white py-2 px-4 rounded hover:bg-pink-700 ml-4" onClick={handleClose}>
+            <button type="button" className="bg-[#0A3A2A] text-white py-2 px-4 rounded hover:bg-pink-700 ml-4" onClick={handleClose}>
               Cancel
             </button>
           </div>

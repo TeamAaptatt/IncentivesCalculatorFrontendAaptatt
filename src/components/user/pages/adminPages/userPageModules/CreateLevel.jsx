@@ -68,7 +68,7 @@ const CreateLevelRange = ({cid, getAllLevelRange}) => {
     <div className=" mt-6">
       <div>
         <button onClick={() => setToggle((prev) => !prev)}
-                  className="hover:bg-pink-700 bg-pink-600 outline outline-1 rounded-md w-auto text-white font-semibold p-2">
+                  className="hover:bg-[#4D9981] bg-[#0A3A2A] outline outline-1 rounded-md w-auto text-white font-semibold p-2">
            {!toggle? 'Promote Level':"Close"}
         </button>
         </div>  
@@ -110,7 +110,7 @@ const CreateLevelRange = ({cid, getAllLevelRange}) => {
                    className="mt-1 p-2 border border-gray-300 rounded-md w-full"
                  /> */}
                </div>
-               <button type="submit" className="bg-pink-600 text-white py-2 px-4 rounded-md">Create</button>
+               <button type="submit" className="bg-[#0A3A2A] text-white py-2 px-4 rounded-md">Create</button>
              </form>
         )}
    

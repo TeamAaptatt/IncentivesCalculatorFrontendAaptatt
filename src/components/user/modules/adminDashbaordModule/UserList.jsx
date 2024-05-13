@@ -46,7 +46,7 @@ const toggleForm = () => {
 
       <div className=" w-1/2 justify-end flex ">
       <button
-            className={` ${toggle?'hidden':''}bg-pink-600 hover:bg-pink-700 my-2  text-white font-bold py-2 px-2 rounded`}
+            className={` ${toggle?'hidden':''}bg-[#0A3A2A] hover:bg-[#4D9981] my-2  text-white font-bold py-2 px-2 rounded`}
             onClick={() => setToggle((state) => !state)}>{toggle === true ? 'Close' : 'Create New User'}
         </button>
         {toggle && <CreateUserForm handleClose={toggleForm} />}        

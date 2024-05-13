@@ -455,8 +455,8 @@ const UserPage = ({ color }) => {
                 className={
                   "text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
                   (openTab === 1
-                    ? "text-white bg-pink-600 "
-                    : "text-pink-600 bg-white")
+                    ? "text-white bg-[#0A3A2A]"
+                    : "text-[#0A3A2A] bg-white")
                 }
                 onClick={e => {
                   e.preventDefault();
@@ -474,8 +474,8 @@ const UserPage = ({ color }) => {
                 className={
                   "text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
                   (openTab === 2
-                    ? "text-white bg-pink-600"
-                    : "text-pink-600 bg-white")
+                    ? "text-white bg-[#0A3A2A]"
+                    : "text-[#0A3A2A] bg-white")
                 }
                 onClick={e => {
                   e.preventDefault();
@@ -493,8 +493,8 @@ const UserPage = ({ color }) => {
                 className={
                   "text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
                   (openTab === 3
-                    ? "text-white bg-pink-600"
-                    : "text-pink-600 bg-white")
+                    ? "text-white bg-[#0A3A2A]"
+                    : "text-[#0A3A2A] bg-white")
                 }
                 onClick={e => {
                   e.preventDefault();
@@ -512,8 +512,8 @@ const UserPage = ({ color }) => {
                 className={
                   "text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
                   (openTab === 4
-                    ? "text-white bg-pink-600"
-                    : "text-pink-600 bg-white")
+                    ? "text-white bg-[#0A3A2A]"
+                    : "text-[#0A3A2A] bg-white")
                 }
                 onClick={e => {
                   e.preventDefault();

@@ -16,7 +16,6 @@ const UserTypeCheck = ({ admin, user }) => {
       const checkUserType = () => {
           try {
             const decodedToken = JSON.parse(atob(token?.split('.')[1]));
-            console.log('d',decodedToken);
             const type = decodedToken?.type || 'user';
             setUserType(type);
           } catch (error) {
@@ -49,7 +48,7 @@ const UserTypeCheck = ({ admin, user }) => {
         } catch (error) {
           console.error('Error refreshing token:', error);
         }
-      }, 300000 );  
+      },40 * 60 * 1000 );  
     
       return () => {
         clearInterval(intervalId);

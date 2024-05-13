@@ -149,7 +149,7 @@ const EmplyeeStatus = ({ cid }) => {
               />
               <span
                 className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 rounded-full transition-colors duration-300 ease-in-out ${
-                  !statusData?.status === "Left" ? " bg-pink-600" : "bg-gray-300"
+                  !statusData?.status === "Left" ? " bg-[#0A3A2A]" : "bg-gray-300"
                 }`}
               >
                 <span
@@ -201,7 +201,7 @@ const EmplyeeStatus = ({ cid }) => {
               {error && <p className="text-red-500 text-sm mx-6">{error}</p>}
 
               <button
-                className="hover:bg-pink-700 bg-pink-600 bottom-0 right-0 absolute  outline outline-1 rounded-md w-auto text-white font-semibold p-2 m-2 "
+                className="hover:bg-[#4D9981] bg-[#0A3A2A] bottom-0 right-0 absolute  outline outline-1 rounded-md w-auto text-white font-semibold p-2 m-2 "
                 onClick={() => handleUpdate()}
               >
                 Terminate
