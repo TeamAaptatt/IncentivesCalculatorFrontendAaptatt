@@ -45,10 +45,10 @@ const toggleForm = () => {
       </div>
 
       <div className=" w-1/2 justify-end flex ">
-      <button
+      {/* <button
             className={` ${toggle?'hidden':''}bg-[#0A3A2A] hover:bg-[#4D9981] my-2  text-white font-bold py-2 px-2 rounded`}
             onClick={() => setToggle((state) => !state)}>{toggle === true ? 'Close' : 'Create New User'}
-        </button>
+        </button> */}
         {toggle && <CreateUserForm handleClose={toggleForm} />}        
       </div>      
       <div className="flex flex-wrap w-full">
