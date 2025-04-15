@@ -48,7 +48,6 @@ const SignIn = () => {
         dispatch(setUser({ token }));
       } catch (error) {
         console.error('Error refreshing token:', error.message);
-        // Handle token refresh errors here, e.g., clearInterval and prompt re-login
       }
     }, 500000000000); // Refresh every 5 minutes
 
@@ -68,8 +67,17 @@ const SignIn = () => {
       setConfirmation('Login successful!');
       getUserDetails();
     } catch (error) {
-      setError(error.message);
-    }
+      let errorMessage = 'An error occurred while signing in.';
+      if (error.code === 'auth/invalid-email') {
+        errorMessage = 'The email address is not valid.';
+      } else if (error.code === 'auth/user-disabled') {
+        errorMessage = 'This user has been disabled.';
+      } else if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No user found with this email address.';
+      } else if (error.code === 'auth/invalid-credential') {
+        errorMessage = 'Incorrect Email or password';
+      }
+      setError(errorMessage);    }
   };
   return (
     <div className="flex flex-col items-center justify-center h-screen">
@@ -90,7 +98,9 @@ const SignIn = () => {
                 className="mt-1 p-2 w-full border rounded-md"
                 placeholder="Enter your email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {setEmail(e.target.value)
+                                 setError('')
+                }}
               />
             </div>
             <div className="mb-4">
@@ -100,7 +110,9 @@ const SignIn = () => {
                 className="mt-1 p-2 w-full border rounded-md"
                 placeholder="Enter your password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setError('')
+                  setPassword(e.target.value)}}
               />
             </div>
             {error && <p className="text-red-500 mb-4">{error}</p>}

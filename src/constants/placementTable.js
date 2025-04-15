@@ -1,0 +1,43 @@
+export const dataFields = [
+    "S.No",
+    "Status",
+    "Candidate",
+    "Client",
+    "Offered Position",
+    "Offered Date",
+    "Date Of Joining",
+    "Candidate Owner",
+    "Account Manager",
+    "Account Head",
+    "P&L Head",
+    "Resume Source",
+    "Billable Salary",
+    "Commercial",
+    "Fee",
+    "Send Off",
+    "Security Period",
+    "Payment Status",
+    "Update",
+  ];
+ export const fields = [
+    "status",
+    "candidate",
+    "client",
+    "offeredPosition",
+    "offeredDate",
+    "dateOfJoining",
+    "cnadidateOwner",
+    "accountManager",
+    "accountHead",
+    "pandLhead",
+    "resumeSource",
+    "billableSalary",
+    "commercial",
+    "fee",
+    "sendOff",
+    "securityPeriod",
+    "paymentStaus",
+  ];
+  export const securityPeriodOptions = ["On-Going", "Completed", "Send-Off"]; 
+  export const paymentStatusOptions = ["Pending", "Received", "Adjusted", "Returning", "Compromised"]; 
+  export const statusOptions = ["Joined","Offered", "Send-Off", "Back Out" ];

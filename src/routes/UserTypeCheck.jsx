@@ -3,16 +3,19 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { auth } from '../utils/firebase/firebase';
 import { setUser } from '../utils/redux/authSlice/authSlice';
+import useUserDetails from '../components/Auth/useUserDetails';
 
 const UserTypeCheck = ({ admin, user }) => {
     const [userType, setUserType] = useState(null);
     const token = useSelector((store)=>store.auth?.token?.token) || '';
     const dispatch =useDispatch();
+    const { getUserDetails } = useUserDetails();
+
     useEffect(() => {
+      
       const checkUserType = () => {
           try {
             const decodedToken = JSON.parse(atob(token?.split('.')[1]));
-            console.log('d',decodedToken);
             const type = decodedToken?.type || 'user';
             setUserType(type);
           } catch (error) {
@@ -40,11 +43,12 @@ const UserTypeCheck = ({ admin, user }) => {
           if (user) {
             const token= await getIdToken(user,  true);
                       dispatch(setUser({token }));
+                      getUserDetails();
           }
         } catch (error) {
           console.error('Error refreshing token:', error);
         }
-      }, 2000000 );  
+      },40 * 60 * 1000 );  
     
       return () => {
         clearInterval(intervalId);
@@ -55,17 +59,32 @@ const UserTypeCheck = ({ admin, user }) => {
     }, [token, dispatch]); 
   
     console.log(userType);
+    useEffect(()=>{
+         setTokenOnFirstRender();
+    }, [])
+
+    const setTokenOnFirstRender = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const token= await getIdToken(user,  true);
+                    dispatch(setUser({token }));
+        }
+      } catch (error) {
+        console.error('Error refreshing token:', error);
+      }
+    }
   //   useEffect(()=>{
   //     const user = JSON.parse(localStorage.getItem('User'))
   //       getToken(user)
   // }, [])
 
-  const getToken = async (user) =>{
-    if (user) {
-      const token= await getIdToken(user,  true);
-                dispatch(setUser({token }));
-    }
-  }
+  // const getToken = async (user) =>{
+  //   if (user) {
+  //     const token= await getIdToken(user,  true);
+  //               dispatch(setUser({token }));
+  //   }
+  // }
   
     return (
       <>

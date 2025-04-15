@@ -3,6 +3,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "../../constants/api";
 import { setUserData } from "../../utils/redux/userSlice";
+import { setLoading } from "../../utils/redux/loadSlice/loadSlice";
 
 const useUserDetails = () => {
   const token = useSelector((state) => state.auth.token.token)||'';
@@ -15,6 +16,7 @@ const useUserDetails = () => {
     }
 
     try {
+      dispatch(setLoading(true))
       const response = await axios.get(BASE_URL + "user-me", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -33,6 +35,8 @@ const useUserDetails = () => {
       }
     } catch (err) {
       console.log(err);
+    } finally{
+      dispatch(setLoading(false));
     }
   };
 

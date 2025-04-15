@@ -4,31 +4,55 @@ import { BASE_URL } from '../../constants/api';
 import axios from 'axios';
 
 const useUserManagement = () => {
-  const [users, setUsers] = useState(null);
+  const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const token = useSelector((state) => state.auth.token.token);
+  const [usersAboveFour, setUsersAboveFour] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const token = useSelector(state => state.auth.token.token);
 
   useEffect(() => {
     const getAllUsers = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get(BASE_URL + "/get-users", {
+        const response = await axios.get(`${BASE_URL}/get-users`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         const data = response.data;
         setUsers(data);
-        setFilteredUsers(data.filter(user => user.level?.level !== 'Level 1' && user.level?.level !== 'Level 2'));
-        console.log("Users:", data);
+        const filteredData = data?.map(user => {
+          const levelRangesCopy = [...user?.levelRanges];
+          const lastElementInLevel = levelRangesCopy.pop();
+          return {
+            ...user,
+            levelRanges: levelRangesCopy,
+          };
+        });
+        console.log(filteredData);
+        setFilteredUsers(users.filter(user => {
+          const lastLevel = user?.levelRanges[user.levelRanges.length - 1]?.level?.level;
+          return (lastLevel !== 'Level 1') && (lastLevel !== 'Level 2');
+        }));
+        setUsersAboveFour(users?.filter(user => {
+          const lastLevel = user?.levelRanges[user?.levelRanges?.length - 1]?.level?.level;
+          console.log(lastLevel);
+          return (lastLevel !== 'Level 1') && (lastLevel !== 'Level 2') && (lastLevel !== 'Level 3');
+        }));
+        
+       
       } catch (err) {
-        console.log(err);
+        setError(err);
+        console.error(err);
       }
+      setLoading(false);
     };
 
     getAllUsers();
   }, [token]);
 
-  return { users, filteredUsers };
+  return { users, filteredUsers, usersAboveFour, loading, error };
 };
 
 export default useUserManagement;

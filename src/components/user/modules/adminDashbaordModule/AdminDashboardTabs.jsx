@@ -14,17 +14,13 @@ import AddPlacementButton from "./AddPlacementButton";
 const AdminDashboardTabs = ({ color }) => {
   const [openTab, setOpenTab] = React.useState(1);
   const [usertoggle, setUSerToggle] = useState(false);
-const [toggle, setToggle] = useState(false);
-const toggleForm = () => {
-    setToggle((prevState) => !prevState);
-  };
 
   return (
     <>
       <div className="flex flex-wrap">
         <div className="w-full">
           <ul
-            className="flex mb-0 list-none flex-wrap pt-3 pb-4 flex-row"
+            className=" flex list-none flex-wrap  pb-4 flex-row"
             role="tablist"
           >
             <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
@@ -32,8 +28,8 @@ const toggleForm = () => {
                 className={
                   "text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
                   (openTab === 1
-                    ? "text-white bg-pink-600 "
-                    : "text-pink-600 bg-white")
+                    ? "text-white bg-[#0A3A2A] "
+                    : "text-[#0A3A2A] bg-white")
                 }
                 onClick={e => {
                   e.preventDefault();
@@ -51,8 +47,8 @@ const toggleForm = () => {
                 className={
                   "text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
                   (openTab === 2
-                    ? "text-white bg-pink-600"
-                    : "text-pink-600 bg-white")
+                    ? "text-white bg-[#0A3A2A]"
+                    : "text--[#0A3A2A] bg-white")
                 }
                 onClick={e => {
                   e.preventDefault();
@@ -70,8 +66,8 @@ const toggleForm = () => {
                 className={
                   "text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
                   (openTab === 3
-                    ? "text-white bg-pink-600"
-                    : "text-pink-600 bg-white")
+                    ? "text-white bg-[#0A3A2A]"
+                    : "text-[#0A3A2A] bg-white")
                 }
                 onClick={e => {
                   e.preventDefault();
@@ -89,8 +85,8 @@ const toggleForm = () => {
                 className={
                   "text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
                   (openTab === 4
-                    ? "text-white bg-pink-600"
-                    : "text-pink-600 bg-white")
+                    ? "text-white bg-[#0A3A2A]"
+                    : "text-[#0A3A2A] bg-white")
                 }
                 onClick={e => {
                   e.preventDefault();
@@ -105,12 +101,12 @@ const toggleForm = () => {
             </li>
           </ul>
           <div className="relative flex flex-col  w-[90vw] break-words bg-white mb-6 shadow-lg rounded">
-            <div className="px-4 py-5 flex-auto">
+            <div className="px-4  flex-auto">
               <div className="tab-content tab-space relative">
-                <div className={openTab === 1 ? "block" : "hidden"} id="link1">
-                  <div className=" flex w-full  justify-end">
+                <div className={openTab === 1 ? "block " : "hidden"} id="link1">
+                  {/* <div className=" flex w-full  justify-end">
                   <AddPlacementButton/>
-                  </div>
+                  </div> */}
                   <AdminPlacementTable/>
                   <div className="absolute bottom-0 right-0">
                      {/* <button className=" h-10 w-10">
@@ -125,9 +121,7 @@ const toggleForm = () => {
                   <IncentiveCalculator/>                </div>
               </div>
               <div className={openTab === 4 ? "block" : "hidden"} id="link4">
-              <button className="bg-black hover:bg-blue-400 translate-x-[70rem] text-white px-4 py-2 rounded-md w-44" onClick={() => setToggle((state) => !state)}>{toggle === true ? 'Close' : 'Create User'}
-        </button>
-        {toggle && <CreateUserForm handleClose={toggleForm} />}             
+     
         
          <UserList />
          </div>    
