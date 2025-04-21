@@ -163,6 +163,7 @@ const AddPlacementButton = ({ getAllPlacements }) => {
   return (
     <div className=" z-20">
       <button
+        onClick={() => setIsModalOpen(true)}
         className=" bg-[#0A3A2A] hover:bg-[#4D9981] text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
       >
         Add Placement

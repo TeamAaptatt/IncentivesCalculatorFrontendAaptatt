@@ -336,6 +336,30 @@ const OwnerShipTable = () => {
   const handleDateRangeChange = (event) => {
     setSelectedDateRange(event.target.value);
   };
+  const handleExportToExcel = () => {
+    const data = reportings.map(reporting => ({
+      "Employee Status": reporting.user.status,
+      "Employee Name": reporting.user.name,
+      "Level Of Job": reporting.user.levelRanges?.level || "", 
+      "Designation": reporting.user.designation?.name || "", 
+      "Assigned Role Category": reporting.user.assignedRole?.name || "", 
+      "Reporting To": `${reporting.reportingTo?.name} (${reporting.reportingTo?.cid})` || "", 
+      "Start Date": reporting.startDate ? new Date(reporting.startDate).toLocaleDateString("en-US") : "",
+      "End Date": reporting.endDate ? new Date(reporting.endDate).toLocaleDateString("en-US") : "",
+      "Skip Level Manager": reporting.user.skip?.name || "", 
+      "Fixed Yearly Salary": reporting.user.salary?.amount || "", 
+    }));
+  
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Ownership Data");
+  
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const excelBlob = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    });
+    saveAs(excelBlob, "ownership_data.xlsx");
+  };
   
   
   return (
@@ -374,6 +398,10 @@ const OwnerShipTable = () => {
 
         </div>
         <div className=" w-1/2 flex justify-end gap-2">
+        <button
+            className="bg-[#0A3A2A] hover:bg-[#4D9981] my-2  text-white font-bold py-2 px-2 rounded"
+
+        onClick={handleExportToExcel}>Export to Excel</button>
 
           <button
             className="bg-[#0A3A2A] hover:bg-[#4D9981] my-2  text-white font-bold py-2 px-2 rounded"

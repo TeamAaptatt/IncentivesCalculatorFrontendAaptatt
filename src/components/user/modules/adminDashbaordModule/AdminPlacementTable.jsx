@@ -287,7 +287,73 @@ const AdminPlacementTable = () => {
   const handleDateRangeChange = (event) => {
     setSelectedDateRange(event.target.value);
   };
- 
+  const handleExportToExcel = () => {
+    // Define all fields
+    const allFields = [
+        "Status",
+        "Candidate",
+        "Client",
+        "Offered Position",
+        "Date of Joining",
+        "Candidate Owner",
+        "Account Manager",
+        "Account Head",
+        "P&L Head",
+        "Resume Source",
+        "Billable Salary",
+        "Commercial Fee",
+        "Fee",
+        "Send Off",
+        "Security Period",
+        "Payment Status",
+    ];
+
+    const fieldMap = {
+        "Status": "status",
+        "Candidate": "candidate",
+        "Client": "client",
+        "Offered Position": "offeredPosition",
+        "Date of Joining": "dateOfJoining",
+        "Candidate Owner": "cnadidateOwner",
+        "Account Manager": "accountManager",
+        "Account Head": "accountHead",
+        "P&L Head": "pandLhead",
+        "Resume Source": "resumeSource",
+        "Billable Salary": "billableSalary",
+        "Commercial Fee": "commercialFee",
+        "Fee": "fee",
+        "Send Off": "sendOff",
+        "Security Period": "securityPeriod",
+        "Payment Status": "paymentStaus",
+    };
+
+    const data = filteredPlacements.map(placement => {
+        const rowData = {};
+        allFields.forEach(field => {
+            const dataKey = fieldMap[field];
+            if (dataKey) {
+                if (dataKey === "dateOfJoining") {
+                    rowData[field] = new Date(placement[dataKey]).toLocaleDateString("en-US");
+                } else if (dataKey === "accountManager" || dataKey === "cnadidateOwner" || dataKey === "pandLhead" || dataKey === "accountHead") {
+                    rowData[field] = `${placement[dataKey]?.name} (${placement[dataKey]?.cid})`;
+                } else {
+                    rowData[field] = placement[dataKey];
+                }
+            }
+        });
+        return rowData;
+    });
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Placement Data");
+
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const excelBlob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    });
+    saveAs(excelBlob, "placement_data.xlsx");
+};
 
   return (
     <>
@@ -334,6 +400,10 @@ const AdminPlacementTable = () => {
         </div>
         <div className=" w-1/2 flex justify-end gap-2">
         <div>
+        <button
+                className=" bg-[#0A3A2A] hover:bg-[#4D9981] text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+
+        onClick={handleExportToExcel}>Export to Excel</button>
       </div>
           <AddPlacementButton getAllPlacements={getAllPlacements} />
         </div>
